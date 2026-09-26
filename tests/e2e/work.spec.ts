@@ -43,6 +43,23 @@ test('stat values stay on one line inside their cells', async ({ page }) => {
   }
 });
 
+test('case studies fit the screen, with the stats in tidy columns', async ({ page, isMobile }) => {
+  for (const c of CASES) {
+    await page.goto(`/work/${c.slug}`);
+    // Only the diagram may scroll sideways, inside its own box; the page itself never does.
+    const width = await page.evaluate(() => ({
+      content: document.documentElement.scrollWidth,
+      screen: document.documentElement.clientWidth,
+    }));
+    expect(width.content, c.slug).toBeLessThanOrEqual(width.screen);
+    await expect(page.getByRole('button', { name: /Switch to/ })).toBeInViewport();
+
+    // On a phone the stats sit in two columns, so the first and third values line up on the left.
+    const lefts = await page.locator('.stats b').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left));
+    if (isMobile) expect(lefts[2], c.slug).toBeCloseTo(lefts[0], 0);
+  }
+});
+
 test('case study 01 links to the playground', async ({ page }) => {
   await page.goto('/work/auto-retry-framework');
   await expect(page.getByRole('link', { name: /See it running/ })).toHaveAttribute('href', '/#play');
