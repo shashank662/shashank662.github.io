@@ -2,19 +2,18 @@ import { LocalAnswerer } from '../lib/ask/answerer';
 import { fillDurations } from '../lib/ask/fill';
 import type { AskEntry } from '../lib/ask/types';
 
-/** Loads the answers (once) and returns a bot that writes into the panel's log. */
+/**
+ * Loads the answers and returns a bot that writes into the panel's log. Rejects if the answers can't load
+ * (offline or blocked), so the panel can say so and try again, rather than reply "I don't know" to everything.
+ */
 export async function createBot(panel: HTMLElement, close: () => void) {
   const log = panel.querySelector<HTMLElement>('[data-ask-log]');
   const fallback = panel.querySelector<HTMLTemplateElement>('[data-ask-fallback]');
   if (!log || !fallback) throw new Error('Ask panel markup is incomplete');
 
-  let answerer: LocalAnswerer | null = null;
-  try {
-    const response = await fetch('/ask-index.json');
-    answerer = new LocalAnswerer((await response.json()) as AskEntry[]);
-  } catch {
-    // Offline or blocked: every question gets the "ask Shashank directly" reply.
-  }
+  const response = await fetch('/ask-index.json');
+  if (!response.ok) throw new Error(`The answers failed to load (HTTP ${response.status})`);
+  const answerer = new LocalAnswerer((await response.json()) as AskEntry[]);
 
   const message = (who: 'you' | 'bot') => {
     const el = document.createElement('div');
@@ -63,7 +62,7 @@ export async function createBot(panel: HTMLElement, close: () => void) {
   return {
     ask(question: string) {
       message('you').textContent = question;
-      const result = answerer?.answer(question) ?? null;
+      const result = answerer.answer(question);
       if (result) reply(result.entry, result.alternatives);
       else message('bot').append(fallback.content.cloneNode(true));
       log.scrollTop = log.scrollHeight;
