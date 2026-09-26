@@ -1,0 +1,30 @@
+{
+  "name": "shashank662-portfolio",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "astro": "astro"
+  },
+  "allowScripts": {
+    "esbuild": true
+  },
+  "dependencies": {
+    "astro": "^7.3.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.63.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
+  }
+}
