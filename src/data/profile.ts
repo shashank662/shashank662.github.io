@@ -7,6 +7,7 @@ export interface Span {
 }
 
 export interface Fact {
+  /** An empty key adds a second line to the term above it, e.g. the internship under "engati". */
   key: string;
   value: string;
   /** When set, the duration is shown after the value, e.g. "(2y 2m)". */
