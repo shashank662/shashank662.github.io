@@ -1,0 +1,61 @@
+---
+import { NODE_HEIGHT, type DiagramSpec, type EdgeKind } from '../../diagrams/types';
+
+interface Props {
+  /** Keeps the arrow-marker ids unique on the page. */
+  id: string;
+  spec: DiagramSpec;
+}
+
+const { id, spec } = Astro.props;
+const kinds: EdgeKind[] = ['plain', 'accent', 'warn'];
+const marker = (kind: EdgeKind) => `dg-${id}-${kind}`;
+---
+<div class="scroller" tabindex="0" role="region" aria-label="Diagram (scrolls sideways on small screens)">
+  <svg class="dg" viewBox={`0 0 1000 ${spec.height}`} role="img" aria-label={spec.title}>
+    <defs>
+      {kinds.map((kind) => (
+        <marker id={marker(kind)} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class={`ah ${kind}`} d="M0,0 L10,5 L0,10 z" />
+        </marker>
+      ))}
+    </defs>
+    {spec.edges.map((edge) => <path class={`e ${edge.kind}`} d={edge.d} marker-end={`url(#${marker(edge.kind)})`} />)}
+    {spec.nodes.map((node) => (
+      <g class:list={['n', { accent: node.accent }]}>
+        <rect x={node.x} y={node.y} width={node.w} height={NODE_HEIGHT} rx="4" />
+        <text x={node.x + 14} y={node.y + 24}>{node.title}</text>
+        <text class="sub" x={node.x + 14} y={node.y + 42}>{node.sub}</text>
+      </g>
+    ))}
+    {spec.labels.map((label) => (
+      <text class="lab" x={label.x} y={label.y} text-anchor={label.anchor ?? 'middle'}>{label.text}</text>
+    ))}
+    {spec.steps.map((step) => (
+      <g class="step">
+        <circle cx={step.x} cy={step.y} r="11" />
+        <text x={step.x} y={step.y + 4}>{step.n}</text>
+      </g>
+    ))}
+  </svg>
+</div>
+
+<style>
+  /* Keeps a readable 720px minimum: on narrow screens the diagram scrolls sideways instead of shrinking. */
+  .scroller { overflow-x: auto; margin-bottom: 30px; padding: 4px 2px 8px; }
+  /* Boxes on the canvas edge (x = 0 or 1000) would lose half their border to clipping. */
+  .dg { display: block; width: 100%; height: auto; min-width: 720px; overflow: visible; }
+  .n rect { fill: var(--bg); stroke: var(--ink); stroke-width: 1.2; }
+  .n.accent rect { stroke: var(--accent); stroke-width: 1.6; }
+  .n text { font: 500 13px var(--font-mono); fill: var(--ink); }
+  .n .sub { font-size: 11px; font-weight: 400; fill: var(--muted); }
+  .e { fill: none; stroke: var(--ink); stroke-width: 1.2; opacity: 0.6; }
+  .e.accent { stroke: var(--accent); stroke-dasharray: 5 5; opacity: 1; }
+  .e.warn { stroke: var(--warn); stroke-dasharray: 5 5; opacity: 1; }
+  .ah { fill: var(--ink); }
+  .ah.accent { fill: var(--accent); }
+  .ah.warn { fill: var(--warn); }
+  .lab { font: 400 11px var(--font-mono); fill: var(--muted); }
+  .step circle { fill: var(--accent); }
+  .step text { font: 600 11px var(--font-sans); fill: var(--on-accent); text-anchor: middle; }
+</style>

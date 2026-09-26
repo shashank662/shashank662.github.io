@@ -10,11 +10,12 @@ test('every home section renders and scrolling through raises no errors', async 
   page.on('pageerror', (err) => errors.push(err.message));
 
   await page.goto('/');
-  for (const id of ['about', 'exp', 'incidents', 'contact']) {
+  for (const id of ['about', 'exp', 'work', 'incidents', 'contact']) {
     await page.locator(`#${id}`).scrollIntoViewIfNeeded();
     await expect(page.locator(`#${id}`)).toBeVisible();
   }
   await expect(page.getByRole('heading', { name: /My career, traced\./ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Things I've shipped\./ })).toBeVisible();
   await expect(page.getByRole('heading', { name: /War stories, resolved\./ })).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -115,5 +116,10 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('#about .w').first()).toHaveCSS('opacity', '1');
     await expect(page.locator('#exp .bar').first()).toHaveCSS('transform', 'none');
     await expect(page.locator('#incidents .bar i').first()).toHaveCSS('transform', 'none');
+  });
+
+  test('the career trace details are open', async ({ page }) => {
+    await page.goto('/#exp');
+    await expect(page.locator('#span-5')).toBeVisible();
   });
 });

@@ -1,0 +1,125 @@
+---
+import SectionHead from './SectionHead.astro';
+import { caseNumber, getCases } from '../../data/work';
+import { profile } from '../../data/profile';
+import { emphasize } from '../../lib/text';
+
+const cases = await getCases();
+const { title, brief } = profile.work;
+// Shared with the case study's title, so the title glides between the two pages.
+const glide = (slug: string) => `view-transition-name: work-${slug}; view-transition-class: work-title`;
+---
+<section class="section wrap" id="work">
+  <SectionHead n="03" label="Selected work · Engati" meta={`${cases.length + 1} systems · ${cases.length} case studies`} />
+  <h2 class="h2 display" set:html={emphasize(title)} />
+  <div class="rows">
+    {cases.map(({ id, data }) => (
+      <a
+        class="row"
+        href={`/work/${id}`}
+        data-card-tag={data.row.cardTag}
+        data-card-go="Case study ↗"
+        data-card-metric={data.row.cardMetric}
+        data-card-label={data.row.cardLabel}
+      >
+        <span class="n mono">{caseNumber(data.order)}</span>
+        <span class="t display" style={glide(id)}>{data.title}</span>
+        <span class="d">{data.row.description}</span>
+        <span class="s mono">{data.row.stack}</span>
+        <span class="st mono">{data.row.metric}<small>{data.row.metricCaption}</small></span>
+      </a>
+    ))}
+    <button
+      type="button"
+      class="row brief"
+      data-disclosure
+      aria-controls="brief-more"
+      data-card-tag={brief.cardTag}
+      data-card-go="Click to expand"
+      data-card-metric={brief.cardMetric}
+      data-card-label={brief.cardLabel}
+    >
+      <span class="n mono">{caseNumber(cases.length + 1)}</span>
+      <span class="t display">{brief.title}</span>
+      <span class="d">{brief.description}</span>
+      <span class="s mono">{brief.stack}</span>
+      <span class="st mono">{brief.metric}<small>{brief.metricCaption}</small></span>
+    </button>
+    <div class="more" id="brief-more"><div><p>{brief.more}</p></div></div>
+  </div>
+
+  <div class="float" data-work-card aria-hidden="true">
+    <div class="card">
+      <p class="card-top mono"><span data-card="tag"></span><span data-card="go"></span></p>
+      <p class="card-metric display" data-card="metric"></p>
+      <p class="card-label" data-card="label"></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/disclosure';
+  import '../../scripts/work-card';
+</script>
+
+<style>
+  .rows { margin-top: 40px; border-top: 1px solid var(--line); }
+  .row {
+    position: relative; display: grid; grid-template-columns: 56px 1.3fr 1.4fr 1fr 110px; gap: 20px; align-items: center;
+    width: 100%; padding: 28px 14px; border-bottom: 1px solid var(--line); text-align: left;
+    transition: background 0.35s;
+  }
+  .n { font-size: 13px; color: var(--muted); }
+  .t { font-size: clamp(30px, 4.2vw, 64px); line-height: 1; transition: transform 0.5s var(--ease-out), color 0.3s; }
+  .d { font-size: 15px; line-height: 1.5; color: color-mix(in srgb, var(--ink) 82%, var(--bg)); }
+  .s { font-size: 12px; line-height: 1.5; color: var(--muted); }
+  .st { font-size: 13px; font-weight: 500; text-align: right; color: var(--accent); }
+  .st small { display: block; margin-top: 3px; font-size: 10.5px; font-weight: 400; color: var(--muted); }
+
+  /* Hover is for a mouse only (a tap would leave it stuck); keyboard focus gets the same look. */
+  @media (hover: hover) {
+    .row:hover { background: var(--line2); }
+    .row:hover .t { transform: translateX(10px); color: var(--accent); }
+  }
+  .row:focus-visible { background: var(--line2); }
+  .row:focus-visible .t, .brief[aria-expanded='true'] .t { color: var(--accent); }
+
+  /* The sandbox brief opens in place. It is only collapsed once JavaScript runs, so it is readable without it. */
+  .more { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.5s var(--ease-out), visibility 0s 0.5s; }
+  .more > div { min-height: 0; overflow: hidden; }
+  .more p {
+    max-width: 980px; padding: 4px 14px 26px 90px; border-bottom: 1px solid var(--line);
+    font-size: 17px; line-height: 1.6; color: var(--muted);
+  }
+  :global(.js) .more { grid-template-rows: 0fr; visibility: hidden; }
+  :global(.js) .more:global(.open) { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+
+  /* The hover card: fixed to the viewport and moved by work-card.ts. */
+  .float { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; }
+  .card {
+    width: 230px; margin: 26px 0 0 26px; padding: 13px 16px 15px; border-radius: 10px;
+    background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-top: 3px solid var(--accent);
+    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.5);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.25s, transform 0.4s var(--ease-out), margin 0.3s;
+  }
+  .float:global(.flip) .card { margin-left: -256px; }
+  .float:global(.on) .card { opacity: 1; transform: none; }
+  .card-top {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  }
+  /* A long tag may wrap, but "Case study ↗" stays in one piece. */
+  .card-top span:last-child { white-space: nowrap; }
+  .card-metric { margin-top: 10px; font-size: 36px; line-height: 1; color: var(--accent); }
+  .card-label { margin-top: 5px; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
+
+  @media (max-width: 860px) {
+    .row { grid-template-columns: 40px 1fr auto; }
+    .d, .s { display: none; }
+    .more p { padding-left: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .t, .more, .card { transition: none; }
+  }
+</style>

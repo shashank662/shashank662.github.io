@@ -28,7 +28,7 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
         const end = span.end ? toAttr(span.end) : '';
         return (
           <li class={`lvl${span.level}`} style={`--i:${i};--c:${colour[span.tone]}`}>
-            <button type="button" class="head" data-row-toggle aria-expanded="false" aria-controls={`span-${i}`}>
+            <button type="button" class="head" data-row-toggle aria-controls={`span-${i}`}>
               <span class="lbl"><span class="name">{span.name}</span><small class="mono">{span.tag}</small></span>
               <span class="track" aria-hidden="true">
                 <span class="bar" data-bar data-start={toAttr(span.start)} data-end={end} style={`--l:${pos.left};--w:${pos.width}`}></span>
@@ -84,18 +84,24 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
   .dur { font-size: 12px; color: var(--muted); }
 
   /* The row animates from 0fr to 1fr, so a detail opens to its full height however long it is.
-     While closed it is also hidden from screen readers, matching aria-expanded. */
+     Details are only collapsed when JavaScript runs (and are then hidden from screen readers too,
+     matching aria-expanded); without it they are simply all open. */
   .more {
-    display: grid; grid-template-rows: 0fr; visibility: hidden;
+    display: grid; grid-template-rows: 1fr; padding-bottom: 14px;
     font-size: 15px; line-height: 1.6; color: var(--muted);
     transition: grid-template-rows 0.5s var(--ease-out), padding 0.5s, visibility 0s 0.5s;
   }
   .more > p { min-height: 0; overflow: hidden; }
-  li:global(.open) .more { grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s; }
+  :global(.js) .more { grid-template-rows: 0fr; padding-bottom: 0; visibility: hidden; }
+  :global(.js) li:global(.open) .more {
+    grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s;
+  }
   /* Hover opens rows for a mouse only: after a tap, a touch screen keeps :hover and the row could not close. */
   @media (hover: hover) {
     li:hover .lbl { color: var(--accent); }
-    li:hover .more { grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s; }
+    :global(.js) li:hover .more {
+      grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s;
+    }
   }
 
   @media (max-width: 760px) {

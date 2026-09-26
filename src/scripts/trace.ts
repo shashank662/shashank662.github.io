@@ -40,8 +40,10 @@ if (trace) {
     }
   }
 
-  // Rows open on click or tap (hover also opens them, in CSS).
+  // Rows open on click or tap (hover also opens them, in CSS). The HTML leaves the details open so they
+  // read fine without JavaScript; they are collapsed under the `js` class and marked collapsed here.
   trace.querySelectorAll<HTMLButtonElement>('[data-row-toggle]').forEach((button) => {
+    button.setAttribute('aria-expanded', 'false');
     button.addEventListener('click', () => {
       const open = button.getAttribute('aria-expanded') !== 'true';
       button.setAttribute('aria-expanded', String(open));

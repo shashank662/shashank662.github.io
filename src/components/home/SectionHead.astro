@@ -13,8 +13,9 @@ const { n, label, meta } = Astro.props;
 </div>
 
 <style>
+  /* On a narrow screen the meta drops to its own line instead of both halves wrapping mid-phrase. */
   .sec-head {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px;
     padding-bottom: 14px; border-bottom: 1.5px solid var(--ink);
   }
   .meta { letter-spacing: 0.01em; text-transform: none; }
