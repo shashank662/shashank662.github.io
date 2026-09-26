@@ -64,6 +64,7 @@ export interface Profile {
   career: { axisStart: YearMonth; title: string; sub: string; spans: CareerSpan[] };
   incidents: { title: string; sub: string; items: Incident[] };
   work: { title: string; brief: WorkRow & { title: string; more: string } };
+  playground: { title: string; sub: string; canvasLabel: string };
   contact: { prompt: string; cta: string };
 }
 
@@ -179,6 +180,12 @@ export const profile: Profile = {
       cardLabel: 'people testing safely · zero production impact',
       more: 'A production-isolated sandbox built with Nginx rerouting. 40–50 people across engineering, FDE and support test there safely, with zero impact on production.',
     },
+  },
+  playground: {
+    title: 'Go on, *break* something.',
+    sub: 'My Engati auto-retry framework, running live. Triggers flow out to Meta; failed deliveries come back as webhooks. Retryable ones fetch their original payload from MongoDB by trackerId and go back out through RabbitMQ with back-off. Switch the framework off, or cause a Meta outage, and watch the failure rate.',
+    canvasLabel:
+      'Live model of the auto-retry framework. Triggers travel from the integrations through the API gateway, trigger service and messaging layer to Meta. Failed deliveries come back as webhooks; retryable ones go through MongoDB and RabbitMQ and are sent again.',
   },
   contact: {
     prompt: 'Got a role in mind?',
