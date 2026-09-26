@@ -123,6 +123,11 @@ main:focus { outline: none; }
 html.theme-wipe::view-transition-old(root),
 html.theme-wipe::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 html.theme-wipe::view-transition-new(root) { z-index: 2; }
+/* A work row's title and its case study's title share a view-transition-name, so the title glides between pages. */
+::view-transition-group(*.work-title) {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
 
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
