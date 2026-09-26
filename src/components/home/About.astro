@@ -11,8 +11,8 @@ const words = accentWords(profile.about.paragraph);
     <dl class="facts mono">
       {profile.about.facts.map((fact) => (
         <Fragment>
-          <dt>{fact.key}</dt>
-          <dd class:list={[{ ok: fact.tone === 'ok' }]}>
+          {fact.key && <dt>{fact.key}</dt>}
+          <dd class:list={[{ ok: fact.tone === 'ok', more: !fact.key }]}>
             {fact.value}
             {fact.span && (
               <Fragment>
@@ -45,6 +45,8 @@ const words = accentWords(profile.about.paragraph);
   .facts { display: grid; grid-template-columns: auto 1fr; gap: 7px 16px; margin-top: 26px; font-size: 12.5px; }
   dt { color: var(--muted); }
   .ok { color: var(--ok); }
+  /* A second description of the term above: stays in the value column. */
+  .more { grid-column: 2; }
   .nowrap { white-space: nowrap; }
   .big { font-size: clamp(28px, 3.6vw, 58px); line-height: 1.14; letter-spacing: -0.025em; font-weight: 500; }
   .w { transition: opacity 0.25s; }
