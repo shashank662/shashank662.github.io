@@ -76,7 +76,7 @@ export const profile: Profile = {
     lede: 'I build *backends* that never wake anyone up at 3 a.m.',
     badge: 'Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺',
     typedLines: [
-      'retrying ~2M third-party api calls a day',
+      '~2M api triggers a day · 50k–100k retries',
       'java · spring boot · kafka · redis · mongodb',
       'failure rate: 35% → 12%',
       'open to sde-2 roles · 2026',
