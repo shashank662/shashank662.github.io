@@ -18,3 +18,12 @@ test('each case study lives at the same address its links use', async ({ page })
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${SITE}${path}`);
   }
 });
+
+test('search engines get a sitemap and robots.txt', async ({ request }) => {
+  const robots = await (await request.get('/robots.txt')).text();
+  expect(robots).toContain(`Sitemap: ${SITE}/sitemap-index.xml`);
+  expect(await (await request.get('/sitemap-index.xml')).text()).toContain('sitemap-0.xml');
+  const urls = await (await request.get('/sitemap-0.xml')).text();
+  for (const path of PAGES) expect(urls).toContain(`<loc>${SITE}${path}</loc>`);
+  expect(urls).not.toMatch(/404|ask-index|\/og\//);
+});
