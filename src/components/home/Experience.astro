@@ -1,0 +1,112 @@
+---
+import SectionHead from './SectionHead.astro';
+import { profile } from '../../data/profile';
+import { formatDuration, monthsBetween, spanPosition, toAttr, yearTicks } from '../../lib/dates';
+import { emphasize } from '../../lib/text';
+
+const { career } = profile;
+const ticks = yearTicks(career.axisStart);
+const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent)' } as const;
+---
+<section class="section wrap" id="exp">
+  <SectionHead n="02" label="Experience" meta={`GET /career · ${career.spans.length} spans · 200 OK`} />
+  <h2 class="h2 display" set:html={emphasize(career.title)} />
+  <p class="sub">{career.sub}</p>
+
+  <div class="trace" data-trace data-in-view data-axis={toAttr(career.axisStart)}>
+    <div class="axis mono" aria-hidden="true">
+      <span>span</span>
+      <div class="ticks" data-ticks>
+        {ticks.map((t) => <span data-year style={`left:${(t.left * 100).toFixed(3)}%`}>{t.year}</span>)}
+        <span class="now" data-now style="left:100%">now</span>
+      </div>
+      <span class="r">took</span>
+    </div>
+    <ol>
+      {career.spans.map((span, i) => {
+        const pos = spanPosition(span.start, span.end, career.axisStart);
+        const end = span.end ? toAttr(span.end) : '';
+        return (
+          <li class={`lvl${span.level}`} style={`--i:${i};--c:${colour[span.tone]}`}>
+            <button type="button" class="head" data-row-toggle aria-expanded="false" aria-controls={`span-${i}`}>
+              <span class="lbl"><span class="name">{span.name}</span><small class="mono">{span.tag}</small></span>
+              <span class="track" aria-hidden="true">
+                <span class="bar" data-bar data-start={toAttr(span.start)} data-end={end} style={`--l:${pos.left};--w:${pos.width}`}></span>
+              </span>
+              <span class="dur mono" data-duration data-start={toAttr(span.start)} data-end={end}>
+                {formatDuration(monthsBetween(span.start, span.end))}
+              </span>
+            </button>
+            <div class="more" id={`span-${i}`}><p>{span.detail}</p></div>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/durations';
+  import '../../scripts/in-view';
+  import '../../scripts/trace';
+</script>
+
+<style>
+  .trace { margin-top: 44px; border-top: 1.5px solid var(--ink); }
+  .axis, .head {
+    display: grid; grid-template-columns: minmax(170px, 300px) 1fr 70px; gap: 22px; align-items: center;
+  }
+  .axis { padding: 10px 0; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); }
+  .r, .dur { text-align: right; }
+  .ticks { position: relative; height: 14px; }
+  /* :global, because trace.ts rebuilds the year labels and new elements don't carry Astro's scope attribute. */
+  .ticks :global(span) { position: absolute; top: 0; transform: translateX(-50%); }
+  .ticks :global(.now) { transform: translateX(-100%); color: var(--accent); }
+
+  li { border-bottom: 1px solid var(--line); }
+  .head { width: 100%; padding: 15px 0; text-align: left; }
+  .lbl { display: flex; align-items: baseline; gap: 10px; min-width: 0; font-size: 16px; transition: color 0.25s; }
+  .name { white-space: nowrap; }
+  .lbl small { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lvl0 .name { font-family: var(--font-mono); font-size: 13px; }
+  .lvl2 .lbl, .lvl2 .more { padding-left: 20px; }
+  li:global(.open) .lbl { color: var(--accent); }
+
+  .track { position: relative; display: block; height: 12px; background: var(--line2); }
+  .bar {
+    position: absolute; top: 0; bottom: 0; left: calc(var(--l) * 100%); width: max(calc(var(--w) * 100%), 6px);
+    background: var(--c); transform-origin: left;
+    transition: transform 1.3s var(--ease-out) calc(var(--i) * 110ms);
+  }
+  .lvl2 .bar { opacity: 0.55; }
+  :global(.js) .trace .bar { transform: scaleX(0); }
+  :global(.js) .trace:global(.in) .bar { transform: scaleX(1); }
+  .dur { font-size: 12px; color: var(--muted); }
+
+  /* The row animates from 0fr to 1fr, so a detail opens to its full height however long it is.
+     While closed it is also hidden from screen readers, matching aria-expanded. */
+  .more {
+    display: grid; grid-template-rows: 0fr; visibility: hidden;
+    font-size: 15px; line-height: 1.6; color: var(--muted);
+    transition: grid-template-rows 0.5s var(--ease-out), padding 0.5s, visibility 0s 0.5s;
+  }
+  .more > p { min-height: 0; overflow: hidden; }
+  li:global(.open) .more { grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s; }
+  /* Hover opens rows for a mouse only: after a tap, a touch screen keeps :hover and the row could not close. */
+  @media (hover: hover) {
+    li:hover .lbl { color: var(--accent); }
+    li:hover .more { grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s; }
+  }
+
+  @media (max-width: 760px) {
+    .axis, .head { grid-template-columns: 130px 1fr 52px; gap: 12px; }
+    /* Too narrow for every year: keep 2021, 2023, 2025 … and "now". */
+    .ticks :global(span:nth-child(even):not(.now)) { display: none; }
+    .lbl { font-size: 14px; }
+    .lbl small { display: none; }
+    .name { white-space: normal; line-height: 1.25; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bar, .more { transition: none; }
+  }
+</style>

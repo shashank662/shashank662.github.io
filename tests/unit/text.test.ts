@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emphasize, escapeHtml } from '../../src/lib/text';
+import { accentWords, emphasize, escapeHtml } from '../../src/lib/text';
 
 describe('escapeHtml', () => {
   it('escapes the five HTML-significant characters', () => {
@@ -24,5 +24,29 @@ describe('emphasize', () => {
 
   it('leaves text without markers unchanged', () => {
     expect(emphasize('plain text')).toBe('plain text');
+  });
+});
+
+describe('accentWords', () => {
+  it('splits text into words and marks the ones inside [brackets]', () => {
+    expect(accentWords('I like [boring deploys.] Now')).toEqual([
+      { word: 'I', accent: false },
+      { word: 'like', accent: false },
+      { word: 'boring', accent: true },
+      { word: 'deploys.', accent: true },
+      { word: 'Now', accent: false },
+    ]);
+  });
+
+  it('returns plain words when there are no brackets', () => {
+    expect(accentWords('just  plain text')).toEqual([
+      { word: 'just', accent: false },
+      { word: 'plain', accent: false },
+      { word: 'text', accent: false },
+    ]);
+  });
+
+  it('returns nothing for empty text', () => {
+    expect(accentWords('')).toEqual([]);
   });
 });

@@ -1,0 +1,21 @@
+---
+interface Props {
+  n: string;
+  label: string;
+  meta?: string;
+}
+
+const { n, label, meta } = Astro.props;
+---
+<div class="sec-head">
+  <p class="label">({n}) {label}</p>
+  {meta && <p class="label mono meta">{meta}</p>}
+</div>
+
+<style>
+  .sec-head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    padding-bottom: 14px; border-bottom: 1.5px solid var(--ink);
+  }
+  .meta { letter-spacing: 0.01em; text-transform: none; }
+</style>

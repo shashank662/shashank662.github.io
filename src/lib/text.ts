@@ -15,3 +15,17 @@ export function escapeHtml(text: string): string {
 export function emphasize(text: string): string {
   return escapeHtml(text).replace(/\*([^*]+)\*/g, '<em>$1</em>');
 }
+
+/** Splits text into words; words inside `[square brackets]` are marked as accented. */
+export function accentWords(text: string): { word: string; accent: boolean }[] {
+  return text
+    .split(/(\[[^\]]+\])/)
+    .flatMap((part) => {
+      const accent = part.startsWith('[') && part.endsWith(']');
+      const inner = accent ? part.slice(1, -1) : part;
+      return inner
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => ({ word, accent }));
+    });
+}

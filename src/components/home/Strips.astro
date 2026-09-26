@@ -1,0 +1,33 @@
+---
+import { profile } from '../../data/profile';
+
+const rows = [profile.strips.skills, profile.strips.highlights];
+---
+<div class="strips" data-strips aria-hidden="true">
+  {rows.map((items, i) => (
+    <div class:list={['strip', `s${i + 1}`]}>
+      <div class="inner" data-strip>
+        {[0, 1].map(() => items.map((item) => <Fragment><span>{item}</span><span class="star">✺</span></Fragment>))}
+      </div>
+    </div>
+  ))}
+</div>
+<p class="visually-hidden">Skills: {profile.strips.skills.join(', ')}. Highlights: {profile.strips.highlights.join(', ')}.</p>
+
+<script>
+  import '../../scripts/strips';
+</script>
+
+<style>
+  .strips { position: relative; height: clamp(150px, 17vw, 240px); overflow: hidden; }
+  .strip {
+    position: absolute; left: -5%; width: 110%; padding: 12px 0; overflow: hidden; white-space: nowrap;
+    font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 52px); text-transform: uppercase;
+  }
+  .s1 { top: 18%; z-index: 2; background: var(--strip1-bg); color: var(--strip1-fg); transform: rotate(-3deg); }
+  .s2 { top: 30%; background: var(--strip2-bg); color: var(--strip2-fg); transform: rotate(2.4deg); }
+  .inner { display: inline-flex; will-change: transform; }
+  .inner span { padding: 0 0.45em; }
+  .s1 .star { color: var(--accent); }
+  .s2 .star { opacity: 0.55; }
+</style>
