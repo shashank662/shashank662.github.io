@@ -15,9 +15,12 @@ const since = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' 
   new Date(fullTime.start[0], fullTime.start[1] - 1),
 );
 const { links, education, summary } = profile;
+/** How a link reads on paper: the address without "mailto:", "https://" or "www.". */
+const printed = (href: string) => href.replace(/^(mailto:|https?:\/\/(www\.)?)/, '');
 ---
 <Base title={`The 60-second view · ${profile.name}`} description={summary.description} ogImage="/og/summary.png">
   <article class="summary wrap">
+    <p class="print-only mono">{printed(new URL('/summary', Astro.site).href)}</p>
     <p class="label">The 60-second view</p>
     <h1 class="display">{profile.name}</h1>
     <p class="role">{profile.role} · {profile.company} · {profile.location}</p>
@@ -50,9 +53,9 @@ const { links, education, summary } = profile;
 
     <p class="actions">
       <a class="pill accent" href={links.resume} download>Download résumé (PDF)</a>
-      <a class="pill" href={links.email}>Email</a>
-      <a class="pill" href={links.linkedin} target="_blank" rel="me noopener">LinkedIn</a>
-      <a class="pill" href={links.github} target="_blank" rel="me noopener">GitHub</a>
+      <a class="pill" href={links.email} data-print={printed(links.email)}>Email</a>
+      <a class="pill" href={links.linkedin} target="_blank" rel="me noopener" data-print={printed(links.linkedin)}>LinkedIn</a>
+      <a class="pill" href={links.github} target="_blank" rel="me noopener" data-print={printed(links.github)}>GitHub</a>
       <a class="u more" href="/">Explore the full site →</a>
     </p>
   </article>
@@ -87,6 +90,7 @@ const { links, education, summary } = profile;
 
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin-top: 36px; font-size: 14px; }
   .more { margin-left: 8px; }
+  .print-only { display: none; }
 
   @media (max-width: 860px) {
     .grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
@@ -106,8 +110,9 @@ const { links, education, summary } = profile;
     .exp { color: #333; }
     .grid { border-top-color: #000; }
     .wins a { border-bottom-color: #ccc; }
+    .print-only { display: block; margin-bottom: 6px; font-size: 11px; color: #555; }
     .actions a { padding: 0; border: 0; background: none; color: #000; }
-    .actions a[href^='http']::after, .actions a[href^='mailto']::after { content: ' (' attr(href) ')'; font-size: 11px; }
-    .more { display: none; }
+    .actions a[data-print]::after { content: ' (' attr(data-print) ')'; font-size: 11px; }
+    .actions a[download], .more { display: none; }
   }
 </style>
