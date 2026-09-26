@@ -1,15 +1,20 @@
 ---
+import Status from '../Status.astro';
+
 interface Props {
   n: string;
   label: string;
   meta?: string;
+  /** Shows the live status pill on the right instead of a meta line. */
+  status?: boolean;
 }
 
-const { n, label, meta } = Astro.props;
+const { n, label, meta, status = false } = Astro.props;
 ---
 <div class="sec-head">
   <p class="label">({n}) {label}</p>
   {meta && <p class="label mono meta">{meta}</p>}
+  {status && <p class="label mono meta"><Status /></p>}
 </div>
 
 <style>
