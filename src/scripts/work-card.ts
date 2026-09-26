@@ -50,6 +50,12 @@ if (float && finePointer()) {
     });
   });
 
+  // Browsers keep the page in memory for the Back button; don't bring the card back frozen in place.
+  addEventListener('pagehide', () => {
+    shown = false;
+    float.classList.remove('on');
+  });
+
   onFrame(() => {
     if (!shown) return;
     pos.x += (target.x - pos.x) * ease;
