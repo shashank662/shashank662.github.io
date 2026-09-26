@@ -1,0 +1,95 @@
+---
+import { profile } from '../data/profile';
+
+const chips = ['Years of experience?', 'Tech stack?', 'Notice period?', 'The retry framework?', 'How do I reach you?'];
+---
+<button type="button" class="pill mono" data-ask-open aria-expanded="false" aria-controls="ask-panel">
+  <i aria-hidden="true"></i>Ask about me
+</button>
+
+<section class="panel" id="ask-panel" role="dialog" aria-modal="false" aria-labelledby="ask-title" hidden data-ask-panel>
+  <header class="head">
+    <h2 id="ask-title">Ask about Shashank</h2>
+    <button type="button" class="close" data-ask-close aria-label="Close">×</button>
+  </header>
+  <div class="log" role="log" aria-live="polite" data-ask-log>
+    <p class="intro">I answer from this site's content. Try one of these:</p>
+    <div class="chips">
+      {chips.map((chip) => <button type="button" class="chip mono" data-ask-chip>{chip}</button>)}
+    </div>
+  </div>
+  <form class="form" data-ask-form>
+    <label class="visually-hidden" for="ask-input">Your question</label>
+    <input id="ask-input" type="text" autocomplete="off" maxlength="200" placeholder="Ask a question…" data-ask-input />
+    <button type="submit" class="send">Send</button>
+  </form>
+  <template data-ask-fallback>
+    <p>I don't have an answer for that yet. You can ask Shashank directly:</p>
+    <p class="actions">
+      <a href={profile.links.email}>Email</a>
+      <a href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </template>
+</section>
+
+<script>
+  import '../scripts/ask';
+</script>
+
+<style>
+  .pill {
+    position: fixed; right: 16px; bottom: 16px; z-index: 80;
+    display: inline-flex; align-items: center; gap: 9px; padding: 11px 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-size: 12px;
+    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45); transition: border-color 0.25s;
+  }
+  .pill:hover { border-color: var(--accent); }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .pill[hidden], .panel[hidden] { display: none; }
+  :global(html:not(.js)) .pill { display: none; }
+
+  .panel {
+    position: fixed; right: 16px; bottom: 16px; z-index: 80;
+    display: flex; flex-direction: column; width: 380px; max-height: min(580px, calc(100vh - 32px));
+    border: 1px solid var(--line); border-radius: 14px; background: var(--bg); color: var(--ink);
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.5);
+  }
+  .head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  h2 { font-size: 15px; font-weight: 600; }
+  .close { width: 30px; height: 30px; border-radius: 8px; font-size: 20px; line-height: 1; color: var(--muted); }
+  .close:hover { background: var(--line2); color: var(--ink); }
+
+  .log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+  .intro { font-size: 14px; color: var(--muted); }
+  .chips, .log :global(.alts) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .chip, .log :global(.chip) {
+    padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 11.5px; color: var(--ink);
+    transition: border-color 0.25s, color 0.25s;
+  }
+  .chip:hover, .log :global(.chip:hover) { border-color: var(--accent); color: var(--accent); }
+  .log :global(.msg) { max-width: 88%; font-size: 14px; line-height: 1.5; }
+  .log :global(.msg.you) {
+    align-self: flex-end; padding: 8px 12px; border-radius: 14px 14px 4px 14px;
+    background: var(--accent); color: var(--on-accent);
+  }
+  .log :global(.msg.bot) {
+    align-self: flex-start; display: grid; gap: 6px; padding: 10px 12px; border-radius: 14px 14px 14px 4px;
+    background: var(--line2);
+  }
+  .log :global(.src) { font-size: 11.5px; color: var(--accent); }
+  .log :global(.actions) { display: flex; gap: 14px; }
+  .log :global(.actions a) { color: var(--accent); text-decoration: underline; }
+
+  .form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+  input {
+    flex: 1; min-width: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px;
+    background: transparent; color: var(--ink); font: inherit; font-size: 14px;
+  }
+  input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .send { padding: 10px 16px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 14px; font-weight: 500; }
+
+  /* A bottom sheet on phones. */
+  @media (max-width: 760px) {
+    .panel { left: 0; right: 0; bottom: 0; width: auto; max-height: 80vh; border-radius: 16px 16px 0 0; }
+  }
+</style>
