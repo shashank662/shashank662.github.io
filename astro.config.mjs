@@ -11,4 +11,9 @@ export default defineConfig({
   build: { format: 'file' },
   // Pages only: not the 404, the chatbot's data or the preview images.
   integrations: [sitemap({ filter: (page) => !/\/404$|ask-index|\/og\//.test(page) })],
+  vite: {
+    // Dev server only. The chatbot's search library sits behind a lazy import, so Vite finds it by scanning at
+    // startup; a restart mid-scan loses it, and the first question then fails to load. Listing it bundles it up front.
+    optimizeDeps: { include: ['minisearch'] },
+  },
 });

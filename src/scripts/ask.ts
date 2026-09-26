@@ -5,8 +5,10 @@ const pill = document.querySelector<HTMLButtonElement>('[data-ask-open]');
 const panel = document.querySelector<HTMLElement>('[data-ask-panel]');
 const input = panel?.querySelector<HTMLInputElement>('[data-ask-input]');
 const form = panel?.querySelector<HTMLFormElement>('[data-ask-form]');
+const log = panel?.querySelector<HTMLElement>('[data-ask-log]');
+const unavailable = panel?.querySelector<HTMLTemplateElement>('[data-ask-unavailable]');
 
-if (pill && panel && input && form) {
+if (pill && panel && input && form && log && unavailable) {
   let bot: Promise<Bot> | null = null;
 
   const close = () => {
@@ -15,15 +17,34 @@ if (pill && panel && input && form) {
     pill.setAttribute('aria-expanded', 'false');
     pill.focus();
   };
-  const load = () => (bot ??= import('./ask-bot').then(({ createBot }) => createBot(panel, close)));
-  const ask = (question: string) => void load().then((b) => b.ask(question));
+  // A failed load is forgotten, so the next question tries again.
+  const load = () =>
+    (bot ??= import('./ask-bot')
+      .then(({ createBot }) => createBot(panel, close))
+      .catch((error: unknown) => {
+        bot = null;
+        throw error;
+      }));
+  // Offline, or the site changed since this page opened: reply with the direct contacts instead of going quiet.
+  const cannotLoad = (question: string) => {
+    const you = document.createElement('div');
+    you.className = 'msg you';
+    you.textContent = question;
+    const reply = document.createElement('div');
+    reply.className = 'msg bot';
+    reply.append(unavailable.content.cloneNode(true));
+    log.append(you, reply);
+    log.scrollTop = log.scrollHeight;
+  };
+  const ask = (question: string) => void load().then((b) => b.ask(question), () => cannotLoad(question));
 
   pill.addEventListener('click', () => {
     panel.hidden = false;
     pill.hidden = true;
     pill.setAttribute('aria-expanded', 'true');
     input.focus();
-    void load();
+    // Start loading now. If it fails, the first question tries again and says so.
+    load().catch(() => {});
   });
   panel.querySelector('[data-ask-close]')?.addEventListener('click', close);
   panel.addEventListener('keydown', (event) => {
