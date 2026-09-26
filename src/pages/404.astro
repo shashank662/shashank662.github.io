@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import { profile } from '../data/profile';
+---
+<Base
+  title={`Page not found · ${profile.name}`}
+  description="This page doesn't exist. Head back to the home page or read the 60-second view."
+  noindex
+>
+  <section class="missing wrap">
+    <p class="trace mono">GET <span data-path>/…</span> <span class="arrow">→</span> <b>404</b> · span not found</p>
+    <h1 class="display">This page <em>isn't here.</em></h1>
+    <p class="sub">The link may be old, or the page has moved.</p>
+    <p class="actions"><a class="pill accent" href="/">← Home</a><a class="pill" href="/summary">60-sec view</a></p>
+    <script is:inline>
+      // A static page can't know which address was asked for; the browser can.
+      document.querySelector('[data-path]').textContent = location.pathname;
+    </script>
+  </section>
+</Base>
+
+<style>
+  .missing { min-height: 72vh; padding-top: 22vh; padding-bottom: 10vh; }
+  .trace { font-size: 13px; color: var(--muted); }
+  .trace b { font-weight: 500; color: var(--bad); }
+  .arrow { color: var(--accent); }
+  h1 { margin-top: 22px; font-size: clamp(52px, 9vw, 150px); line-height: 0.88; }
+  h1 em { font-family: var(--font-serif); font-style: italic; font-weight: 400; text-transform: none; color: var(--accent); }
+  .actions { display: flex; gap: 12px; margin-top: 30px; font-size: 14px; }
+</style>

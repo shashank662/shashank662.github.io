@@ -10,7 +10,7 @@ import Playground from '../components/home/Playground.astro';
 import Contact from '../components/home/Contact.astro';
 import { profile } from '../data/profile';
 ---
-<Base title={`${profile.name} · ${profile.role}`} description={profile.metaDescription}>
+<Base title={`${profile.name} · ${profile.role}`} description={profile.metaDescription} ogImage="/og/home.png">
   <Hero />
   <Strips />
   <About />

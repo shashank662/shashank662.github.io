@@ -11,14 +11,31 @@ import interUrl from '@fontsource-variable/inter/files/inter-latin-wght-normal.w
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Ask from '../components/Ask.astro';
+import { profile } from '../data/profile';
 
 interface Props {
   title: string;
   description: string;
+  /** The page's 1200 × 630 preview image, from src/pages/og. */
+  ogImage?: string;
+  /** Keeps the page out of search results (the 404 page). */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const { title, description, ogImage = '/og/home.png', noindex = false } = Astro.props;
+// Pages are built as single files, so they see their own path with ".html"; the public address has none.
+const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, '') || '/', Astro.site);
+// Who the site is about, for search engines (spec §12).
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  jobTitle: profile.role,
+  worksFor: { '@type': 'Organization', name: profile.company },
+  address: { '@type': 'PostalAddress', addressLocality: profile.location, addressCountry: 'IN' },
+  url: Astro.site,
+  sameAs: [profile.links.linkedin, profile.links.github],
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -30,6 +47,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="color-scheme" content="light dark" />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={profile.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(person).replace(/</g, '\\u003c')} />
     <link rel="preload" href={antonUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={interUrl} as="font" type="font/woff2" crossorigin />
     <script is:inline>

@@ -67,6 +67,9 @@ export interface Profile {
   about: { paragraph: string; facts: Fact[] };
   certifications: string[];
   awards: string[];
+  education: { degree: string; school: string; cgpa: string };
+  /** The 60-second view: a one-line description and the top wins, each with its number. */
+  summary: { description: string; wins: { metric: string; text: string; href: string }[] };
   career: { axisStart: YearMonth; title: string; sub: string; spans: CareerSpan[] };
   incidents: { title: string; sub: string; items: Incident[] };
   work: { title: string; brief: WorkRow & { title: string; more: string } };
@@ -79,6 +82,7 @@ const STUDIES: Span = { start: [2020, 8], end: [2024, 7] };
 const INTERNSHIP: Span = { start: [2024, 1], end: [2024, 6] };
 const FULL_TIME: Span = { start: [2024, 7], end: null };
 const AWARDS = ['Employee of the Month ×2 · “Always at 110%”', 'Company award for the AI code reviewer'];
+const EDUCATION = { degree: 'B.E., Information Science', school: 'JSS Science and Technology University, Mysuru', cgpa: '9.47/10' };
 
 /** Everything the site says about its owner. Pages and components read from here. */
 export const profile: Profile = {
@@ -136,13 +140,24 @@ export const profile: Profile = {
   },
   certifications: ['MongoDB Associate Developer'],
   awards: AWARDS,
+  education: EDUCATION,
+  summary: {
+    description:
+      'Shashank H R in 60 seconds: backend engineer at Engati in Bangalore, his top wins with numbers, stack, education and résumé.',
+    wins: [
+      { metric: '35% → 12%', text: 'failure rate on ~2M API triggers a day', href: '/work/auto-retry-framework' },
+      { metric: '2 h → 30 min', text: 'code review for ~20 developers, with a company award', href: '/work/ai-code-reviewer' },
+      { metric: '−60%', text: 'production MongoDB memory usage', href: '/#incidents' },
+      { metric: '1–2 sprints', text: 'to ship a full-stack abandoned-cart flow as an intern', href: '/work/abandoned-cart-recovery' },
+    ],
+  },
   career: {
     axisStart: [2020, 7],
     title: 'My career, *traced.*',
     sub: 'Read it like a request trace: my degree, internship, full-time role and the systems I built are spans on one timeline. Hover a row to open it.',
     spans: [
       { name: 'GET /career', tag: 'root span', level: 0, start: [2020, 8], end: null, tone: 'muted', detail: 'Everything so far. Still running, status 200.' },
-      { id: 'education', name: 'B.E., Information Science', tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: 'JSS Science and Technology University, Mysuru. Graduated with a 9.47/10 CGPA.' },
+      { id: 'education', name: EDUCATION.degree, tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: `${EDUCATION.school}. Graduated with a ${EDUCATION.cgpa} CGPA.` },
       { id: 'internship', name: 'Engati · SDE intern', tag: '6 months', level: 1, ...INTERNSHIP, tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
       { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, start: [2024, 3], end: [2024, 3], tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
       { id: 'full-time', name: 'Engati · Software Engineer', tag: 'full-time', level: 1, ...FULL_TIME, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
