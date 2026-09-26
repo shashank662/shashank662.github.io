@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+import { profile } from '../data/profile';
+import { formatDuration, monthsBetween, toAttr } from '../lib/dates';
+
+const span = (id: 'internship' | 'full-time') => {
+  const found = profile.career.spans.find((s) => s.id === id);
+  if (!found) throw new Error(`profile.career has no span with id "${id}"`);
+  return found;
+};
+const fullTime = span('full-time');
+const internship = span('internship');
+const internMonths = monthsBetween(internship.start, internship.end);
+const since = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' }).format(
+  new Date(fullTime.start[0], fullTime.start[1] - 1),
+);
+const { links, education, summary } = profile;
+---
+<Base title={`The 60-second view · ${profile.name}`} description={summary.description} ogImage="/og/summary.png">
+  <article class="summary wrap">
+    <p class="label">The 60-second view</p>
+    <h1 class="display">{profile.name}</h1>
+    <p class="role">{profile.role} · {profile.company} · {profile.location}</p>
+    <p class="open mono"><i aria-hidden="true"></i>{profile.status}</p>
+    <!-- One line: Astro drops the line break after </b>, which would glue "full-time" to "at". -->
+    <p class="exp">
+      <b><span data-duration data-start={toAttr(fullTime.start)} data-end="">{formatDuration(monthsBetween(fullTime.start, null))}</span> full-time</b> at {profile.company} (since {since}), plus a {internMonths}-month internship before that.
+    </p>
+
+    <div class="grid">
+      <section aria-labelledby="wins-title">
+        <h2 class="label" id="wins-title">Top wins</h2>
+        <ul class="wins">
+          {summary.wins.map((win) => (
+            <li><a href={win.href}><b class="display">{win.metric}</b><span>{win.text}</span></a></li>
+          ))}
+        </ul>
+      </section>
+      <section class="facts" aria-label="Background">
+        <h2 class="label">Core stack</h2>
+        <p class="mono">{profile.strips.skills.join(' · ')}</p>
+        <h2 class="label">Education</h2>
+        <p>{education.degree}, {education.school} · CGPA {education.cgpa}</p>
+        <h2 class="label">Awards</h2>
+        <p>{profile.awards.join('; ')}</p>
+        <h2 class="label">Certification</h2>
+        <p>{profile.certifications.join('; ')}</p>
+      </section>
+    </div>
+
+    <p class="actions">
+      <a class="pill accent" href={links.resume} download>Download résumé (PDF)</a>
+      <a class="pill" href={links.email}>Email</a>
+      <a class="pill" href={links.linkedin} target="_blank" rel="me noopener">LinkedIn</a>
+      <a class="pill" href={links.github} target="_blank" rel="me noopener">GitHub</a>
+      <a class="u more" href="/">Explore the full site →</a>
+    </p>
+  </article>
+</Base>
+
+<script>
+  import '../scripts/durations';
+</script>
+
+<style>
+  .summary { max-width: 1180px; padding-top: 104px; padding-bottom: 48px; }
+  h1 { margin-top: 12px; font-size: clamp(48px, 8vw, 104px); line-height: 0.9; }
+  .role { margin-top: 14px; font-size: clamp(18px, 2vw, 24px); }
+  .open { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--ok); }
+  .open i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .exp { max-width: 720px; margin-top: 18px; font-size: 17px; line-height: 1.6; color: var(--muted); }
+  .exp b { font-weight: 600; color: var(--ink); }
+
+  .grid {
+    display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 48px;
+    margin-top: 36px; padding-top: 24px; border-top: 1.5px solid var(--ink);
+  }
+  .wins { display: grid; gap: 4px; margin-top: 12px; }
+  .wins a { display: grid; grid-template-columns: 190px 1fr; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .wins b { font-size: 30px; line-height: 1; white-space: nowrap; color: var(--accent); }
+  .wins span { font-size: 16px; line-height: 1.45; }
+  .wins a:hover span { color: var(--accent); }
+  .facts h2 { margin-top: 18px; }
+  .facts h2:first-child { margin-top: 0; }
+  .facts p { margin-top: 6px; font-size: 15px; line-height: 1.55; }
+  .facts .mono { font-size: 13px; }
+
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin-top: 36px; font-size: 14px; }
+  .more { margin-left: 8px; }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .wins a { grid-template-columns: 1fr; gap: 4px; }
+  }
+
+  /* Printed: A4, ink on white, no site chrome, and every outside link spelled out. */
+  @media print {
+    @page { size: A4; margin: 16mm; }
+    :global(html), :global(body) { background: #fff; color: #000; }
+    :global(body::after), :global([data-header]), :global(footer), :global([data-progress]),
+    :global([data-cursor-dot]), :global([data-ask-open]), :global([data-ask-panel]), :global(.skip-link) {
+      display: none !important;
+    }
+    .summary { max-width: none; padding: 0; }
+    .open, .wins b, .wins a:hover span, .exp b { color: #000; }
+    .exp { color: #333; }
+    .grid { border-top-color: #000; }
+    .wins a { border-bottom-color: #ccc; }
+    .actions a { padding: 0; border: 0; background: none; color: #000; }
+    .actions a[href^='http']::after, .actions a[href^='mailto']::after { content: ' (' attr(href) ')'; font-size: 11px; }
+    .more { display: none; }
+  }
+</style>
