@@ -16,9 +16,9 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
   <div class="trace" data-trace data-in-view data-axis={toAttr(career.axisStart)}>
     <div class="axis mono" aria-hidden="true">
       <span>span</span>
-      <div class="ticks">
-        {ticks.map((t) => <span style={`left:${(t.left * 100).toFixed(3)}%`}>{t.year}</span>)}
-        <span class="now" style="left:100%">now</span>
+      <div class="ticks" data-ticks>
+        {ticks.map((t) => <span data-year style={`left:${(t.left * 100).toFixed(3)}%`}>{t.year}</span>)}
+        <span class="now" data-now style="left:100%">now</span>
       </div>
       <span class="r">took</span>
     </div>
@@ -59,8 +59,9 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
   .axis { padding: 10px 0; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); }
   .r, .dur { text-align: right; }
   .ticks { position: relative; height: 14px; }
-  .ticks span { position: absolute; top: 0; transform: translateX(-50%); }
-  .ticks .now { transform: translateX(-100%); color: var(--accent); }
+  /* :global, because trace.ts rebuilds the year labels and new elements don't carry Astro's scope attribute. */
+  .ticks :global(span) { position: absolute; top: 0; transform: translateX(-50%); }
+  .ticks :global(.now) { transform: translateX(-100%); color: var(--accent); }
 
   li { border-bottom: 1px solid var(--line); }
   .head { width: 100%; padding: 15px 0; text-align: left; }
@@ -100,7 +101,7 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
   @media (max-width: 760px) {
     .axis, .head { grid-template-columns: 130px 1fr 52px; gap: 12px; }
     /* Too narrow for every year: keep 2021, 2023, 2025 … and "now". */
-    .ticks span:nth-child(even):not(.now) { display: none; }
+    .ticks :global(span:nth-child(even):not(.now)) { display: none; }
     .lbl { font-size: 14px; }
     .lbl small { display: none; }
     .name { white-space: normal; line-height: 1.25; }
