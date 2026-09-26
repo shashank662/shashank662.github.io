@@ -39,6 +39,9 @@ row:
   cardTag: "AI tooling · award"
   cardMetric: "4× faster"
   cardLabel: "reviews: ~2 h → ~30 min · ~20 devs"
+ask:
+  alt: ["ai code reviewer", "code review bot", "llm project", "ai project", "code review tool"]
+  keywords: ["ai", "llm", "review", "reviewer", "gitlab", "slack", "merge", "diff", "token"]
 ---
 
 Reviewing a merge request took each developer around two hours. The idea: let an assistant do the first pass on the diff, while a person still makes the final call.
