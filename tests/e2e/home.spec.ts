@@ -60,6 +60,20 @@ test('a trace row hides its detail until opened, shows all of it, and closes aga
   await expect(detail).toBeHidden();
 });
 
+test('the timeline follows the visitor’s date, and no year label runs into "now"', async ({ page }) => {
+  // A visit long after the build, just after New Year: 2027's label lands almost on top of "now".
+  await page.clock.setFixedTime(new Date(2027, 0, 20));
+  await page.goto('/#exp');
+  await expect(page.locator('#about [data-duration]').first()).toHaveText('2y 6m');
+  await expect(page.locator('#exp [data-year]', { hasText: '2027' })).toHaveCount(1);
+
+  const now = (await page.locator('#exp [data-now]').boundingBox())!;
+  for (const label of await page.locator('#exp [data-year]:visible').all()) {
+    const box = (await label.boundingBox())!;
+    expect(box.x + box.width).toBeLessThan(now.x);
+  }
+});
+
 test('About shows the full-time and internship durations', async ({ page }) => {
   await page.goto('/#about');
   const facts = page.locator('#about [data-duration]');
