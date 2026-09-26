@@ -1,0 +1,57 @@
+import { expect, test } from '@playwright/test';
+
+const DURATION = /^(\d+y( \d+m)?|\d+m)$/;
+
+test('every home section renders and scrolling through raises no errors', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') errors.push(msg.text());
+  });
+  page.on('pageerror', (err) => errors.push(err.message));
+
+  await page.goto('/');
+  for (const id of ['about', 'exp', 'incidents', 'contact']) {
+    await page.locator(`#${id}`).scrollIntoViewIfNeeded();
+    await expect(page.locator(`#${id}`)).toBeVisible();
+  }
+  await expect(page.getByRole('heading', { name: /My career, traced\./ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /War stories, resolved\./ })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('the career trace lists every span with a duration and opens rows on click', async ({ page }) => {
+  await page.goto('/#exp');
+  await expect(page.getByText('GET /career · 8 spans · 200 OK')).toBeVisible();
+
+  const durations = page.locator('#exp [data-duration]');
+  await expect(durations).toHaveCount(8);
+  for (const text of await durations.allTextContents()) expect(text.trim()).toMatch(DURATION);
+
+  const first = page.locator('#exp [data-row-toggle]').first();
+  await expect(first).toHaveAttribute('aria-expanded', 'false');
+  await first.click();
+  await expect(first).toHaveAttribute('aria-expanded', 'true');
+});
+
+test('About shows the full-time and internship durations', async ({ page }) => {
+  await page.goto('/#about');
+  const facts = page.locator('#about [data-duration]');
+  await expect(facts).toHaveCount(2);
+  await expect(facts.nth(1)).toHaveText('6m');
+  expect((await facts.nth(0).textContent())?.trim()).toMatch(DURATION);
+});
+
+test('with reduced motion, the About words are fully visible', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#about');
+  const opacity = await page.locator('#about .w').first().evaluate((el) => getComputedStyle(el).opacity);
+  expect(opacity).toBe('1');
+});
+
+test('incidents show their results and contact opens an email', async ({ page }) => {
+  await page.goto('/#incidents');
+  await expect(page.locator('#incidents article')).toHaveCount(2);
+  await expect(page.getByText('−60%')).toBeVisible();
+  await expect(page.getByText('2.5 → 1 GB')).toBeVisible();
+  await expect(page.getByRole('link', { name: "Let's talk" })).toHaveAttribute('href', /^mailto:/);
+});
