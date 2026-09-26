@@ -1,0 +1,27 @@
+---
+import { profile } from '../../data/profile';
+
+const { links, contact } = profile;
+---
+<section class="contact wrap" id="contact">
+  <h2 class="label">(06) Contact · {contact.prompt}</h2>
+  <a class="big display" href={links.email}>{contact.cta} <span aria-hidden="true">→</span></a>
+  <ul class="links">
+    <li><a class="u" href={links.email}>Email</a></li>
+    <li><a class="u" href={links.linkedin} target="_blank" rel="me noopener">LinkedIn</a></li>
+    <li><a class="u" href={links.github} target="_blank" rel="me noopener">GitHub</a></li>
+    <li><a class="u" href={links.resume}>Résumé (PDF)</a></li>
+  </ul>
+</section>
+
+<style>
+  .contact { margin-top: 5vw; padding-top: 7vw; padding-bottom: 6vw; border-top: 1.5px solid var(--ink); }
+  .big { display: inline-flex; align-items: center; gap: 0.2em; margin-top: 18px; font-size: clamp(64px, 12vw, 210px); line-height: 0.95; }
+  .big span { display: inline-block; color: var(--accent); transition: transform 0.6s var(--ease-out); }
+  .big:hover span { transform: translateX(2vw) rotate(-45deg); }
+  .links { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 26px; font-size: 17px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .big span { transition: none; }
+  }
+</style>
