@@ -1,12 +1,8 @@
 ---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import { profile } from '../data/profile';
 ---
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Shashank H R</title>
-  </head>
-  <body>
-    <h1>Shashank H R</h1>
-  </body>
-</html>
+<Base title={`${profile.name} · ${profile.role}`} description={profile.metaDescription}>
+  <Hero />
+</Base>
