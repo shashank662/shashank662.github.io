@@ -43,7 +43,8 @@ const marker = (kind: EdgeKind) => `dg-${id}-${kind}`;
 <style>
   /* Keeps a readable 720px minimum: on narrow screens the diagram scrolls sideways instead of shrinking. */
   .scroller { overflow-x: auto; margin-bottom: 30px; padding: 4px 2px 8px; }
-  .dg { display: block; width: 100%; height: auto; min-width: 720px; }
+  /* Boxes on the canvas edge (x = 0 or 1000) would lose half their border to clipping. */
+  .dg { display: block; width: 100%; height: auto; min-width: 720px; overflow: visible; }
   .n rect { fill: var(--bg); stroke: var(--ink); stroke-width: 1.2; }
   .n.accent rect { stroke: var(--accent); stroke-width: 1.6; }
   .n text { font: 500 13px var(--font-mono); fill: var(--ink); }
