@@ -117,4 +117,9 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('#exp .bar').first()).toHaveCSS('transform', 'none');
     await expect(page.locator('#incidents .bar i').first()).toHaveCSS('transform', 'none');
   });
+
+  test('the career trace details are open', async ({ page }) => {
+    await page.goto('/#exp');
+    await expect(page.locator('#span-5')).toBeVisible();
+  });
 });
