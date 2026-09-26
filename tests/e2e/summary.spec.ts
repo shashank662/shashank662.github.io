@@ -24,4 +24,9 @@ test('it prints as ink on white, without the site chrome', async ({ page }) => {
   await expect(page.locator('[data-header]')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Ask about me' })).toBeHidden();
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(255, 255, 255)');
+  // On paper, say where it came from and spell out how to get in touch.
+  await expect(page.getByText('shashank662.github.io/summary')).toBeVisible();
+  const email = await page.getByRole('link', { name: 'Email' }).evaluate((el) => getComputedStyle(el, '::after').content);
+  expect(email).toBe('" (shashankhr06@gmail.com)"');
+  await expect(page.getByRole('link', { name: 'Download résumé (PDF)' })).toBeHidden();
 });
