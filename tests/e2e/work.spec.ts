@@ -47,3 +47,67 @@ test('case study 01 links to the playground', async ({ page }) => {
   await page.goto('/work/auto-retry-framework');
   await expect(page.getByRole('link', { name: /See it running/ })).toHaveAttribute('href', '/#play');
 });
+
+test('Selected work lists the four case studies and the sandbox brief', async ({ page }) => {
+  await page.goto('/#work');
+  await expect(page.getByText('5 systems · 4 case studies')).toBeVisible();
+  const hrefs = await page
+    .locator('#work a[href^="/work/"]')
+    .evaluateAll((els) => els.map((el) => el.getAttribute('href')));
+  expect(hrefs).toEqual(CASES.map((c) => `/work/${c.slug}`));
+  await expect(page.getByRole('button', { name: /Prod sandbox/ })).toBeVisible();
+});
+
+test('a work row opens its case study, and "Back to work" returns to the list', async ({ page }) => {
+  await page.goto('/#work');
+  await page.locator('#work a[href="/work/auto-retry-framework"]').click();
+  await expect(page).toHaveURL(/\/work\/auto-retry-framework$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Auto-retry framework');
+
+  await page.getByRole('link', { name: 'Back to work' }).click();
+  await expect(page).toHaveURL(/\/#work$/);
+  await expect(page.locator('#work')).toBeInViewport();
+});
+
+test('the sandbox row expands in place', async ({ page }) => {
+  await page.goto('/#work');
+  const brief = page.getByRole('button', { name: /Prod sandbox/ });
+  const more = page.locator('#brief-more');
+  await expect(brief).toHaveAttribute('aria-expanded', 'false');
+  await expect(more).toBeHidden();
+
+  await brief.click();
+  await expect(brief).toHaveAttribute('aria-expanded', 'true');
+  await expect(more).toBeVisible();
+  await expect(more).toContainText('zero impact on production');
+});
+
+test('a small card follows the mouse over a work row', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'touch screens get no hover card');
+  await page.goto('/#work');
+  const card = page.locator('[data-work-card]');
+  await page.locator('#work a[href="/work/ai-code-reviewer"]').hover();
+  await expect(card).toHaveClass(/\bon\b/);
+  await expect(card).toContainText('4× faster');
+
+  await page.mouse.move(2, 2);
+  await expect(card).not.toHaveClass(/\bon\b/);
+});
+
+test('touch screens get no hover card', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'only for touch screens');
+  await page.goto('/#work');
+  await page.getByRole('button', { name: /Prod sandbox/ }).tap();
+  await expect(page.locator('[data-work-card]')).not.toHaveClass(/\bon\b/);
+});
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('the sandbox brief is open and case studies still load', async ({ page }) => {
+    await page.goto('/#work');
+    await expect(page.locator('#brief-more')).toBeVisible();
+    await page.goto('/work/auto-retry-framework');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Auto-retry framework');
+  });
+});
