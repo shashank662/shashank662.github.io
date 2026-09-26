@@ -30,6 +30,13 @@ const chips = ['Years of experience?', 'Tech stack?', 'Notice period?', 'The ret
       <a href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>
     </p>
   </template>
+  <template data-ask-unavailable>
+    <p>I couldn't load my answers just now. Try again in a moment, or ask Shashank directly:</p>
+    <p class="actions">
+      <a href={profile.links.email}>Email</a>
+      <a href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+    </p>
+  </template>
 </section>
 
 <script>
