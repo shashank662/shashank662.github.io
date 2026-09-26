@@ -37,7 +37,12 @@ const FONTS = [
 
 /** A Satori element: plain objects instead of JSX. */
 const el = (type: string, style: Record<string, unknown>, children?: unknown) => ({ type, props: { style, children } });
-const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
+/** Shortens text to at most `max` characters, ending on a whole word, with an ellipsis. */
+const clip = (text: string, max: number) => {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  return `${cut.slice(0, cut.lastIndexOf(' ')).replace(/[\s,;:·]+$/, '')}…`;
+};
 
 /** A 1200 × 630 PNG for link previews: kicker, big title, serif subtitle, owner line. */
 export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard): Promise<Uint8Array<ArrayBuffer>> {
