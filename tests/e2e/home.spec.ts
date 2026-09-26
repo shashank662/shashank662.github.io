@@ -41,6 +41,14 @@ test('About shows the full-time and internship durations', async ({ page }) => {
   expect((await facts.nth(0).textContent())?.trim()).toMatch(DURATION);
 });
 
+test('every About fact sits under a named term', async ({ page }) => {
+  await page.goto('/#about');
+  const terms = (await page.locator('#about dt').allTextContents()).map((t) => t.trim());
+  expect(terms).not.toContain('');
+  // The internship shares the "engati" term with the full-time role.
+  await expect(page.locator('#about dd', { hasText: 'intern' })).toBeVisible();
+});
+
 test('with reduced motion, the About words are fully visible', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#about');
