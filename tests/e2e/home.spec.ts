@@ -33,6 +33,33 @@ test('the career trace lists every span with a duration and opens rows on click'
   await expect(first).toHaveAttribute('aria-expanded', 'true');
 });
 
+test('a trace row hides its detail until opened, shows all of it, and closes again', async ({ page, isMobile }) => {
+  await page.goto('/#exp');
+  // The auto-retry row has one of the longest details.
+  const row = page.locator('#exp [data-row-toggle]').nth(5);
+  const detail = page.locator('#span-5');
+  const press = () => (isMobile ? row.tap() : row.click());
+  // How far the text runs past the bottom of its box; above 0 means the last line is cut off.
+  const overflow = () =>
+    detail.evaluate((el) => {
+      const text = document.createRange();
+      text.selectNodeContents(el);
+      return text.getBoundingClientRect().bottom - el.getBoundingClientRect().bottom;
+    });
+
+  await expect(detail).toBeHidden();
+  await press();
+  await expect(row).toHaveAttribute('aria-expanded', 'true');
+  await expect(detail).toBeVisible();
+  await expect.poll(overflow).toBeLessThanOrEqual(0.5);
+
+  await press();
+  // A mouse resting on a row opens it on purpose, so move it away; a finger leaves nothing behind.
+  if (!isMobile) await page.mouse.move(0, 0);
+  await expect(row).toHaveAttribute('aria-expanded', 'false');
+  await expect(detail).toBeHidden();
+});
+
 test('About shows the full-time and internship durations', async ({ page }) => {
   await page.goto('/#about');
   const facts = page.locator('#about [data-duration]');
