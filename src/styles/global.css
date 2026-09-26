@@ -75,6 +75,8 @@ img, svg { display: block; }
 }
 .sub { max-width: 640px; margin-top: 22px; font-size: 17px; line-height: 1.6; color: var(--muted); }
 .section { padding-top: 9vw; padding-bottom: 5vw; }
+/* Jump links land below the fixed header instead of under it. */
+[id] { scroll-margin-top: 72px; }
 
 /* ---------- skip link, progress bar, cursor ---------- */
 .skip-link {
