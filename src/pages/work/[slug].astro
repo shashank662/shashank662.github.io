@@ -124,7 +124,9 @@ if (spec.steps.length !== data.steps.length) {
   .stats b { display: block; font-size: clamp(28px, 3.6vw, 60px); line-height: 1; white-space: nowrap; color: var(--accent); }
   .stats span { display: block; margin-top: 10px; font-size: 13px; line-height: 1.45; color: var(--muted); }
 
-  .sec { display: grid; grid-template-columns: 1fr 3fr; gap: 4vw; padding-top: 6vw; }
+  /* minmax(0, …) lets a column be narrower than its content, so the diagram scrolls inside its own box
+     instead of widening the page. */
+  .sec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); gap: 4vw; padding-top: 6vw; }
   .prose :global(p) { max-width: 760px; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.6; }
   .prose :global(p + p) { margin-top: 1em; }
   .prose :global(strong), .results :global(strong) { font-weight: 600; }
@@ -166,7 +168,7 @@ if (spec.steps.length !== data.steps.length) {
     .stats div:nth-child(2) { border-right: 0; }
     .stats div:nth-child(3) { padding-left: 0; }
     .stats div:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
-    .sec { grid-template-columns: 1fr; gap: 18px; }
+    .sec { grid-template-columns: minmax(0, 1fr); gap: 18px; }
     .decisions { grid-template-columns: 1fr; }
     .decisions div, .decisions div + div { padding-left: 0; border-right: 0; border-bottom: 1px solid var(--line); }
   }
