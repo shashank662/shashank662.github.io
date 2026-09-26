@@ -49,9 +49,11 @@ const words = accentWords(profile.about.paragraph);
   .more { grid-column: 2; }
   .nowrap { white-space: nowrap; }
   .big { font-size: clamp(28px, 3.6vw, 58px); line-height: 1.14; letter-spacing: -0.025em; font-weight: 500; }
-  .w { transition: opacity 0.25s; }
-  :global(.js) .w { opacity: 0.14; }
-  .hl { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent); }
+  /* Unlit words stay readable: --dim is the faintest each colour can be and still pass 3:1 as large text on
+     either theme's background (ink 0.47, accent 0.69). The scroll script raises --lit from 0 to 1. */
+  .w { --dim: 0.47; transition: opacity 0.25s; }
+  :global(.js) .w { opacity: max(var(--dim), var(--lit, 0)); }
+  .hl { --dim: 0.69; font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent); }
 
   @media (max-width: 760px) {
     .about { grid-template-columns: 1fr; }
