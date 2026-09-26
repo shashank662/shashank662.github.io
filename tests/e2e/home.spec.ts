@@ -55,3 +55,16 @@ test('incidents show their results and contact opens an email', async ({ page })
   await expect(page.getByText('2.5 → 1 GB')).toBeVisible();
   await expect(page.getByRole('link', { name: "Let's talk" })).toHaveAttribute('href', /^mailto:/);
 });
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('everything that animates in is already showing', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.hero .ch > span').first()).toHaveCSS('transform', 'none');
+    await expect(page.locator('.hero .row2')).toHaveCSS('opacity', '1');
+    await expect(page.locator('#about .w').first()).toHaveCSS('opacity', '1');
+    await expect(page.locator('#exp .bar').first()).toHaveCSS('transform', 'none');
+    await expect(page.locator('#incidents .bar i').first()).toHaveCSS('transform', 'none');
+  });
+});
