@@ -30,7 +30,7 @@ if (spec.steps.length !== data.steps.length) {
   throw new Error(`${entry.id}: the diagram has ${spec.steps.length} numbered dots but the page lists ${data.steps.length} steps`);
 }
 ---
-<Base title={`${data.title} · ${profile.name}`} description={plainText(data.lede)}>
+<Base title={`${data.title} · ${profile.name}`} description={plainText(data.lede)} ogImage={`/og/${entry.id}.png`}>
   <article class="case">
     <div class="top wrap">
       <a class="back mono" href="/#work">← Back to work</a>
