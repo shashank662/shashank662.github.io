@@ -33,6 +33,33 @@ test('an off-topic question gets the fallback with ways to reach Shashank', asyn
   await expect(panel.getByRole('log').getByRole('link', { name: 'Email' })).toHaveAttribute('href', /^mailto:/);
 });
 
+test("if its answers can't load, it says so and tries again on the next question", async ({ page }) => {
+  let online = false;
+  await page.route('**/ask-index.json', (route) => (online ? route.continue() : route.abort()));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Ask about me' }).click();
+  const panel = page.getByRole('dialog', { name: 'Ask about Shashank' });
+  const log = panel.getByRole('log');
+  const chip = panel.getByRole('button', { name: 'Tech stack?', exact: true });
+
+  await chip.click();
+  await expect(log).toContainText("I couldn't load my answers just now");
+  await expect(log.getByRole('link', { name: 'Email' })).toHaveAttribute('href', /^mailto:/);
+
+  online = true;
+  await chip.click();
+  await expect(log).toContainText('Spring Boot');
+});
+
+test("if its code can't load, it says so instead of going quiet", async ({ page }) => {
+  await page.route('**/_astro/ask-bot.*.js', (route) => route.abort());
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Ask about me' }).click();
+  const panel = page.getByRole('dialog', { name: 'Ask about Shashank' });
+  await panel.getByRole('button', { name: 'Tech stack?', exact: true }).click();
+  await expect(panel.getByRole('log')).toContainText("I couldn't load my answers just now");
+});
+
 test('following a source link closes the panel', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Ask about me' }).click();
