@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
@@ -8,4 +9,6 @@ export default defineConfig({
   // and the canonical URL matches every link.
   trailingSlash: 'never',
   build: { format: 'file' },
+  // Pages only: not the 404, the chatbot's data or the preview images.
+  integrations: [sitemap({ filter: (page) => !/\/404$|ask-index|\/og\//.test(page) })],
 });
