@@ -1,0 +1,119 @@
+---
+import SectionHead from './SectionHead.astro';
+import { profile } from '../../data/profile';
+import { emphasize } from '../../lib/text';
+
+const { playground } = profile;
+---
+<section class="section wrap" id="play" data-playground>
+  <SectionHead n="05" label="Playground" status />
+  <h2 class="h2 display" set:html={emphasize(playground.title)} />
+  <p class="sub">{playground.sub}</p>
+  <div class="grid">
+    <div class="stage" data-stage data-cursor>
+      <canvas data-canvas role="img" aria-label={playground.canvasLabel}></canvas>
+      <button type="button" class="send mono" data-send>↳ send 5 of your own triggers</button>
+      <button type="button" class="play" data-play hidden>▶ Play the simulation</button>
+      <p class="nojs">
+        The live model needs JavaScript. <a class="u" href="/work/auto-retry-framework">Read how the framework works →</a>
+      </p>
+    </div>
+    <div class="panel">
+      <div class="metric"><span class="label">failure rate · live</span><b class="display good" data-metric="fail">12.0%</b></div>
+      <div class="metric"><span class="label">in retry queue</span><b class="display" data-metric="queue">0</b></div>
+      <div class="metric"><span class="label">saved by retries</span><b class="display" data-metric="saved">0</b></div>
+      <button type="button" class="toggle" role="switch" aria-checked="true" data-retry-switch>
+        <span>Retry framework</span>
+        <span class="tg" aria-hidden="true"><b data-switch-label>ON</b><i class="sw"></i></span>
+      </button>
+      <button type="button" class="kill display" data-outage>⚡ Simulate a Meta outage</button>
+      <div class="logs mono" data-logs aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/playground';
+</script>
+
+<style>
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; margin-top: 44px; border: 1.5px solid var(--ink); }
+  .stage {
+    position: relative; min-height: 440px; border-right: 1.5px solid var(--ink);
+    background-image: radial-gradient(var(--line) 1px, transparent 1.3px); background-size: 22px 22px;
+  }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .send { position: absolute; left: 14px; bottom: 12px; font-size: 11px; color: var(--muted); transition: color 0.25s; }
+  .send:hover { color: var(--accent); }
+  /* No display rule here, so the hidden attribute keeps working. */
+  .play {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    padding: 14px 22px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 500;
+  }
+  .nojs {
+    display: none; position: absolute; inset: 0; place-content: center; padding: 24px;
+    text-align: center; font-size: 15px; line-height: 1.6; color: var(--muted);
+  }
+  :global(html:not(.js)) .nojs { display: grid; }
+  :global(html:not(.js)) .send, :global(html:not(.js)) .toggle, :global(html:not(.js)) .kill { display: none; }
+
+  .panel { display: flex; flex-direction: column; }
+  .metric {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 16px 18px; border-bottom: 1px solid var(--line);
+  }
+  .metric b { font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; transition: color 0.3s; }
+  .metric b.good { color: var(--ok); }
+  .metric b.warn { color: var(--warn); }
+  .metric b.bad { color: var(--bad); }
+
+  .toggle {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin: 16px 18px 0; padding: 12px 14px; border: 1px solid var(--line); font-size: 14px; text-align: left;
+    transition: border-color 0.25s;
+  }
+  .toggle:hover { border-color: var(--ink); }
+  .tg { display: flex; align-items: center; gap: 10px; }
+  .tg b { font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--bad); }
+  .sw { position: relative; width: 40px; height: 22px; border-radius: 999px; background: var(--line); transition: background 0.3s; }
+  .sw::after {
+    content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--ink); transition: transform 0.35s var(--ease-out), background 0.3s;
+  }
+  .toggle[aria-checked='true'] .tg b { color: var(--accent); }
+  .toggle[aria-checked='true'] .sw { background: var(--accent); }
+  .toggle[aria-checked='true'] .sw::after { transform: translateX(18px); background: var(--on-accent); }
+
+  .kill {
+    margin: 12px 18px 14px; padding: 16px; background: var(--ink); color: var(--bg);
+    font-size: 19px; letter-spacing: 0.02em; transition: background 0.25s, color 0.25s, opacity 0.25s;
+  }
+  .kill:hover:not(:disabled) { background: var(--accent); color: var(--on-accent); }
+  .kill:disabled { opacity: 0.45; }
+
+  .logs {
+    flex: 1; display: flex; flex-direction: column; justify-content: flex-end; min-height: 120px;
+    padding: 0 18px 16px; overflow: hidden; font-size: 11px; line-height: 1.75; color: var(--muted);
+  }
+  .logs :global(.l) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: log-in 0.35s ease; }
+  .logs :global(.lv) { font-weight: 500; }
+  .logs :global(.INFO) { color: var(--ink); }
+  .logs :global(.OK) { color: var(--ok); }
+  .logs :global(.WARN) { color: var(--warn); }
+  .logs :global(.ERR) { color: var(--bad); }
+  .logs :global(.YOU) { color: var(--accent); }
+  @keyframes log-in { from { opacity: 0; transform: translateY(6px); } }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .stage { min-height: 380px; border-right: 0; border-bottom: 1.5px solid var(--ink); }
+  }
+  /* Narrow stages switch to the tall node layout (see playgroundLayout.ts), which needs the height. */
+  @media (max-width: 700px) {
+    .stage { min-height: 560px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logs :global(.l) { animation: none; }
+    .sw, .sw::after { transition: none; }
+  }
+</style>
