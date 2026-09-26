@@ -36,6 +36,18 @@ export interface Incident {
   after: { label: string; width: number };
 }
 
+/** A row in Selected work. Case studies carry theirs in their Markdown file. */
+export interface WorkRow {
+  description: string;
+  stack: string;
+  metric: string;
+  metricCaption: string;
+  /** The hover card: a tag, a big number and a short label. */
+  cardTag: string;
+  cardMetric: string;
+  cardLabel: string;
+}
+
 export interface Profile {
   name: string;
   firstName: string;
@@ -51,6 +63,7 @@ export interface Profile {
   about: { paragraph: string; facts: Fact[] };
   career: { axisStart: YearMonth; title: string; sub: string; spans: CareerSpan[] };
   incidents: { title: string; sub: string; items: Incident[] };
+  work: { title: string; brief: WorkRow & { title: string; more: string } };
   contact: { prompt: string; cta: string };
 }
 
@@ -152,6 +165,20 @@ export const profile: Profile = {
         after: { label: '~1 GB', width: 0.4 },
       },
     ],
+  },
+  work: {
+    title: "Things I've *shipped.*",
+    brief: {
+      title: 'Prod sandbox',
+      description: 'Production-isolated test environment for engineering, FDE and support, built with Nginx rerouting',
+      stack: 'Nginx',
+      metric: '40–50 users',
+      metricCaption: 'zero prod impact',
+      cardTag: 'Platform',
+      cardMetric: '40–50',
+      cardLabel: 'people testing safely · zero production impact',
+      more: 'A production-isolated sandbox built with Nginx rerouting. 40–50 people across engineering, FDE and support test there safely, with zero impact on production.',
+    },
   },
   contact: {
     prompt: 'Got a role in mind?',
