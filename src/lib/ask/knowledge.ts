@@ -75,7 +75,10 @@ export function buildKnowledge({ profile, cases, faq }: KnowledgeInput): AskEntr
       id: 'stack',
       question: 'What is your tech stack?',
       alt: ['what technologies do you use', 'which languages and frameworks', 'what are your skills', 'do you know java'],
-      keywords: ['stack', 'technologies', 'technology', 'skills', 'languages', 'frameworks', 'tools', 'java', 'spring', 'microservices'],
+      keywords: [
+        'stack', 'technologies', 'technology', 'skills', 'languages', 'frameworks', 'tools',
+        ...profile.strips.skills.flatMap((skill) => skill.toLowerCase().split(' ')),
+      ],
       answer: `${list(profile.strips.skills)}.`,
       source: about,
     },
