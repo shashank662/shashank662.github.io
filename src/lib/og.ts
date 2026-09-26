@@ -40,7 +40,7 @@ const el = (type: string, style: Record<string, unknown>, children?: unknown) =>
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
 
 /** A 1200 × 630 PNG for link previews: kicker, big title, serif subtitle, owner line. */
-export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard): Promise<Uint8Array> {
+export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard): Promise<Uint8Array<ArrayBuffer>> {
   const card = el(
     'div',
     {
@@ -75,5 +75,6 @@ export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard)
     ],
   );
   const svg = await satori(card as Parameters<typeof satori>[0], { width: 1200, height: 630, fonts: FONTS });
-  return new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng();
+  // A plain copy of resvg's Node Buffer, so it can be a Response body.
+  return new Uint8Array(new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng());
 }
