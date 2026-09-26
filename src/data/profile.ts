@@ -68,6 +68,11 @@ export interface Profile {
   contact: { prompt: string; cta: string };
 }
 
+/** Dates that appear in several places (About facts, the career trace), kept in one spot. */
+const STUDIES: Span = { start: [2020, 8], end: [2024, 7] };
+const INTERNSHIP: Span = { start: [2024, 1], end: [2024, 6] };
+const FULL_TIME: Span = { start: [2024, 7], end: null };
+
 /** Everything the site says about its owner. Pages and components read from here. */
 export const profile: Profile = {
   name: 'Shashank H R',
@@ -114,8 +119,8 @@ export const profile: Profile = {
       "I joined Engati as an intern in 2024, shipped a full-stack abandoned-cart flow within two sprints, and stayed to build its messaging backend: retry systems that ride out Meta delivery failures, Kafka pipelines that bill customers accurately, and an AI code reviewer my whole team now uses. I like queues, caches, clean APIs and [boring deploys.] Now I'm looking for my [next team.]",
     facts: [
       { key: 'based_in', value: 'Bangalore, IN' },
-      { key: 'engati', value: 'SDE · Jul 2024 → now', span: { start: [2024, 7], end: null } },
-      { key: '', value: 'intern · Jan → Jun 2024', span: { start: [2024, 1], end: [2024, 6] } },
+      { key: 'engati', value: 'SDE · Jul 2024 → now', span: FULL_TIME },
+      { key: '', value: 'intern · Jan → Jun 2024', span: INTERNSHIP },
       { key: 'stack', value: 'Java · Spring Boot · Kafka' },
       { key: 'education', value: 'B.E. ISE · CGPA 9.47' },
       { key: 'awards', value: 'Employee of the Month ×2 · “Always at 110%”' },
@@ -128,10 +133,10 @@ export const profile: Profile = {
     sub: 'Read it like a request trace: my degree, internship, full-time role and the systems I built are spans on one timeline. Hover a row to open it.',
     spans: [
       { name: 'GET /career', tag: 'root span', level: 0, start: [2020, 8], end: null, tone: 'muted', detail: 'Everything so far. Still running, status 200.' },
-      { name: 'B.E., Information Science', tag: 'JSS STU, Mysuru', level: 1, start: [2020, 8], end: [2024, 7], tone: 'ink', detail: 'JSS Science and Technology University, Mysuru. Graduated with a 9.47/10 CGPA.' },
-      { name: 'Engati · SDE intern', tag: '6 months', level: 1, start: [2024, 1], end: [2024, 6], tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
+      { name: 'B.E., Information Science', tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: 'JSS Science and Technology University, Mysuru. Graduated with a 9.47/10 CGPA.' },
+      { name: 'Engati · SDE intern', tag: '6 months', level: 1, ...INTERNSHIP, tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
       { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, start: [2024, 3], end: [2024, 3], tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
-      { name: 'Engati · Software Engineer', tag: 'full-time', level: 1, start: [2024, 7], end: null, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
+      { name: 'Engati · Software Engineer', tag: 'full-time', level: 1, ...FULL_TIME, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
       { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', level: 2, start: [2024, 10], end: null, tone: 'accent', detail: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day. Failure rate 35% → 12%.' },
       { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', level: 2, start: [2025, 4], end: null, tone: 'accent', detail: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
       { name: 'AI code reviewer', tag: 'spring boot · llm', level: 2, start: [2025, 9], end: null, tone: 'accent', detail: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
