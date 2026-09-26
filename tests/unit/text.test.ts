@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { accentWords, emphasize, escapeHtml } from '../../src/lib/text';
+import { accentWords, emphasize, escapeHtml, plainText } from '../../src/lib/text';
 
 describe('escapeHtml', () => {
   it('escapes the five HTML-significant characters', () => {
@@ -25,6 +25,10 @@ describe('emphasize', () => {
   it('leaves text without markers unchanged', () => {
     expect(emphasize('plain text')).toBe('plain text');
   });
+
+  it('turns **words** into a <strong> element alongside *emphasis*', () => {
+    expect(emphasize('cut from **35% to 12%**, *fast*')).toBe('cut from <strong>35% to 12%</strong>, <em>fast</em>');
+  });
 });
 
 describe('accentWords', () => {
@@ -48,5 +52,11 @@ describe('accentWords', () => {
 
   it('returns nothing for empty text', () => {
     expect(accentWords('')).toEqual([]);
+  });
+});
+
+describe('plainText', () => {
+  it('drops the emphasis markers', () => {
+    expect(plainText('about *2 million* triggers, **35% to 12%**')).toBe('about 2 million triggers, 35% to 12%');
   });
 });
