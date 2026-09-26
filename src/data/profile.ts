@@ -16,6 +16,8 @@ export interface Fact {
 }
 
 export interface CareerSpan extends Span {
+  /** Lets other parts of the site (the chatbot) find this span. */
+  id?: 'education' | 'internship' | 'full-time';
   name: string;
   tag: string;
   level: 0 | 1 | 2;
@@ -34,6 +36,8 @@ export interface Incident {
   deltaLabel: string;
   before: { label: string; width: number };
   after: { label: string; width: number };
+  /** Words the chatbot matches for this incident. */
+  keywords: string[];
 }
 
 /** A row in Selected work. Case studies carry theirs in their Markdown file. */
@@ -61,6 +65,8 @@ export interface Profile {
   sections: { n: string; label: string; href: string }[];
   strips: { skills: string[]; highlights: string[] };
   about: { paragraph: string; facts: Fact[] };
+  certifications: string[];
+  awards: string[];
   career: { axisStart: YearMonth; title: string; sub: string; spans: CareerSpan[] };
   incidents: { title: string; sub: string; items: Incident[] };
   work: { title: string; brief: WorkRow & { title: string; more: string } };
@@ -72,6 +78,7 @@ export interface Profile {
 const STUDIES: Span = { start: [2020, 8], end: [2024, 7] };
 const INTERNSHIP: Span = { start: [2024, 1], end: [2024, 6] };
 const FULL_TIME: Span = { start: [2024, 7], end: null };
+const AWARDS = ['Employee of the Month ×2 · “Always at 110%”', 'Company award for the AI code reviewer'];
 
 /** Everything the site says about its owner. Pages and components read from here. */
 export const profile: Profile = {
@@ -123,20 +130,22 @@ export const profile: Profile = {
       { key: '', value: 'intern · Jan → Jun 2024', span: INTERNSHIP },
       { key: 'stack', value: 'Java · Spring Boot · Kafka' },
       { key: 'education', value: 'B.E. ISE · CGPA 9.47' },
-      { key: 'awards', value: 'Employee of the Month ×2 · “Always at 110%”' },
+      { key: 'awards', value: AWARDS[0] },
       { key: 'status', value: '● open to SDE-2 roles', tone: 'ok' },
     ],
   },
+  certifications: ['MongoDB Associate Developer'],
+  awards: AWARDS,
   career: {
     axisStart: [2020, 7],
     title: 'My career, *traced.*',
     sub: 'Read it like a request trace: my degree, internship, full-time role and the systems I built are spans on one timeline. Hover a row to open it.',
     spans: [
       { name: 'GET /career', tag: 'root span', level: 0, start: [2020, 8], end: null, tone: 'muted', detail: 'Everything so far. Still running, status 200.' },
-      { name: 'B.E., Information Science', tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: 'JSS Science and Technology University, Mysuru. Graduated with a 9.47/10 CGPA.' },
-      { name: 'Engati · SDE intern', tag: '6 months', level: 1, ...INTERNSHIP, tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
+      { id: 'education', name: 'B.E., Information Science', tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: 'JSS Science and Technology University, Mysuru. Graduated with a 9.47/10 CGPA.' },
+      { id: 'internship', name: 'Engati · SDE intern', tag: '6 months', level: 1, ...INTERNSHIP, tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
       { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, start: [2024, 3], end: [2024, 3], tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
-      { name: 'Engati · Software Engineer', tag: 'full-time', level: 1, ...FULL_TIME, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
+      { id: 'full-time', name: 'Engati · Software Engineer', tag: 'full-time', level: 1, ...FULL_TIME, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
       { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', level: 2, start: [2024, 10], end: null, tone: 'accent', detail: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day. Failure rate 35% → 12%.' },
       { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', level: 2, start: [2025, 4], end: null, tone: 'accent', detail: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
       { name: 'AI code reviewer', tag: 'spring boot · llm', level: 2, start: [2025, 9], end: null, tone: 'accent', detail: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
@@ -157,6 +166,7 @@ export const profile: Profile = {
         deltaLabel: 'memory usage (cut by over 60%)',
         before: { label: '100%', width: 1 },
         after: { label: '<40%', width: 0.4 },
+        keywords: ['mongodb', 'memory', 'index', 'indexes', 'indexing', 'query', 'queries', 'cluster', 'm20'],
       },
       {
         id: 'INC-02',
@@ -169,6 +179,7 @@ export const profile: Profile = {
         deltaLabel: 'peak memory',
         before: { label: '2.5 GB', width: 1 },
         after: { label: '~1 GB', width: 0.4 },
+        keywords: ['fastapi', 'python', 'memory', 'leak', 'leaking', 'embedding', 'embeddings'],
       },
     ],
   },
