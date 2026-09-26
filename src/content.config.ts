@@ -33,6 +33,8 @@ const work = defineCollection({
       cardMetric: text,
       cardLabel: text,
     }),
+    /** How visitors might ask about this project, for the chatbot. */
+    ask: z.object({ alt: z.array(text).min(1), keywords: z.array(text).min(1) }),
   }),
 });
 

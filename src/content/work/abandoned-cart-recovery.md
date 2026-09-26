@@ -42,6 +42,9 @@ row:
   cardTag: "Internship · full stack"
   cardMetric: "1–2 sprints"
   cardLabel: "designed, built and tested end to end"
+ask:
+  alt: ["abandoned cart", "shopify project", "cart recovery", "internship project"]
+  keywords: ["abandoned", "cart", "shopify", "duckdb", "liquid", "popup", "discount", "shopper", "ecommerce", "parquet"]
 ---
 
 A store can only win back an abandoned cart if it can reach the shopper. Shopify doesn’t share a customer’s details across stores, so someone new to one store is often unknown there, even if they have ordered elsewhere.

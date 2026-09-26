@@ -38,6 +38,9 @@ row:
   cardTag: "Event-driven"
   cardMetric: "Replay-safe"
   cardLabel: "idempotent Spark jobs · accurate customer billing"
+ask:
+  alt: ["rcs billing", "billing pipeline", "how is rcs usage billed", "spark jobs"]
+  keywords: ["rcs", "billing", "bill", "spark", "s3", "kafka", "replay", "idempotent", "pipeline", "aggregation"]
 ---
 
 RCS usage is billed from webhook events, so the numbers have to be exact. Events arrive all day, and a billing job that fails halfway, or runs twice, must never change what a customer pays.

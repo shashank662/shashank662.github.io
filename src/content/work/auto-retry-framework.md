@@ -42,6 +42,9 @@ row:
   cardTag: "Resilience"
   cardMetric: "~2M / day"
   cardLabel: "third-party API triggers handled"
+ask:
+  alt: ["tell me about the retry framework", "how do retries work", "what happens when meta fails a message", "auto retry"]
+  keywords: ["retry", "retries", "back-off", "backoff", "webhook", "rabbitmq", "trackerid", "idempotency", "leadsquared", "moengage"]
 ---
 
 Marketing and CRM platforms like LeadSquared and MoEngage trigger messages through Engati’s API. When Meta failed to deliver one, it stayed failed: **35% of triggers were failing** before this framework.
