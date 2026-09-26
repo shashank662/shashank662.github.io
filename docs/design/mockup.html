@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shashank H R · Backend Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{--bg:#f1ede4;--ink:#141414;--muted:#6b675f;--line:rgba(20,20,20,.2);--line2:rgba(20,20,20,.07);--accent:#1f3dff;--on-accent:#ffffff;--ok:#15803d;--warn:#c2410c;--bad:#dc2626;--b1bg:#141414;--b1fg:#f1ede4;--b2bg:var(--accent);--b2fg:#f1ede4;--grain-op:.55;--grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");color-scheme:light}
+:root[data-theme=dark]{--bg:#0e0d0c;--ink:#efeae0;--muted:#8f8a81;--line:rgba(239,234,224,.17);--line2:rgba(239,234,224,.07);--accent:#5a78ff;--on-accent:#0e0d0c;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--b1bg:#efeae0;--b1fg:#0e0d0c;--b2bg:var(--accent);--b2fg:#0e0d0c;--grain-op:.5;--grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");color-scheme:dark}
+::selection{background:var(--accent);color:var(--on-accent)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:90;background-image:var(--grain);opacity:var(--grain-op)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+ol{list-style:none}
+.fine,.fine *{cursor:none}
+.fine .rv,.fine .rv *{cursor:auto}
+.fine .rv button{cursor:pointer}
+.mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
+.serif{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;text-transform:none}
+.display{font-family:Anton,Impact,sans-serif;font-weight:400;text-transform:uppercase}
+.label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.label.mono{letter-spacing:.01em;text-transform:none}
+.wrap{padding-left:3.2vw;padding-right:3.2vw}
+.u{position:relative}
+.u::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .4s cubic-bezier(.19,1,.22,1)}
+.u:hover::after{transform:scaleX(1);transform-origin:left}
+html.theme-wipe::view-transition-old(root),html.theme-wipe::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html.theme-wipe::view-transition-new(root){z-index:2}
+::view-transition-old(root){animation-duration:.25s}
+::view-transition-new(root){animation-duration:.4s}
+::view-transition-group(case-title){animation-duration:.6s;animation-timing-function:cubic-bezier(.19,1,.22,1)}
+.view{display:none}.view.on{display:block}
+[id]{scroll-margin-top:72px}
+.progress{position:fixed;top:0;left:0;right:0;height:2px;background:var(--accent);transform-origin:left;transform:scaleX(0);z-index:60}
+.status{display:inline-flex;align-items:center;gap:8px;color:var(--ok);transition:color .3s}
+.status i{width:7px;height:7px;border-radius:50%;background:currentColor;animation:ping 1.8s infinite}
+.status.bad{color:var(--warn)}
+@keyframes ping{0%{box-shadow:0 0 0 0 currentColor}100%{box-shadow:0 0 0 8px transparent}}
+
+/* cursor + hover card */
+.cursor{position:fixed;left:0;top:0;z-index:100;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;display:grid;place-items:center;font:600 11px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#000;opacity:0;transition:width .45s cubic-bezier(.19,1,.22,1),height .45s cubic-bezier(.19,1,.22,1),margin .45s cubic-bezier(.19,1,.22,1),opacity .2s}
+.cursor span{display:none}
+.cursor.big{width:34px;height:34px;margin:-17px 0 0 -17px;background:transparent;box-shadow:inset 0 0 0 1.5px #fff}
+.float{position:fixed;left:0;top:0;z-index:30;pointer-events:none;will-change:transform}
+.float .card{width:230px;margin:26px 0 0 26px;padding:13px 16px 15px;border-radius:10px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-top:3px solid var(--accent);box-shadow:0 18px 40px -18px rgba(0,0,0,.5);opacity:0;transform:translateY(8px);transition:opacity .25s,transform .4s cubic-bezier(.19,1,.22,1),margin .3s}
+.float.flip .card{margin-left:-256px}
+.float.on .card{opacity:1;transform:none}
+.cf-top{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cf-metric{font-family:Anton,Impact,sans-serif;font-size:36px;line-height:1;margin-top:10px;color:var(--accent)}
+.cf-label{font-size:12.5px;line-height:1.4;color:var(--muted);margin-top:5px}
+
+/* header */
+.hd{position:fixed;top:0;left:0;right:0;z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:18px 3.2vw;font-size:13px;border-bottom:1px solid transparent;transition:background .3s,border-color .3s,padding .3s}
+.hd.scrolled{background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom-color:var(--line);padding-top:12px;padding-bottom:12px}
+.hd .who b{font-weight:600}
+.hd .who span{color:var(--muted);margin-left:8px}
+.hd .mid{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.hd .clock{font-variant-numeric:tabular-nums}
+.hd nav{justify-self:end;display:flex;align-items:center;gap:20px}
+.pill{padding:7px 13px;border-radius:999px;border:1px solid var(--ink);white-space:nowrap;transition:background .25s,color .25s}
+.pill.accent{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+.pill.accent:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.theme-btn{display:flex;align-items:center;gap:8px;height:34px;padding:0 12px 0 9px;border-radius:999px;border:1px solid var(--line);transition:border-color .25s}
+.theme-btn:hover{border-color:var(--ink)}
+.theme-btn svg{transition:transform .8s cubic-bezier(.7,0,.25,1)}
+[data-theme=dark] .theme-btn svg{transform:rotate(180deg)}
+.theme-btn .lt,[data-theme=dark] .theme-btn .dk{display:inline}
+.theme-btn .dk,[data-theme=dark] .theme-btn .lt{display:none}
+
+/* hero */
+.hero{position:relative;min-height:100vh;min-height:100svh;padding:112px 3.2vw 54px;display:flex;flex-direction:column}
+.hero-meta{display:flex;justify-content:space-between;gap:32px}
+.intro{max-width:350px;margin-top:12px;font-size:15px;line-height:1.55;color:var(--muted)}
+.index{font-size:12px;line-height:2.1}
+.index a{display:flex;gap:16px;transition:color .25s}
+.index a span{color:var(--muted)}
+.index a:hover{color:var(--accent)}
+.name{margin-top:auto;padding-top:40px;font-size:clamp(84px,20.5vw,360px);line-height:.8;display:flex;justify-content:space-between;white-space:nowrap;user-select:none}
+.name .ch{display:inline-block;overflow:hidden;padding-top:.05em;transform-origin:50% 100%;will-change:transform}
+.name .ch>span{display:inline-block;transform:translateY(108%);transition:transform 1.2s cubic-bezier(.19,1,.22,1),color .3s;transition-delay:calc(var(--i)*60ms + .1s)}
+.go .name .ch>span{transform:none}
+.name .ch.hot>span{color:var(--accent)}
+.row2{display:grid;grid-template-columns:auto 1fr;gap:4vw;align-items:end;margin-top:2.6vw;opacity:0;transform:translateY(24px);transition:opacity 1s .75s,transform 1.2s cubic-bezier(.19,1,.22,1) .75s}
+.go .row2{opacity:1;transform:none}
+.badge{width:clamp(96px,10.5vw,150px);aspect-ratio:1;position:relative}
+.badge svg{width:100%;height:100%;animation:spin 14s linear infinite;overflow:visible}
+.badge text{font:600 8.4px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;fill:var(--ink)}
+.badge .core{position:absolute;inset:29%;border-radius:50%;background:var(--accent);display:grid;place-items:center;color:var(--on-accent);font-size:clamp(16px,1.8vw,24px)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lede-wrap{justify-self:end;text-align:right;max-width:920px}
+.lede{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(28px,3.8vw,62px);line-height:1.02;letter-spacing:-.01em}
+.lede em{color:var(--accent)}
+.typed{margin-top:18px;font-size:clamp(12px,1.05vw,14px);color:var(--muted);min-height:1.6em}
+.typed .pr{color:var(--accent)}
+.caret{display:inline-block;width:.55em;height:1.1em;background:var(--accent);vertical-align:-.2em;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* skill bands */
+.bands{position:relative;height:clamp(150px,17vw,240px);overflow:hidden}
+.band{position:absolute;left:-5%;width:110%;padding:12px 0;white-space:nowrap;font-family:Anton,Impact,sans-serif;font-size:clamp(26px,3.4vw,52px);text-transform:uppercase;overflow:hidden}
+.band.one{top:18%;background:var(--b1bg);color:var(--b1fg);transform:rotate(-3deg);z-index:2}
+.band.two{top:30%;background:var(--b2bg);color:var(--b2fg);transform:rotate(2.4deg)}
+.band .inner{display:inline-flex;will-change:transform}
+.band .inner span{padding:0 .45em}
+.band.one .inner span:nth-child(even){color:var(--accent)}
+.band.two .inner span:nth-child(even){color:var(--b2fg);opacity:.55}
+
+/* about */
+.about{display:grid;grid-template-columns:1fr 3fr;gap:4vw;padding-top:12vw;padding-bottom:8vw}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:7px 16px;margin-top:26px;font-size:12.5px}
+.facts dt{color:var(--muted)}
+.facts .ok{color:var(--ok)}
+.big{font-size:clamp(28px,3.6vw,58px);line-height:1.14;letter-spacing:-.025em;font-weight:500}
+.big .w{opacity:.14;transition:opacity .25s}
+.big .w.hl{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--accent)}
+
+/* shared section bits */
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:14px;border-bottom:1.5px solid var(--ink)}
+.h2{font-size:clamp(52px,8.6vw,150px);line-height:.88;margin-top:30px}
+.h2 .serif{font-size:1.08em;letter-spacing:-.01em;color:var(--accent)}
+.sub{max-width:640px;margin-top:22px;font-size:17px;line-height:1.6;color:var(--muted)}
+.exp,.work,.play{padding-top:9vw;padding-bottom:5vw}
+
+/* experience trace */
+.trace{margin-top:44px;border-top:1.5px solid var(--ink)}
+.t-axis,.t-row{display:grid;grid-template-columns:minmax(170px,300px) 1fr 70px;gap:22px;align-items:center}
+.t-axis{padding:10px 0;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line)}
+.t-axis .r{text-align:right}
+.ticks{position:relative;height:14px}
+.ticks span{position:absolute;top:0;transform:translateX(-50%)}
+.ticks span:last-child{transform:translateX(-100%);color:var(--accent)}
+.t-row{padding:15px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.t-row .lbl{font-size:16px;padding-left:calc((var(--lvl) - 1)*20px);display:flex;align-items:baseline;gap:10px;min-width:0;transition:color .25s}
+.t-row .lbl span{white-space:nowrap}
+.t-row .lbl small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-row.root .lbl{padding-left:0;font-family:'JetBrains Mono',monospace;font-size:13px}
+.t-row:hover .lbl,.t-row.open .lbl{color:var(--accent)}
+.t-track{position:relative;height:12px;background:var(--line2)}
+.t-bar{position:absolute;top:0;bottom:0;left:calc(var(--s)*100%);width:max(calc(var(--d)*100%),6px);background:var(--c);transform:scaleX(0);transform-origin:left;transition:transform 1.3s cubic-bezier(.19,1,.22,1) calc(var(--i)*110ms)}
+.t-row.child .t-bar{opacity:.55}
+.trace.in .t-bar{transform:scaleX(1)}
+.t-row .dur{text-align:right;font-size:12px;color:var(--muted)}
+.t-more{grid-column:1/-1;max-height:0;overflow:hidden;font-size:15px;line-height:1.6;color:var(--muted);padding-left:calc((var(--lvl) - 1)*20px);transition:max-height .5s cubic-bezier(.19,1,.22,1),margin .5s}
+.t-row:hover .t-more,.t-row.open .t-more{max-height:90px;margin-top:6px}
+
+/* selected work */
+.rows{margin-top:40px;border-top:1px solid var(--line)}
+.w-row{position:relative;display:grid;grid-template-columns:56px 1.3fr 1.4fr 1fr 110px;gap:20px;align-items:center;padding:28px 14px;border-bottom:1px solid var(--line);transition:background .35s}
+.w-row:hover{background:var(--line2)}
+.w-row .n{font-size:13px;opacity:.55}
+.w-row .t{font-family:Anton,Impact,sans-serif;font-size:clamp(30px,4.2vw,64px);text-transform:uppercase;line-height:1;transition:transform .5s cubic-bezier(.19,1,.22,1),color .3s}
+.w-row:hover .t{transform:translateX(10px);color:var(--accent)}
+.w-row .d{font-size:15px;opacity:.8}
+.w-row .s{font-size:12px;opacity:.6}
+.w-row .st{font-size:13px;text-align:right;color:var(--accent);font-weight:500}
+.w-row .st small{display:block;font-size:10.5px;color:inherit;opacity:.65;font-weight:400;margin-top:3px}
+
+/* incidents */
+.inc-grid{display:grid;grid-template-columns:1fr 1fr;margin-top:44px;border-top:1.5px solid var(--ink)}
+.inc{padding:28px 30px 32px 0;border-bottom:1px solid var(--line)}
+.inc+.inc{padding-left:30px;padding-right:0;border-left:1px solid var(--line)}
+.inc-top{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}
+.inc-top .ok{color:var(--ok)}
+.inc h3{font-family:Anton,Impact,sans-serif;font-weight:400;text-transform:uppercase;font-size:clamp(26px,2.8vw,40px);line-height:1.02;margin:16px 0 20px}
+.inc dl{display:grid;grid-template-columns:78px 1fr;gap:9px 16px;font-size:15px;line-height:1.5}
+.inc dt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding-top:4px}
+.inc .res{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-top:26px}
+.big-delta{font-family:Anton,Impact,sans-serif;font-size:clamp(44px,5.4vw,80px);line-height:.9;color:var(--accent)}
+.big-delta small{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:.02em}
+.bars{flex:1;max-width:260px;font-size:11px;color:var(--muted)}
+.bar-row{display:grid;grid-template-columns:48px 1fr 56px;gap:10px;align-items:center;margin-top:8px}
+.bar-row span:last-child{text-align:right;color:var(--ink)}
+.bar{height:10px;background:var(--line2);position:relative}
+.bar i{position:absolute;top:0;bottom:0;left:0;width:var(--w);background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform 1.3s cubic-bezier(.19,1,.22,1) .2s}
+.bar.after i{background:var(--accent);transition-delay:.55s}
+.inc.in .bar i{transform:scaleX(1)}
+
+/* playground */
+.play-grid{display:grid;grid-template-columns:1fr 300px;margin-top:44px;border:1.5px solid var(--ink)}
+.stage{position:relative;min-height:440px;background-image:radial-gradient(var(--line) 1px,transparent 1.3px);background-size:22px 22px;border-right:1.5px solid var(--ink)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.stage .hint{position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--muted)}
+.panel{display:flex;flex-direction:column}
+.metric{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.metric b{font-size:34px;line-height:1;font-variant-numeric:tabular-nums;transition:color .3s}
+.metric b.good{color:var(--ok)}.metric b.warn{color:var(--warn)}.metric b.bad{color:var(--bad)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 18px 0;padding:12px 14px;border:1px solid var(--line);font-size:14px;text-align:left;transition:border-color .25s}
+.toggle:hover{border-color:var(--ink)}
+.toggle .tg{display:flex;align-items:center;gap:10px}
+.toggle b{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--bad)}
+.toggle.on b{color:var(--accent)}
+.sw{position:relative;width:40px;height:22px;border-radius:999px;background:var(--line);transition:background .3s}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--ink);transition:transform .35s cubic-bezier(.19,1,.22,1),background .3s}
+.toggle.on .sw{background:var(--accent)}
+.toggle.on .sw::after{transform:translateX(18px);background:var(--on-accent)}
+.kill{margin:12px 18px 14px;padding:16px;background:var(--ink);color:var(--bg);font-size:19px;letter-spacing:.02em;transition:background .25s,color .25s,opacity .25s}
+.kill:hover{background:var(--accent);color:var(--on-accent)}
+.kill:disabled{opacity:.45}
+.logs{flex:1;min-height:120px;padding:0 18px 16px;font-size:11px;line-height:1.75;color:var(--muted);display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.logs .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:lin .35s ease}
+.logs .lv{font-weight:500}
+.logs .WARN{color:var(--warn)}.logs .OK{color:var(--ok)}.logs .YOU{color:var(--accent)}.logs .INFO{color:var(--ink)}
+@keyframes lin{from{opacity:0;transform:translateY(6px)}}
+
+/* contact + footer */
+.cta{margin-top:5vw;padding-top:7vw;padding-bottom:6vw;border-top:1.5px solid var(--ink)}
+.big-link{display:inline-flex;align-items:center;gap:.2em;font-size:clamp(64px,12vw,210px);line-height:.95;margin-top:18px}
+.big-link span{color:var(--accent);display:inline-block;transition:transform .6s cubic-bezier(.19,1,.22,1)}
+.big-link:hover span{transform:translateX(2vw) rotate(-45deg)}
+.links{display:flex;flex-wrap:wrap;gap:26px;margin-top:26px;font-size:17px}
+.ft{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:24px;padding-bottom:120px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+.ft b{color:var(--ink);font-weight:500}
+
+/* case studies */
+.case{padding-top:84px;min-height:100vh}
+.case-top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:16px;padding-bottom:16px;border-bottom:1.5px solid var(--ink)}
+.back{font-size:13px;transition:color .25s}
+.back:hover{color:var(--accent)}
+.case-hero{padding-top:6vw;padding-bottom:4vw}
+.case-title{view-transition-name:case-title;font-size:clamp(56px,11vw,190px);line-height:.86;margin-top:18px}
+.case-lede{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(24px,3vw,44px);line-height:1.12;max-width:980px;margin-top:26px}
+.case-lede em{color:var(--accent)}
+.case-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:44px;border-top:1px solid var(--line)}
+.case-meta div{padding:14px 16px 0 0}
+.case-meta dt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.case-meta dd{font-size:13px;margin-top:6px;line-height:1.5}
+.case-meta .ok{color:var(--ok)}
+.case-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+.case-stats div{padding:26px 18px 24px 0;border-right:1px solid var(--line)}
+.case-stats div+div{padding-left:18px}
+.case-stats div:last-child{border-right:0}
+.case-stats b{display:block;font-size:clamp(28px,3.6vw,60px);line-height:1;color:var(--accent);white-space:nowrap}
+.case-stats span{display:block;margin-top:10px;font-size:13px;line-height:1.45;color:var(--muted)}
+.case-sec{display:grid;grid-template-columns:1fr 3fr;gap:4vw;padding-top:6vw}
+.case-body p{font-size:clamp(18px,1.6vw,22px);line-height:1.6;max-width:760px}
+.case-body b{font-weight:600}
+.dg-wrap{overflow-x:auto;margin-bottom:30px;padding:4px 2px 8px}
+.dg{display:block;width:100%;height:auto;min-width:720px}
+.dg .n rect{fill:var(--bg);stroke:var(--ink);stroke-width:1.2}
+.dg .n.acc rect{stroke:var(--accent);stroke-width:1.6}
+.dg .n text{font:500 13px 'JetBrains Mono',ui-monospace,monospace;fill:var(--ink)}
+.dg .n .sub{font-size:11px;font-weight:400;fill:var(--muted)}
+.dg .e{fill:none;stroke:var(--ink);stroke-width:1.2;opacity:.6;marker-end:url(#ah)}
+.dg .e.acc{stroke:var(--accent);opacity:1;stroke-dasharray:5 5;marker-end:url(#ahacc)}
+.dg .e.warn{stroke:var(--warn);opacity:1;stroke-dasharray:5 5;marker-end:url(#ahwarn)}
+.dg .ah{fill:var(--ink)}.dg .ah.acc{fill:var(--accent)}.dg .ah.warn{fill:var(--warn)}
+.dg .step circle{fill:var(--accent)}
+.dg .step text{font:600 11px Inter,sans-serif;fill:var(--on-accent);text-anchor:middle}
+.dg .lab{font:400 11px 'JetBrains Mono',monospace;fill:var(--muted)}
+.steps{counter-reset:s;display:grid;gap:12px;max-width:780px;list-style:none}
+.steps li{display:grid;grid-template-columns:34px 1fr;font-size:16.5px;line-height:1.55}
+.steps li::before{counter-increment:s;content:counter(s);width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:600 12px Inter,sans-serif;display:grid;place-items:center;margin-top:1px}
+.decisions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}
+.decisions div{padding:20px 22px 22px 0;border-right:1px solid var(--line)}
+.decisions div+div{padding-left:22px}
+.decisions div:last-child{border-right:0}
+.decisions h4{font-family:Anton,Impact,sans-serif;font-weight:400;text-transform:uppercase;font-size:24px;line-height:1.05}
+.decisions p{font-size:15px;line-height:1.6;color:var(--muted);margin-top:10px}
+.results{list-style:none;display:grid;gap:14px}
+.results li{display:grid;grid-template-columns:28px 1fr;font-size:clamp(18px,1.6vw,22px);line-height:1.5}
+.results li::before{content:'→';color:var(--accent)}
+.case-cta{display:inline-block;margin-top:28px;font-size:13px;border-bottom:1px solid currentColor;padding-bottom:3px;transition:color .25s}
+.case-cta:hover{color:var(--accent)}
+.case-quote{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:clamp(24px,2.6vw,38px);line-height:1.2;margin-top:36px;padding-left:22px;border-left:3px solid var(--accent);max-width:820px}
+.case-next{display:block;margin-top:8vw;padding-top:3vw;padding-bottom:4vw;border-top:1.5px solid var(--ink)}
+.case-next .display{display:block;font-size:clamp(44px,8vw,130px);line-height:.9;margin-top:14px;transition:color .3s}
+.case-next:hover .display{color:var(--accent)}
+.w-row.brief{cursor:pointer}
+.w-more{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.19,1,.22,1)}
+.w-more.open{max-height:220px}
+.w-more p{padding:4px 14px 26px 90px;font-size:17px;line-height:1.6;color:var(--muted);max-width:980px;border-bottom:1px solid var(--line)}
+@media (max-width:860px){.case-meta,.case-stats{grid-template-columns:1fr 1fr}.case-stats div:nth-child(2){border-right:0}.case-stats div:nth-child(3){padding-left:0}.case-stats div:nth-child(-n+2){border-bottom:1px solid var(--line)}.case-sec{grid-template-columns:1fr;gap:18px}.decisions{grid-template-columns:1fr}.decisions div,.decisions div+div{border-right:0;padding-left:0;border-bottom:1px solid var(--line)}.w-more p{padding-left:14px}}
+
+/* review note (not part of the design) */
+.rv{position:fixed;left:16px;bottom:16px;z-index:120;width:min(370px,calc(100% - 32px));padding:14px 16px;border-radius:14px;background:rgba(20,20,22,.9);color:#ededf0;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 40px rgba(0,0,0,.35);font:13px/1.5 Inter,sans-serif}
+.rv-t{font-weight:600;padding-right:26px}
+.rv p{color:#b9b9c4;margin:6px 0 12px}
+.rv p b{color:#fff}
+.rv-b{display:flex;gap:8px}
+.rv-b button{flex:1;padding:9px 10px;border-radius:10px;background:#fff;color:#111;font-weight:600}
+.rv-b button+button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28)}
+.rv-b button.done{background:#4ade80;color:#052e12;border-color:#4ade80}
+.rv-x{position:absolute;top:9px;right:10px;width:24px;height:24px;border-radius:6px;color:#999;font-size:16px}
+.rv-x:hover{background:rgba(255,255,255,.1);color:#fff}
+.rv.min{width:auto;padding:9px 14px;cursor:pointer}
+.rv.min>*{display:none}
+.rv.min::before{content:'Review note ▴'}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,10px);z-index:130;padding:10px 16px;border-radius:12px;background:var(--ink);color:var(--bg);font:500 13px/1.4 Inter,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:1000px){.hd{grid-template-columns:1fr auto}.hd .mid{display:none}}
+@media (max-width:860px){.play-grid{grid-template-columns:1fr}.stage{border-right:0;border-bottom:1.5px solid var(--ink);min-height:380px}.w-row{grid-template-columns:40px 1fr auto}.w-row .d,.w-row .s{display:none}.inc-grid{grid-template-columns:1fr}.inc,.inc+.inc{padding-left:0;padding-right:0;border-left:0}}
+@media (max-width:760px){.hd nav .u,.hd .who span{display:none}.hero-meta .index{display:none}.row2{grid-template-columns:1fr}.lede-wrap{text-align:left;justify-self:start}.about{grid-template-columns:1fr}.t-axis,.t-row{grid-template-columns:130px 1fr 52px;gap:12px}.t-row .lbl small{display:none}.t-row .lbl{font-size:14px}.t-row .lbl span{white-space:normal;line-height:1.25}.rv{width:calc(100% - 32px)}.rv p{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="cursor" id="cursor"><span id="cursorTxt">View</span></div>
+<div class="float" id="float"><div class="card"><div class="cf-top"><span id="cfTag"></span><span id="cfGo">Case study ↗</span></div><div class="cf-metric" id="cfMetric"></div><div class="cf-label" id="cfLabel"></div></div></div>
+
+<header class="hd" id="hd">
+  <div class="who"><b>Shashank H R</b><span>Backend Engineer</span></div>
+  <div class="mid"><span class="status"><i></i><span class="st-t">all systems operational</span></span><span>·</span><span class="mono clock" id="clock">--:--:-- IST</span></div>
+  <nav>
+    <a class="u" href="#work">Work</a><a class="u" href="#play">Playground</a><a class="u" href="#contact">Contact</a>
+    <a class="pill accent fast" href="#">60-sec view</a>
+    <button class="theme-btn" data-toggle-theme aria-label="Switch light or dark theme"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1a7 7 0 0 1 0 14z" fill="currentColor"/></svg><span class="lt">Light</span><span class="dk">Dark</span></button>
+  </nav>
+</header>
+
+<main id="home" class="view on">
+  <section class="hero" id="top">
+    <div class="hero-meta">
+      <div><div class="label">Portfolio · 2026 edition</div><p class="intro">Backend engineer at Engati, Bangalore. 2+ years full-time (after a 6-month internship) building Java &amp; Spring Boot services for a high-volume B2B messaging platform.</p></div>
+      <ol class="index mono">
+        <li><a href="#about"><span>01</span>About</a></li>
+        <li><a href="#exp"><span>02</span>Experience</a></li>
+        <li><a href="#work"><span>03</span>Work</a></li>
+        <li><a href="#incidents"><span>04</span>Incidents</a></li>
+        <li><a href="#play"><span>05</span>Playground</a></li>
+        <li><a href="#contact"><span>06</span>Contact</a></li>
+      </ol>
+    </div>
+    <h1 class="name display" id="name" aria-label="Shashank"></h1>
+    <div class="row2">
+      <div class="badge">
+        <svg viewBox="0 0 100 100"><defs><path id="circ" d="M50,50 m-40,0 a40,40 0 1,1 80,0 a40,40 0 1,1 -80,0"/></defs><text><textPath href="#circ" textLength="249" lengthAdjust="spacing">Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺</textPath></text></svg>
+        <div class="core">↓</div>
+      </div>
+      <div class="lede-wrap">
+        <p class="lede">I build <em>backends</em> that never wake anyone up at 3&nbsp;a.m.</p>
+        <div class="typed mono"><span class="pr">~/shashank $</span> <span id="typed"></span><i class="caret"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="bands" aria-hidden="true">
+    <div class="band one"><div class="inner" id="band1"></div></div>
+    <div class="band two"><div class="inner" id="band2"></div></div>
+  </div>
+
+  <section class="about wrap" id="about">
+    <div>
+      <div class="label">(01) About</div>
+      <dl class="facts mono">
+        <dt>based_in</dt><dd>Bangalore, IN</dd>
+        <dt>engati</dt><dd>SDE · Jul 2024 → now (<span id="sdeDur">2y 2m</span>)</dd>
+        <dt></dt><dd>intern · Jan → Jun 2024 (6m)</dd>
+        <dt>stack</dt><dd>Java · Spring Boot · Kafka</dd>
+        <dt>education</dt><dd>B.E. ISE · CGPA 9.47</dd>
+        <dt>awards</dt><dd>Employee of the Month ×2 · “Always at 110%”</dd>
+        <dt>status</dt><dd class="ok">● open to SDE-2 roles</dd>
+      </dl>
+    </div>
+    <p class="big" id="big"></p>
+  </section>
+
+  <section class="exp wrap" id="exp">
+    <div class="sec-head"><span class="label">(02) Experience</span><span class="label mono">GET /career · 8 spans · 200 OK</span></div>
+    <h2 class="h2 display">My career, <span class="serif">traced.</span></h2>
+    <p class="sub">Read it like a request trace: my degree, internship, full-time role and the systems I built are spans on one timeline. Hover a row to open it.</p>
+    <div class="trace" id="trace"><div class="t-axis mono"><span>span</span><div class="ticks" id="ticks"></div><span class="r">took</span></div></div>
+  </section>
+
+  <section class="work wrap" id="work">
+    <div class="sec-head"><span class="label">(03) Selected work · Engati</span><span class="label mono">5 systems · 4 case studies</span></div>
+    <h2 class="h2 display">Things I've <span class="serif">shipped.</span></h2>
+    <div class="rows">
+      <a class="w-row" href="#/work/auto-retry" data-case="1" data-cursor="View" data-t="Auto-retry framework" data-tag="Resilience" data-m="~2M / day" data-l="third-party API triggers handled"><span class="n mono">01</span><span class="t">Auto-retry framework</span><span class="d">Retries failed Meta deliveries for LeadSquared &amp; MoEngage triggers: webhook → MongoDB → RabbitMQ, with back-off</span><span class="s mono">Java · Redis · RabbitMQ · MongoDB</span><span class="st mono">35% → 12%<small>failure rate</small></span></a>
+      <a class="w-row" href="#/work/rcs-billing" data-case="1" data-cursor="View" data-t="RCS billing pipeline" data-tag="Event-driven" data-m="Replay-safe" data-l="idempotent Spark jobs · accurate customer billing"><span class="n mono">02</span><span class="t">RCS billing pipeline</span><span class="d">Webhooks → Kafka → S3 → idempotent Spark aggregation per bot, customer and metric</span><span class="s mono">Kafka · AWS S3 · Spark</span><span class="st mono">replay-safe<small>idempotent by design</small></span></a>
+      <a class="w-row" href="#/work/ai-reviewer" data-case="1" data-cursor="View" data-t="AI code reviewer" data-tag="AI tooling · award" data-m="4× faster" data-l="reviews: ~2 h → ~30 min · ~20 devs"><span class="n mono">03</span><span class="t">AI code reviewer</span><span class="d">Spring Boot agent that reviews GitLab MRs with an LLM, triggered from Slack</span><span class="s mono">Spring Boot · LLMs · GitLab · Slack</span><span class="st mono">2 h → 30 min<small>per review · company award</small></span></a>
+      <a class="w-row" href="#/work/abandoned-cart" data-case="1" data-cursor="View" data-t="Abandoned-cart recovery" data-tag="Internship · full stack" data-m="1–2 sprints" data-l="designed, built and tested end to end"><span class="n mono">04</span><span class="t">Abandoned-cart recovery</span><span class="d">Shopify popup → async shopper lookups → Kafka → branded message, built as an intern</span><span class="s mono">Liquid · Spring Boot · DuckDB · Kafka</span><span class="st mono">1–2 sprints<small>design to production</small></span></a>
+      <div class="w-row brief" role="button" tabindex="0" aria-expanded="false" aria-controls="sandboxMore" data-cursor="View" data-t="Production sandbox" data-tag="Platform" data-m="40–50" data-l="people testing safely · zero production impact"><span class="n mono">05</span><span class="t">Prod sandbox</span><span class="d">Production-isolated test environment for engineering, FDE and support, built with Nginx rerouting</span><span class="s mono">Nginx</span><span class="st mono">40–50 users<small>zero prod impact</small></span></div>
+      <div class="w-more" id="sandboxMore"><p>A production-isolated sandbox built with Nginx rerouting. 40–50 people across engineering, FDE and support test there safely, with zero impact on production.</p></div>
+    </div>
+  </section>
+
+  <section class="work wrap" id="incidents">
+    <div class="sec-head"><span class="label">(04) Incidents</span><span class="label mono">2 resolved · 0 open</span></div>
+    <h2 class="h2 display">War stories, <span class="serif">resolved.</span></h2>
+    <p class="sub">Production problems I tracked down, written up the way a postmortem would be.</p>
+    <div class="inc-grid">
+      <article class="inc">
+        <div class="inc-top mono"><span>INC-01 · MongoDB M20 · production</span><span class="ok">● resolved</span></div>
+        <h3>Cluster running out of memory</h3>
+        <dl>
+          <dt>Impact</dt><dd>Memory exhaustion on the production MongoDB cluster.</dd>
+          <dt>Cause</dt><dd>Hot queries had no supporting index: ~3,000 documents scanned for every 5 returned.</dd>
+          <dt>Fix</dt><dd>Indexed the high-frequency query fields; scan-to-return fell under 100:1.</dd>
+        </dl>
+        <div class="res">
+          <div class="big-delta">−60%<small>memory usage (cut by over 60%)</small></div>
+          <div class="bars mono">
+            <div class="bar-row"><span>before</span><div class="bar"><i style="--w:100%"></i></div><span>100%</span></div>
+            <div class="bar-row"><span>after</span><div class="bar after"><i style="--w:40%"></i></div><span>&lt;40%</span></div>
+          </div>
+        </div>
+      </article>
+      <article class="inc">
+        <div class="inc-top mono"><span>INC-02 · FastAPI · embeddings</span><span class="ok">● resolved</span></div>
+        <h3>A service quietly leaking memory</h3>
+        <dl>
+          <dt>Impact</dt><dd>Peak memory climbing to 2.5 GB on a critical service.</dd>
+          <dt>Cause</dt><dd>String concatenation inside an embedding loop kept allocating new copies.</dd>
+          <dt>Fix</dt><dd>Refactored the loop to in-place operations.</dd>
+        </dl>
+        <div class="res">
+          <div class="big-delta">2.5 → 1 GB<small>peak memory</small></div>
+          <div class="bars mono">
+            <div class="bar-row"><span>before</span><div class="bar"><i style="--w:100%"></i></div><span>2.5 GB</span></div>
+            <div class="bar-row"><span>after</span><div class="bar after"><i style="--w:40%"></i></div><span>~1 GB</span></div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="play wrap" id="play">
+    <div class="sec-head"><span class="label">(05) Playground</span><span class="status mono"><i></i><span class="st-t">all systems operational</span></span></div>
+    <h2 class="h2 display">Go on, <span class="serif">break</span> something.</h2>
+    <p class="sub">My Engati auto-retry framework, running live. Triggers flow out to Meta; failed deliveries come back as webhooks. Retryable ones fetch their original payload from MongoDB by trackerId and go back out through RabbitMQ with back-off. Switch the framework off, or cause a Meta outage, and watch the failure rate.</p>
+    <div class="play-grid">
+      <div class="stage" id="stage" data-cursor="Send"><canvas id="pg"></canvas><div class="hint mono">click the diagram to send your own triggers</div></div>
+      <aside class="panel">
+        <div class="metric"><span class="label">failure rate · live</span><b class="display good" id="mFail">12.0%</b></div>
+        <div class="metric"><span class="label">in retry queue</span><b class="display" id="mQueue">0</b></div>
+        <div class="metric"><span class="label">saved by retries</span><b class="display" id="mSaved">0</b></div>
+        <button class="toggle on" id="retryToggle" role="switch" aria-checked="true" data-cursor="Flip"><span>Retry framework</span><span class="tg"><b>ON</b><i class="sw"></i></span></button>
+        <button class="kill display" id="outage" data-cursor="Break">⚡ Simulate a Meta outage</button>
+        <div class="logs mono" id="logs"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="cta wrap" id="contact">
+    <div class="label">(06) Contact · got a role in mind?</div>
+    <a class="big-link display fast" href="#">Let's talk <span>→</span></a>
+    <div class="links"><a class="u fast" href="#">Email</a><a class="u fast" href="#">LinkedIn</a><a class="u fast" href="#">GitHub</a><a class="u fast" href="#">Resume (PDF)</a></div>
+  </section>
+</main>
+<article class="view case" id="case"></article>
+
+<footer class="ft wrap mono">
+  <span>© 2026 Shashank H R · designed &amp; built by hand, no templates</span>
+  <span>page loaded in <b id="ftLoad">—</b> · uptime <b id="ftUp">00:00:00</b> · <span class="status"><i></i><span class="st-t">all systems operational</span></span></span>
+</footer>
+
+<aside class="rv" id="rv">
+  <div class="rv-t">v6 · your internship flow is case study 04</div>
+  <p>Open <b>Abandoned-cart recovery</b> in Selected work, or any of the other three. The internship bar on the timeline now shows it too.</p>
+  <div class="rv-b"><button data-choice="love">✓ This is it</button><button data-choice="tweak">✎ Needs tweaks</button></div>
+  <button class="rv-x" id="rvX" aria-label="Minimise note">–</button>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t, rand = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
+const root = document.documentElement;
+const fine = matchMedia('(pointer: fine)').matches, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (fine) root.classList.add('fine');
+
+/* ---------- toast for links that are fake in the mockup ---------- */
+let toastT;
+const toast = msg => { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2800); };
+document.addEventListener('click', e => {
+  const f = e.target.closest('.fast');
+  if (!f) return;
+  e.preventDefault();
+  toast('In the real site this opens a one-page summary: role, stack, top 3 wins with numbers, resume download.');
+});
+
+/* ---------- theme: circular wipe from the click point ---------- */
+const hexRgb = h => { h = h.replace('#', ''); if (h.length === 3) h = h.replace(/./g, c => c + c); const n = parseInt(h, 16); return `${n >> 16 & 255},${n >> 8 & 255},${n & 255}`; };
+let TH = {};
+const readTheme = () => {
+  const cs = getComputedStyle(root), g = k => cs.getPropertyValue(k).trim();
+  TH = { bg: g('--bg'), ink: g('--ink'), line: g('--line'), muted: g('--muted'), ok: g('--ok'), okRgb: hexRgb(g('--ok')), accent: hexRgb(g('--accent')), inkRgb: hexRgb(g('--ink')), warn: hexRgb(g('--warn')), bad: hexRgb(g('--bad')) };
+};
+readTheme();
+const setTheme = (next, x, y) => wipe(() => { root.dataset.theme = next; readTheme(); }, x, y);
+function wipe(apply, x, y) {
+  if (!document.startViewTransition || reduce || document.visibilityState !== 'visible') return apply();
+  const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  root.classList.add('theme-wipe');
+  const vt = document.startViewTransition(apply), done = () => root.classList.remove('theme-wipe');
+  vt.finished.then(done, done);
+  vt.ready.then(() => {
+    root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+      { duration: 800, easing: 'cubic-bezier(.7,0,.25,1)', pseudoElement: '::view-transition-new(root)' });
+  }).catch(() => {}); // a skipped transition still applies the theme
+}
+$$('[data-toggle-theme]').forEach(b => b.addEventListener('click', e => {
+  const r = b.getBoundingClientRect();
+  setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark', e.clientX || r.left + r.width / 2, e.clientY || r.top + r.height / 2);
+}));
+
+/* ---------- live status shared by header, playground and footer ---------- */
+const setStatus = (bad, text) => $$('.status').forEach(s => {
+  s.classList.toggle('bad', bad);
+  $('.st-t', s).textContent = bad ? (text || 'degraded · self-healing') : 'all systems operational';
+});
+
+/* ---------- hero ---------- */
+$('#name').innerHTML = 'SHASHANK'.split('').map((c, i) => `<span class="ch"><span style="--i:${i}">${c}</span></span>`).join('');
+requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('go')));
+const heroEl = $('.hero'), letters = $$('.name .ch'), LS = letters.map(() => ({ y: 0, s: 1 }));
+const LINES = ['retrying ~2M third-party api calls a day', 'java · spring boot · kafka · redis · mongodb', 'failure rate: 35% → 12%', 'open to sde-2 roles · 2026'];
+const ty = { li: 0, ci: 0, mode: 'type', at: 1200 }, typedEl = $('#typed');
+function typing(now) {
+  if (now < ty.at) return;
+  const line = LINES[ty.li];
+  if (ty.mode === 'type') {
+    typedEl.textContent = line.slice(0, ++ty.ci); ty.at = now + rand(30, 65);
+    if (ty.ci >= line.length) { ty.mode = 'erase'; ty.at = now + 2000; }
+  } else {
+    typedEl.textContent = line.slice(0, --ty.ci); ty.at = now + 16;
+    if (ty.ci <= 0) { ty.mode = 'type'; ty.li = (ty.li + 1) % LINES.length; ty.at = now + 350; }
+  }
+}
+
+/* ---------- skill bands ---------- */
+const band = items => { const one = items.map(t => `<span>${t}</span><span>✺</span>`).join(''); return one + one; };
+$('#band1').innerHTML = band(['Java', 'Spring Boot', 'Apache Kafka', 'RabbitMQ', 'Redis', 'MongoDB', 'Spark', 'AWS S3', 'Microservices']);
+$('#band2').innerHTML = band(['Open to SDE-2 roles', 'Employee of the Month ×2', 'MongoDB certified', 'CGPA 9.47', 'Bangalore']);
+const inners = [$('#band1'), $('#band2')], halfW = [1, 1], bxs = [0, 0];
+const measureBands = () => inners.forEach((n, i) => { halfW[i] = n.scrollWidth / 2 || 1; });
+measureBands();
+
+/* ---------- about: words light up as you read ---------- */
+const ABOUT = "I joined Engati as an intern in 2024, shipped a full-stack abandoned-cart flow within two sprints, and stayed to build its messaging backend: retry systems that ride out Meta delivery failures, Kafka pipelines that bill customers accurately, and an AI code reviewer my whole team now uses. I like queues, caches, clean APIs and [boring deploys.] Now I'm looking for my [next team.]";
+const big = $('#big');
+big.innerHTML = ABOUT.split(/(\[[^\]]+\])/).filter(Boolean).map(seg => {
+  const hl = seg.startsWith('[');
+  return seg.replace(/[[\]]/g, '').trim().split(/\s+/).map(w => `<span class="w${hl ? ' hl' : ''}">${w}</span>`).join(' ');
+}).join(' ');
+const words = $$('#big .w');
+
+/* ---------- experience trace (placeholder data) ---------- */
+// dates are [year, month]; e: null = still running. Durations are computed from today, so they never go stale.
+const today = new Date(), mi = ([y, m]) => y * 12 + (m - 1);
+const NOWM = today.getFullYear() * 12 + today.getMonth() + today.getDate() / 31, M0 = mi([2020, 7]), SPANM = NOWM - M0;
+const endOf = e => e ? mi(e) + 1 : NOWM;
+const dur = months => { const t = Math.floor(months + .001), y = Math.floor(t / 12), m = t % 12; return y ? y + 'y' + (m ? ' ' + m + 'm' : '') : Math.max(1, m) + 'm'; };
+const SPANS = [
+  { name: 'GET /career', tag: 'root span', lvl: 0, s: [2020, 8], e: null, c: 'var(--muted)', more: 'Everything so far. Still running, status 200.' },
+  { name: 'B.E., Information Science', tag: 'JSS STU, Mysuru', lvl: 1, s: [2020, 8], e: [2024, 7], c: 'var(--ink)', more: 'JSS Science and Technology University, Mysuru. Graduated with a 9.47/10 CGPA.' },
+  { name: 'Engati · SDE intern', tag: '6 months', lvl: 1, s: [2024, 1], e: [2024, 6], c: 'var(--accent)', more: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
+  { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', lvl: 2, s: [2024, 3], e: [2024, 3], c: 'var(--accent)', more: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
+  { name: 'Engati · Software Engineer', tag: 'full-time', lvl: 1, s: [2024, 7], e: null, c: 'var(--accent)', more: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
+  { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', lvl: 2, s: [2024, 10], e: null, c: 'var(--accent)', more: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day (300K–400K at peak). Failure rate 35% → 12%.' },
+  { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', lvl: 2, s: [2025, 4], e: null, c: 'var(--accent)', more: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
+  { name: 'AI code reviewer', tag: 'spring boot · llm', lvl: 2, s: [2025, 9], e: null, c: 'var(--accent)', more: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
+];
+const traceEl = $('#trace'), ticks = $('#ticks');
+for (let y = 2021; y <= today.getFullYear(); y++) ticks.insertAdjacentHTML('beforeend', `<span style="left:${(mi([y, 1]) - M0) / SPANM * 100}%">${y}</span>`);
+ticks.insertAdjacentHTML('beforeend', '<span style="left:100%">now</span>');
+SPANS.forEach((s, i) => {
+  const a = mi(s.s), b = endOf(s.e), row = document.createElement('div');
+  row.className = 't-row' + (s.lvl === 0 ? ' root' : s.lvl > 1 ? ' child' : '');
+  row.style.cssText = `--s:${(a - M0) / SPANM};--d:${(b - a) / SPANM};--lvl:${Math.max(1, s.lvl)};--i:${i};--c:${s.c}`;
+  row.innerHTML = `<div class="lbl"><span>${s.name}</span><small class="mono">${s.tag}</small></div><div class="t-track"><div class="t-bar"></div></div><div class="dur mono">${dur(b - a)}</div><div class="t-more">${s.more}</div>`;
+  row.addEventListener('click', () => row.classList.toggle('open'));
+  traceEl.appendChild(row);
+});
+$('#sdeDur').textContent = dur(NOWM - mi([2024, 7]));
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .25 });
+io.observe(traceEl);
+$$('.inc').forEach(c => io.observe(c));
+
+/* ---------- playground: the Engati auto-retry framework, live ---------- */
+const PG = (() => {
+  const stage = $('#stage'), canvas = $('#pg'), ctx = canvas.getContext('2d'), logsEl = $('#logs');
+  const toggle = $('#retryToggle'), outageBtn = $('#outage');
+  const M = { fail: $('#mFail'), queue: $('#mQueue'), saved: $('#mSaved') };
+  const FONT = '500 11px "JetBrains Mono", ui-monospace, monospace', SMALL = '400 10px "JetBrains Mono", ui-monospace, monospace';
+  // the real flow: trigger → gateway → trigger-svc → messaging → Meta; failures come back as webhooks,
+  // retryable ones fetch the original payload from MongoDB by trackerId and go back out via RabbitMQ with back-off
+  const NODES = {
+    src:   { label: 'integrations', at: [.10, .22], info: 'LeadSquared · MoEngage send API triggers' },
+    gw:    { label: 'api-gateway',  at: [.30, .22], info: 'entry point for every trigger' },
+    ats:   { label: 'trigger-svc',  at: [.50, .22], info: 'action trigger management service' },
+    msg:   { label: 'messaging',    at: [.70, .22], info: 'platform messaging layer' },
+    meta:  { label: 'meta',         at: [.90, .22], info: 'delivers to the user, then sends a webhook' },
+    wh:    { label: 'webhooks',     at: [.90, .62], info: 'checks status codes: retryable or not' },
+    mongo: { label: 'mongodb',      at: [.70, .62], info: 'original payload, looked up by trackerId' },
+    rmq:   { label: 'rabbitmq',     at: [.50, .62], info: 'retry queue · fixed & exponential back-off' },
+    redis: { label: 'redis',        at: [.90, .88], info: 'trackerId correlation' },
+  };
+  const KEYS = Object.keys(NODES);
+  const EDGES = [
+    ['src', 'gw', 'API trigger', 'send'], ['gw', 'ats', '', 'send'], ['ats', 'msg', '', 'send'], ['msg', 'meta', '', 'send'],
+    ['meta', 'wh', 'webhook', 'hook'], ['wh', 'redis', '', 'retry'], ['wh', 'mongo', 'trackerId', 'retry'],
+    ['mongo', 'rmq', '', 'retry'], ['rmq', 'msg', 'retry + back-off', 'retry'],
+  ];
+  const BASE_FAIL = .35, RETRY_FAIL = .15, OUTAGE_FAIL = .9, RETRYABLE = .7, MAX_ATTEMPTS = 3, SPEED = 210;
+  KEYS.forEach(k => Object.assign(NODES[k], { X: 0, Y: 0, w: 90, flash: 0 }));
+  let W = 0, H = 0, hover = null, packets = [], pops = [], st = 0, acc = 0, outageUntil = -1, wasOutage = false;
+  let retryOn = true, saved = 0, rate = .12, visible = false, booted = false, quiet = false, lastLog = -9, hudAt = 0;
+  const tid = () => Math.random().toString(16).slice(2, 8);
+
+  function resize() {
+    const r = stage.getBoundingClientRect();
+    W = r.width; H = r.height;
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = FONT;
+    KEYS.forEach(k => {
+      const n = NODES[k];
+      n.w = ctx.measureText(n.label).width + 34;
+      n.X = clamp(n.at[0] * W, n.w / 2 + 8, W - n.w / 2 - 8);
+      n.Y = clamp(n.at[1] * H, 24, H - 30);
+    });
+  }
+
+  function log(level, text, gap = 0) {
+    if (quiet || st - lastLog < gap) return;
+    lastLog = st;
+    const line = document.createElement('div');
+    line.className = 'l';
+    line.innerHTML = `<span>${new Date().toTimeString().slice(0, 8)}</span> <span class="lv ${level}">${level}</span> ${text}`;
+    logsEl.appendChild(line);
+    while (logsEl.children.length > 6) logsEl.firstChild.remove();
+  }
+
+  const trigger = (kind = 'send') => packets.push({ kind, path: ['src', 'gw', 'ats', 'msg', 'meta'], seg: 0, t: 0, attempt: 1, id: tid(), trail: [], x: NODES.src.X, y: NODES.src.Y });
+  const pop = (k, kind) => pops.push({ x: NODES[k].X, y: NODES[k].Y, r: 6, a: .9, kind });
+  const drop = (p, why) => { p.drop = true; p.fade = 1; pop('wh', 'bad'); log('ERR', `tr_${p.id} ${why}`, 1.2); };
+
+  function step(dt) {
+    st += dt;
+    const outage = st < outageUntil;
+    if (wasOutage && !outage) { wasOutage = false; setStatus(false); outageBtn.disabled = false; log('OK', 'meta recovered · retry queue draining'); }
+    acc += dt * 2.6;
+    while (acc >= 1) { acc--; trigger(); }
+    for (const p of packets) {
+      if (p.dead) continue;
+      if (p.drop) { p.fade -= dt * 1.6; if (p.fade <= 0) p.dead = true; continue; }
+      if (p.until) {
+        if (st < p.until) continue;
+        p.until = 0; p.kind = 'retry'; p.path = ['rmq', 'msg', 'meta']; p.seg = 0; p.t = 0; p.trail = [];
+      }
+      const a = NODES[p.path[p.seg]], b = NODES[p.path[p.seg + 1]];
+      p.t += SPEED * dt / (Math.hypot(b.X - a.X, b.Y - a.Y) || 1);
+      const tt = Math.min(1, p.t);
+      p.x = lerp(a.X, b.X, tt); p.y = lerp(a.Y, b.Y, tt);
+      if (!quiet) { p.trail.push(p.x, p.y); if (p.trail.length > 16) p.trail.splice(0, 2); }
+      if (p.t < 1) continue;
+      const at = p.path[p.seg + 1];
+      NODES[at].flash = 1; p.seg++; p.t = 0;
+      if (p.seg < p.path.length - 1) continue;
+      if (at === 'meta') {
+        const pf = outage ? OUTAGE_FAIL : p.attempt > 1 ? RETRY_FAIL : BASE_FAIL;
+        if (Math.random() >= pf) {
+          p.dead = true; pop('meta', 'ok');
+          if (p.attempt > 1) { saved++; log('OK', `tr_${p.id} delivered on attempt ${p.attempt}`, .8); }
+        } else { p.kind = 'hook'; p.path = ['meta', 'wh']; p.seg = 0; p.trail = []; }
+      } else if (at === 'wh') {
+        if (Math.random() >= RETRYABLE) drop(p, 'non-retryable status · not retried');
+        else if (!retryOn) drop(p, 'retryable, but the framework is OFF');
+        else if (p.attempt >= MAX_ATTEMPTS) drop(p, `gave up after ${MAX_ATTEMPTS} attempts`);
+        else { p.kind = 'retry'; p.path = ['wh', 'mongo', 'rmq']; p.seg = 0; p.trail = []; NODES.redis.flash = 1; }
+      } else if (at === 'rmq') {
+        const wait = 1.5 * Math.pow(2, p.attempt - 1);
+        p.until = st + wait; p.wait = wait; p.attempt++;
+        log('INFO', `tr_${p.id} queued · retry in ${wait.toFixed(1)}s (attempt ${p.attempt})`, 1.4);
+      }
+    }
+    packets = packets.filter(p => !p.dead);
+    for (const o of pops) { o.r += dt * 50; o.a -= dt * 1.5; }
+    pops = pops.filter(o => o.a > 0);
+    KEYS.forEach(k => { NODES[k].flash = Math.max(0, NODES[k].flash - dt * 2.4); });
+  }
+
+  // the headline number: a large Monte Carlo sample of the same rules, so it is steady and reacts in ~1s
+  function sampleFail(outage) {
+    for (let attempt = 1; ; attempt++) {
+      const pf = outage ? OUTAGE_FAIL : attempt > 1 ? RETRY_FAIL : BASE_FAIL;
+      if (Math.random() >= pf) return 0;
+      if (Math.random() >= RETRYABLE || !retryOn || attempt >= MAX_ATTEMPTS) return 1;
+    }
+  }
+  function hud() {
+    const outage = st < outageUntil;
+    let f = 0;
+    for (let i = 0; i < 400; i++) f += sampleFail(outage);
+    rate = lerp(rate, f / 400, .35);
+    M.fail.textContent = (rate * 100).toFixed(1) + '%';
+    M.fail.className = 'display ' + (rate > .5 ? 'bad' : rate > .2 ? 'warn' : 'good');
+    M.queue.textContent = packets.filter(p => p.until).length;
+    M.saved.textContent = saved.toLocaleString('en-IN');
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const outage = st < outageUntil;
+    ctx.lineWidth = 1.2; ctx.font = SMALL; ctx.textBaseline = 'middle';
+    for (const [a, b, label, type] of EDGES) {
+      const A = NODES[a], B = NODES[b], off = type === 'retry' && !retryOn;
+      ctx.strokeStyle = off ? `rgba(${TH.inkRgb},.07)` : type === 'send' ? TH.line : type === 'hook' ? `rgba(${TH.warn},.55)` : `rgba(${TH.accent},.5)`;
+      ctx.setLineDash(type === 'send' ? [] : [4, 5]);
+      ctx.beginPath(); ctx.moveTo(A.X, A.Y); ctx.lineTo(B.X, B.Y); ctx.stroke();
+      if (label && Math.hypot(A.X - B.X, A.Y - B.Y) - (A.w + B.w) / 2 > ctx.measureText(label).width + 12) {
+        const mx = (A.X + B.X) / 2, my = (A.Y + B.Y) / 2, flat = Math.abs(A.Y - B.Y) < 4;
+        ctx.fillStyle = off ? `rgba(${TH.inkRgb},.2)` : TH.muted;
+        ctx.textAlign = flat ? 'center' : 'right';
+        ctx.fillText(label, flat ? mx : mx - 10, flat ? my - 11 : my);
+      }
+    }
+    ctx.setLineDash([]);
+    for (const o of pops) {
+      const rgb = o.kind === 'ok' ? TH.okRgb : TH.bad;
+      ctx.strokeStyle = `rgba(${rgb},${o.a})`; ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.stroke();
+      if (o.kind === 'ok') { ctx.fillStyle = `rgba(${rgb},${o.a})`; ctx.font = FONT; ctx.textAlign = 'center'; ctx.fillText('✓', o.x + 22, o.y - 20 - (o.r - 6) * .5); }
+    }
+    ctx.font = SMALL;
+    for (const p of packets) {
+      if (p.until) continue;
+      const rgb = p.drop ? TH.bad : p.kind === 'hook' ? TH.warn : p.kind === 'send' ? TH.inkRgb : TH.accent;
+      const al = p.drop ? p.fade : p.kind === 'send' ? .6 : 1, tr = p.trail, rad = p.kind === 'you' ? 3.4 : 2.4;
+      for (let k = 2; k < tr.length; k += 2) {
+        const f = k / tr.length;
+        ctx.strokeStyle = `rgba(${rgb},${f * .5 * al})`; ctx.lineWidth = 2.2 * f;
+        ctx.beginPath(); ctx.moveTo(tr[k - 2], tr[k - 1]); ctx.lineTo(tr[k], tr[k + 1]); ctx.stroke();
+      }
+      ctx.fillStyle = `rgba(${rgb},${.16 * al})`; ctx.beginPath(); ctx.arc(p.x, p.y, rad * 3, 0, TAU); ctx.fill();
+      ctx.fillStyle = `rgba(${rgb},${al})`; ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, TAU); ctx.fill();
+      if (p.kind === 'retry' && !p.drop) { ctx.textAlign = 'left'; ctx.fillText('↻' + p.attempt, p.x + 7, p.y - 9); }
+    }
+    const R = NODES.rmq;
+    packets.filter(p => p.until).forEach((p, i) => {
+      const x = R.X - R.w / 2 + 6 + (i % 10) * 11, y = R.Y + 30 + Math.floor(i / 10) * 11, left = clamp((p.until - st) / p.wait, 0, 1);
+      ctx.fillStyle = `rgb(${TH.accent})`; ctx.beginPath(); ctx.arc(x, y, 2.6, 0, TAU); ctx.fill();
+      ctx.strokeStyle = `rgba(${TH.accent},.6)`; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x, y, 4.6, -Math.PI / 2, -Math.PI / 2 + TAU * left); ctx.stroke();
+    });
+    ctx.font = FONT; ctx.textBaseline = 'middle';
+    KEYS.forEach(k => {
+      const n = NODES[k], down = k === 'meta' && outage, off = !retryOn && (k === 'rmq' || k === 'mongo' || k === 'redis');
+      const x = n.X - n.w / 2 + (down ? rand(-1.2, 1.2) : 0), y = n.Y - 15, w = n.w, h = 30;
+      if (n.flash > 0 && !down && !off) {
+        const pad = (1 - n.flash) * 10;
+        ctx.strokeStyle = `rgba(${TH.accent},${n.flash * .45})`; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.roundRect(x - pad, y - pad, w + pad * 2, h + pad * 2, 4 + pad); ctx.stroke();
+      }
+      ctx.globalAlpha = off ? .35 : 1;
+      ctx.fillStyle = down ? `rgba(${TH.bad},.14)` : TH.bg;
+      ctx.strokeStyle = down ? `rgb(${TH.bad})` : hover === k ? `rgb(${TH.accent})` : `rgba(${TH.inkRgb},${.5 + n.flash * .5})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.roundRect(x, y, w, h, 4); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = down ? `rgb(${TH.bad})` : TH.ok; ctx.beginPath(); ctx.arc(x + 13, n.Y, 3, 0, TAU); ctx.fill();
+      ctx.fillStyle = down ? `rgb(${TH.bad})` : TH.ink; ctx.textAlign = 'left'; ctx.fillText(n.label, x + 23, n.Y + .5);
+      ctx.globalAlpha = 1;
+    });
+    if (!retryOn) { ctx.fillStyle = `rgb(${TH.bad})`; ctx.font = SMALL; ctx.textAlign = 'center'; ctx.fillText('retries OFF', R.X, R.Y + 30); }
+    if (hover) {
+      const n = NODES[hover], right = n.X > W * .6, below = n.Y < H * .6;
+      const txt = hover === 'meta' && outage ? 'outage · most deliveries failing' : n.info;
+      ctx.font = SMALL; ctx.fillStyle = `rgb(${TH.accent})`; ctx.textAlign = right ? 'right' : 'left';
+      ctx.fillText(txt, right ? n.X + n.w / 2 : n.X - n.w / 2, below ? n.Y + 30 : n.Y - 28);
+    }
+  }
+
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    hover = KEYS.find(k => Math.abs(mx - NODES[k].X) < NODES[k].w / 2 + 6 && Math.abs(my - NODES[k].Y) < 22) || null;
+  });
+  canvas.addEventListener('mouseleave', () => { hover = null; });
+  canvas.addEventListener('click', () => {
+    for (let i = 0; i < 5; i++) setTimeout(() => trigger('you'), i * 120);
+    log('YOU', 'you sent 5 triggers through the integrations');
+  });
+  toggle.addEventListener('click', () => {
+    retryOn = !retryOn;
+    toggle.classList.toggle('on', retryOn);
+    toggle.setAttribute('aria-checked', String(retryOn));
+    $('b', toggle).textContent = retryOn ? 'ON' : 'OFF';
+    log(retryOn ? 'OK' : 'WARN', retryOn ? 'retry framework ON · retryable failures get re-sent' : 'retry framework OFF · failed deliveries are lost');
+  });
+  outageBtn.addEventListener('click', () => {
+    if (st < outageUntil) return;
+    outageUntil = st + 5; wasOutage = true; outageBtn.disabled = true;
+    setStatus(true, 'meta outage · retrying');
+    log('WARN', 'meta delivery failures spiking (simulated outage)');
+  });
+  new IntersectionObserver(es => es.forEach(e => {
+    visible = e.isIntersecting;
+    if (visible && !booted) {
+      booted = true; resize();
+      quiet = true;
+      for (let i = 0; i < 600; i++) step(1 / 30); // warm up ~20 s so it opens in a steady state
+      quiet = false; saved = 0;
+      packets.forEach(p => { p.trail = []; });
+      log('INFO', 'retry framework running · ~2M triggers a day in production');
+      log('YOU', 'try it: switch it off, or simulate a Meta outage');
+      hud();
+    }
+  }), { threshold: .15 }).observe(stage);
+
+  return {
+    resize,
+    frame(now, dt) {
+      if (!visible) return;
+      step(dt); draw();
+      if (now > hudAt) { hudAt = now + 300; hud(); }
+    },
+  };
+})();
+
+/* ---------- cursor, hover card, scroll effects ---------- */
+const cursorEl = $('#cursor'), cursorTxt = $('#cursorTxt'), fl = $('#float');
+const m = { x: innerWidth / 2, y: innerHeight / 2 }, cur = { x: m.x, y: m.y }, fp = { x: m.x, y: m.y, r: 0 };
+let over = false, lastY = scrollY, vel = 0, dir = 1, wordsDirty = true, rvPinned = false;
+addEventListener('mousemove', e => {
+  m.x = e.clientX; m.y = e.clientY;
+  over = !!e.target.closest('.rv, .toast');
+  const c = e.target.closest('[data-cursor]');
+  cursorEl.classList.toggle('big', !!c && !over);
+  if (c) cursorTxt.textContent = c.dataset.cursor;
+});
+$$('.w-row').forEach(row => {
+  row.addEventListener('mouseenter', () => {
+    $('#cfTag').textContent = row.dataset.tag;
+    $('#cfGo').textContent = row.dataset.case ? 'Case study ↗' : 'Click to expand';
+    $('#cfMetric').textContent = row.dataset.m; $('#cfLabel').textContent = row.dataset.l;
+    fl.classList.add('on');
+  });
+  row.addEventListener('mouseleave', () => fl.classList.remove('on'));
+});
+addEventListener('scroll', () => {
+  const d = scrollY - lastY; lastY = scrollY;
+  if (d) { dir = d > 0 ? 1 : -1; vel = clamp(vel + Math.abs(d) * .6, 0, 60); }
+  wordsDirty = true;
+  $('#hd').classList.toggle('scrolled', scrollY > 30);
+  const max = root.scrollHeight - innerHeight;
+  $('#progress').style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+  if (scrollY > 500 && !rvPinned) $('#rv').classList.add('min');
+}, { passive: true });
+
+/* ---------- case studies: #/work/<id> ---------- */
+const DIAGRAMS = (() => {
+  const node = (x, y, w, t, s, cls = '') => `<g class="n ${cls}"><rect x="${x}" y="${y}" width="${w}" height="56" rx="4"/><text x="${x + 14}" y="${y + 24}">${t}</text><text class="sub" x="${x + 14}" y="${y + 42}">${s}</text></g>`;
+  const edge = (d, cls = '') => `<path class="e ${cls}" d="${d}"/>`;
+  const dot = (x, y, n) => `<g class="step"><circle cx="${x}" cy="${y}" r="11"/><text x="${x}" y="${y + 4}">${n}</text></g>`;
+  const lab = (x, y, t, a = 'middle') => `<text class="lab" x="${x}" y="${y}" text-anchor="${a}">${t}</text>`;
+  const svg = (h, title, body) => `<svg class="dg" viewBox="0 0 1000 ${h}" role="img" aria-label="${title}"><defs>${['', 'acc', 'warn'].map(c => `<marker id="ah${c}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah ${c}" d="M0,0 L10,5 L0,10 z"/></marker>`).join('')}</defs>${body}</svg>`;
+  return {
+    retry: svg(400, 'How the auto-retry framework works',
+      lab(218, 28, 'API trigger') +
+      node(0, 40, 190, 'integrations', 'LeadSquared · MoEngage') + node(250, 40, 140, 'api-gateway', 'entry point') +
+      node(450, 40, 170, 'trigger-svc', 'action trigger mgmt') + node(680, 40, 140, 'messaging', 'messaging layer') +
+      node(860, 40, 140, 'meta', '→ the user') +
+      edge('M190,68 H246') + edge('M390,68 H446') + edge('M620,68 H676') + edge('M820,68 H856') +
+      edge('M930,96 V226', 'warn') + lab(942, 165, 'webhook', 'start') +
+      node(820, 230, 180, 'webhooks', 'status-code checks', 'acc') + node(560, 230, 190, 'mongodb', 'payload by trackerId', 'acc') +
+      node(310, 230, 190, 'rabbitmq', 'retry + back-off', 'acc') + node(820, 330, 180, 'redis', 'trackerId correlation') +
+      edge('M820,258 H754', 'acc') + edge('M560,258 H504', 'acc') + edge('M405,230 C405,160 750,170 750,100', 'acc') + edge('M910,286 V326') +
+      lab(600, 204, 'retry with back-off', 'start') +
+      dot(218, 68, 1) + dot(418, 68, 2) + dot(648, 68, 3) + dot(930, 160, 4) + dot(820, 230, 5) + dot(787, 258, 6) + dot(578, 165, 7)),
+    rcs: svg(215, 'How the RCS billing pipeline works',
+      node(0, 40, 160, 'rcs webhooks', 'every message event') + node(210, 40, 130, 'kafka', 'event stream') +
+      node(390, 40, 130, 'aws s3', 'raw events') + node(570, 40, 200, 'spark jobs', 'idempotent · replay-safe', 'acc') +
+      node(820, 40, 180, 'billing', 'per bot & customer') +
+      edge('M160,68 H206') + edge('M340,68 H386') + edge('M520,68 H566') + edge('M770,68 H816') +
+      edge('M455,96 C455,170 670,170 670,100', 'acc') + lab(562, 202, 'replay any period ↺') +
+      dot(185, 68, 1) + dot(365, 68, 2) + dot(545, 68, 3) + dot(795, 68, 4) + dot(562, 152, 5)),
+    ai: svg(290, 'How the AI code reviewer works',
+      node(0, 40, 150, 'slack', 'review requested') + node(200, 40, 170, 'review agent', 'spring boot', 'acc') +
+      node(420, 40, 140, 'gitlab', 'MR diff') + node(610, 40, 170, 'token budget', 'fits the context', 'acc') +
+      node(830, 40, 170, 'llm', 'writes feedback') + node(830, 210, 170, 'human reviewer', 'makes the call') +
+      edge('M150,68 H196') + edge('M370,68 H416') + edge('M560,68 H606') + edge('M780,68 H826') + edge('M915,96 V206') +
+      lab(927, 156, 'feedback', 'start') +
+      dot(175, 68, 1) + dot(395, 68, 2) + dot(585, 68, 3) + dot(805, 68, 4) + dot(915, 150, 5)),
+    cart: svg(500, 'How the abandoned-cart flow works',
+      node(0, 40, 170, 'shopify popup', 'theme.liquid CTA') + node(230, 40, 190, 'product-discovery', 'validation checks') +
+      node(480, 40, 160, '@Async task', 'store config checks', 'acc') +
+      node(700, 40, 300, '1 · our database', 'shopper by email') + node(700, 130, 300, '2 · shopify graphql', 'customer in this store') +
+      node(700, 220, 300, '3 · duckdb parquet', 'archived orders, any store: email → phone', 'acc') +
+      node(700, 330, 300, 'kafka', 'keyed by user_id') + node(330, 330, 310, 'shopify-consumer-svc', 'payload · discount · short link', 'acc') +
+      node(380, 430, 210, 'url shortener', 'engati-branded link') + node(0, 330, 270, 'messaging pipeline', '→ the shopper') +
+      edge('M170,68 H226') + edge('M420,68 H476') + edge('M640,68 H696') +
+      edge('M850,96 V126') + lab(862, 115, 'not found', 'start') + edge('M850,186 V216') + lab(862, 205, 'not found', 'start') +
+      edge('M850,276 V326', 'acc') + edge('M700,358 H644', 'acc') + edge('M485,386 V426') + lab(497, 412, 'shorten', 'start') + edge('M330,358 H274', 'acc') +
+      dot(198, 68, 1) + dot(448, 68, 2) + dot(668, 68, 3) + dot(700, 248, 4) + dot(850, 303, 5) + dot(672, 358, 6) + dot(302, 358, 7)),
+  };
+})();
+
+const OK = t => `<span class="ok">● ${t}</span>`;
+const CASES = {
+  'auto-retry': {
+    n: '01', kicker: 'Engati · Resilience', title: 'Auto-retry framework', diagram: 'retry',
+    lede: 'Meta can’t deliver every message the first time. This framework gives failed deliveries another chance, for about <em>2 million API triggers a day</em>.',
+    meta: [['Role', 'Designed it'], ['Stack', 'Java · Spring Boot · RabbitMQ · MongoDB · Redis'], ['Scale', '~2M triggers a day'], ['Status', OK('in production')]],
+    stats: [['35% → 12%', 'failure rate'], ['~2M', 'API triggers a day'], ['50K–100K', 'retries a day'], ['300K–400K', 'retries a day at peak, during Meta failures']],
+    problem: ['Marketing and CRM platforms like LeadSquared and MoEngage trigger messages through Engati’s API. When Meta failed to deliver one, it stayed failed: <b>35% of triggers were failing</b> before this framework.'],
+    steps: ['LeadSquared or MoEngage sends an API trigger.', 'It enters through the API gateway and reaches the action trigger management service.', 'The message goes out through our messaging layer and Meta to the user.', 'Meta sends a webhook back: delivered, or failed with a status code.', 'Status-code checks decide whether the failure is worth retrying.', 'Retryable failures are pushed with a trackerId, the idempotency key, which fetches the original payload from MongoDB.', 'RabbitMQ triggers the retry, with fixed-interval or exponential back-off.'],
+    decisions: [['trackerId as the idempotency key', 'Every retry carries the trackerId of the original message, so it finds the right payload and the same message isn’t sent twice.'], ['Retry only what can succeed', 'Status codes separate temporary failures from permanent ones, so the system doesn’t keep hammering messages that will never go through.'], ['Back off, don’t pile on', 'Fixed-interval and exponential back-off spread retries out, so a Meta outage doesn’t turn into a retry storm.']],
+    results: ['Failure rate cut from <b>35% to 12%</b>.', 'Handles <b>~2M API triggers</b> and <b>50K–100K retries</b> a day.', 'Absorbed peaks of <b>300K–400K retries a day</b> during Meta delivery failures.'],
+    cta: ['See it running: the playground is a live model of this flow', '#play'],
+  },
+  'rcs-billing': {
+    n: '02', kicker: 'Engati · Event-driven data', title: 'RCS billing pipeline', diagram: 'rcs',
+    lede: 'Every RCS message event ends up on a customer’s bill. This pipeline counts each one once, <em>even when a job runs again</em>.',
+    meta: [['Role', 'Architected it'], ['Stack', 'Apache Kafka · AWS S3 · Apache Spark'], ['Scope', 'Customer billing for RCS'], ['Status', OK('in production')]],
+    stats: [['Kafka', 'takes in every webhook'], ['S3', 'keeps the raw events'], ['Spark', 'idempotent, replay-safe jobs'], ['3 keys', 'botRef · customerId · metric type']],
+    problem: ['RCS usage is billed from webhook events, so the numbers have to be exact. Events arrive all day, and a billing job that fails halfway, or runs twice, must never change what a customer pays.'],
+    steps: ['Every RCS message event arrives as a webhook and is published to Apache Kafka.', 'Events are persisted to AWS S3, so the raw data is always kept.', 'Spark jobs aggregate them by botRef, customerId and metric type.', 'The totals feed customer billing.', 'The jobs are idempotent and replay-safe: re-running any period gives the same totals.'],
+    decisions: [['Kafka in front', 'Publishing webhooks to Kafka separates receiving events from processing them, so a burst of traffic doesn’t hold billing up.'], ['Keep the raw events', 'Everything lands in S3 first, so any period can be recomputed from the source if something goes wrong.'], ['Idempotent by design', 'Running a job twice gives the same totals as running it once, so a replay can never double-bill a customer.']],
+    results: ['Accurate customer billing for RCS, <b>aggregated per bot, customer and metric</b>.', 'Failed or repeated jobs are <b>safe to re-run</b>: the totals stay the same.'],
+  },
+  'ai-reviewer': {
+    n: '03', kicker: 'Engati · AI tooling · company award', title: 'AI code reviewer', diagram: 'ai',
+    lede: 'A reviewer that reads the diff first. Code review went from about <em>2 hours to 30 minutes</em> per developer, and the team made it their default.',
+    meta: [['Role', 'Engineered it'], ['Stack', 'Spring Boot · GitLab API · LLM · Slack'], ['Users', '~20 developers'], ['Status', OK('team default')]],
+    stats: [['2 h → 30 min', 'review effort per developer'], ['~20', 'developers use it'], ['Default', 'the team’s review workflow'], ['Award', 'company award for the project']],
+    problem: ['Reviewing a merge request took each developer around two hours. The idea: let an assistant do the first pass on the diff, while a person still makes the final call.'],
+    steps: ['A developer asks for a review from Slack.', 'The Spring Boot agent pulls the merge request’s diff from GitLab.', 'Token-budget preprocessing shapes the diff to fit the model’s context window.', 'An LLM writes review feedback.', 'The feedback goes to a human reviewer, who makes the final call.'],
+    decisions: [['Start in Slack', 'Reviews begin where the team already talks, so there was nothing new to learn.'], ['Mind the token budget', 'Large diffs are shaped before they reach the model, so big merge requests still fit in its context.'], ['An aid, not an autopilot', 'The AI suggests; a person decides. Its output is always checked by a human.']],
+    results: ['Review effort per developer: <b>~2 hours → ~30 minutes</b>.', 'Adopted by <b>~20 developers</b> and became <b>the team’s default</b> review workflow.', 'Won a <b>company award</b>.'],
+  },
+  'abandoned-cart': {
+    n: '04', kicker: 'Engati · Internship · full stack', title: 'Abandoned-cart recovery', diagram: 'cart',
+    lede: 'High-intent shoppers who leave a Shopify store get a personal nudge to come back: a branded link, and a discount if the store offers one. I designed and shipped it end to end as an intern, in <em>one to two sprints</em>.',
+    meta: [['Role', 'Built it end to end (intern)'], ['Stack', 'Shopify Liquid · Spring Boot @Async · Shopify GraphQL · DuckDB · Kafka'], ['Timeline', '1–2 sprints'], ['Status', OK('shipped')]],
+    stats: [['1–2 sprints', 'from design to production'], ['3 lookups', 'our DB → Shopify GraphQL → DuckDB'], ['2 services', 'product-discovery · shopify-consumer'], ['Full stack', 'storefront popup to the shopper’s phone']],
+    problem: ['A store can only win back an abandoned cart if it can reach the shopper. Shopify doesn’t share a customer’s details across stores, so someone new to one store is often unknown there, even if they have ordered elsewhere.'],
+    steps: ['The shopper enters their phone number in a CTA popup on the Shopify store, built with theme.liquid.', 'The product-discovery-service runs validation checks and hands off to an @Async task.', 'The async task checks the store’s Shopify integration and configuration, then looks the shopper up by email: our database first, then Shopify’s GraphQL API for that store.', 'Last fallback: the archived-orders parquet in DuckDB, across every store. It pulls all matching records and extracts the phone number, even when it wasn’t in the shipping details.', 'The result is pushed to Kafka, keyed by user_id.', 'The shopify-consumer-service builds the payload, applies any discount configured on the portal, and turns the store link into an Engati-branded short URL with our in-house shortener.', 'The message goes out through Engati’s existing messaging pipeline.'],
+    decisions: [['Three places to look', 'Shopify can’t see across stores, so the lookup falls back from our database, to Shopify’s GraphQL API, to archived orders in DuckDB that span every store.'], ['Async at every hop', 'Validation happens up front; store checks and lookups run in an @Async task, and the hand-off to messaging goes through Kafka.'], ['Keyed by user_id', 'Kafka messages are keyed by user_id, so everything about one shopper lands on the same partition, in order.']],
+    results: ['Designed, built and tested end to end in <b>one to two sprints</b>, as an intern.', 'Shoppers new to a store can still be reached, thanks to the <b>cross-store DuckDB lookup</b>.', 'Learned design patterns like <b>adapter and factory</b> along the way.'],
+    quote: 'I worked days and nights to test it end to end. It was a lot of fun, and I learned a lot.',
+  },
+};
+const ORDER = Object.keys(CASES);
+
+function renderCase(id) {
+  const c = CASES[id], next = ORDER[(ORDER.indexOf(id) + 1) % ORDER.length];
+  return `
+  <div class="case-top wrap"><a class="back mono" href="#work">← Back to work</a><span class="label mono">Case study ${c.n} / 0${ORDER.length}</span></div>
+  <header class="case-hero wrap">
+    <div class="label">${c.kicker}</div>
+    <h1 class="case-title display">${c.title}</h1>
+    <p class="case-lede">${c.lede}</p>
+    <dl class="case-meta mono">${c.meta.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+  </header>
+  <div class="case-stats wrap">${c.stats.map(([v, l]) => `<div><b class="display">${v}</b><span>${l}</span></div>`).join('')}</div>
+  <section class="case-sec wrap"><div class="label">(01) The problem</div><div class="case-body">${c.problem.map(p => `<p>${p}</p>`).join('')}</div></section>
+  <section class="case-sec wrap"><div class="label">(02) How it works</div><div class="case-body"><div class="dg-wrap">${DIAGRAMS[c.diagram]}</div><ol class="steps">${c.steps.map(s => `<li><span>${s}</span></li>`).join('')}</ol></div></section>
+  <section class="case-sec wrap"><div class="label">(03) Key decisions</div><div class="case-body"><div class="decisions">${c.decisions.map(([h, p]) => `<div><h4>${h}</h4><p>${p}</p></div>`).join('')}</div></div></section>
+  <section class="case-sec wrap"><div class="label">(04) Results</div><div class="case-body"><ul class="results">${c.results.map(r => `<li><span>${r}</span></li>`).join('')}</ul>${c.quote ? `<blockquote class="case-quote">${c.quote}</blockquote>` : ''}${c.cta ? `<a class="case-cta mono" href="${c.cta[1]}">${c.cta[0]} →</a>` : ''}</div></section>
+  <a class="case-next wrap" href="#/work/${next}"><span class="label">Next case study</span><span class="display">${CASES[next].title} →</span></a>`;
+}
+
+/* routing: the project title glides from its row (or the "next" link) into the case header and back */
+const homeEl = $('#home'), caseEl = $('#case');
+let view = 'home';
+function swap(update, morphFrom) {
+  if (!document.startViewTransition || reduce || document.visibilityState !== 'visible') return update();
+  if (morphFrom) morphFrom.style.viewTransitionName = 'case-title';
+  const vt = document.startViewTransition(() => { if (morphFrom) morphFrom.style.viewTransitionName = ''; update(); });
+  const clear = () => $$('.w-row .t').forEach(t => { t.style.viewTransitionName = ''; });
+  vt.ready.catch(() => {});
+  vt.finished.then(clear, clear);
+}
+function showCase(id) {
+  const from = view === 'home' ? $(`.w-row[href="#/work/${id}"] .t`) : $('.case-next .display');
+  fl.classList.remove('on');
+  swap(() => {
+    caseEl.innerHTML = renderCase(id);
+    homeEl.classList.remove('on'); caseEl.classList.add('on');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    document.title = `${CASES[id].title} · Shashank H R`;
+    view = id;
+  }, from);
+}
+function showHome(target) {
+  const from = view;
+  swap(() => {
+    caseEl.classList.remove('on'); homeEl.classList.add('on');
+    document.title = 'Shashank H R · Backend Engineer';
+    view = 'home';
+    const el = target && document.getElementById(target);
+    if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    const t = $(`.w-row[href="#/work/${from}"] .t`);
+    if (t) t.style.viewTransitionName = 'case-title';
+  });
+}
+function route() {
+  const m = location.hash.match(/^#\/work\/([\w-]+)$/);
+  if (m && CASES[m[1]]) { if (view !== m[1]) showCase(m[1]); }
+  else if (view !== 'home') showHome(location.hash.slice(1));
+}
+addEventListener('hashchange', route);
+const firstCase = location.hash.match(/^#\/work\/([\w-]+)$/);
+if (firstCase && CASES[firstCase[1]]) {
+  caseEl.innerHTML = renderCase(firstCase[1]);
+  homeEl.classList.remove('on'); caseEl.classList.add('on'); view = firstCase[1];
+}
+
+$$('.w-row.brief').forEach(row => {
+  const more = document.getElementById(row.getAttribute('aria-controls'));
+  const flip = () => { const open = !more.classList.contains('open'); more.classList.toggle('open', open); row.setAttribute('aria-expanded', String(open)); };
+  row.addEventListener('click', flip);
+  row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+});
+
+/* ---------- review note ---------- */
+$('#rvX').addEventListener('click', e => { e.stopPropagation(); $('#rv').classList.add('min'); rvPinned = true; });
+$('#rv').addEventListener('click', () => { const rv = $('#rv'); if (rv.classList.contains('min')) { rv.classList.remove('min'); rvPinned = true; } });
+$$('.rv-b button').forEach(b => b.addEventListener('click', () => {
+  $$('.rv-b button').forEach(x => x.classList.remove('done'));
+  b.classList.add('done');
+  b.textContent = b.dataset.choice === 'love' ? '✓ Great, say so in chat' : '✎ Tell me what in chat';
+}));
+
+/* ---------- page load + clock ---------- */
+let loadMs = null;
+addEventListener('load', () => setTimeout(() => {
+  const nav = performance.getEntriesByType('navigation')[0];
+  loadMs = Math.round(nav && nav.loadEventEnd > 0 ? nav.loadEventEnd : performance.now());
+  $('#ftLoad').textContent = loadMs + ' ms';
+}, 0));
+const IST = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });
+const t0 = performance.now();
+
+/* ---------- main loop ---------- */
+let last = performance.now(), secAt = 0, errored = false;
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  try {
+    cur.x = lerp(cur.x, m.x, .25); cur.y = lerp(cur.y, m.y, .25);
+    cursorEl.style.transform = `translate3d(${cur.x}px,${cur.y}px,0)`;
+    cursorEl.style.opacity = fine && !over ? 1 : 0;
+
+    fp.x = lerp(fp.x, m.x, .2); fp.y = lerp(fp.y, m.y, .2);
+    fl.style.transform = `translate3d(${fp.x}px,${fp.y}px,0)`;
+    fl.classList.toggle('flip', m.x > innerWidth - 290);
+    vel *= Math.pow(.92, dt * 60);
+    const sp = (60 + vel * 14) * dt;
+    bxs[0] -= sp * dir; bxs[1] += sp * dir;
+    for (let i = 0; i < 2; i++) {
+      if (bxs[i] <= -halfW[i]) bxs[i] += halfW[i];
+      if (bxs[i] > 0) bxs[i] -= halfW[i];
+      inners[i].style.transform = `translate3d(${bxs[i]}px,0,0)`;
+    }
+    const hr = heroEl.getBoundingClientRect();
+    if (hr.bottom > 0) letters.forEach((ch, i) => {
+      const cx = hr.left + ch.offsetLeft + ch.offsetWidth / 2, cy = hr.top + ch.offsetTop + ch.offsetHeight / 2;
+      const inf = over || !fine ? 0 : clamp(1 - Math.hypot(m.x - cx, m.y - cy) / 300, 0, 1), st = LS[i];
+      st.y = lerp(st.y, -inf * 22, .14); st.s = lerp(st.s, 1 + inf * .14, .14);
+      ch.style.transform = `translate3d(0,${st.y.toFixed(2)}px,0) scaleY(${st.s.toFixed(3)})`;
+      ch.classList.toggle('hot', inf > .55);
+    });
+    if (wordsDirty) {
+      wordsDirty = false;
+      const r = big.getBoundingClientRect(), vh = innerHeight;
+      const lit = clamp((vh * .85 - r.top) / (r.height + vh * .25), 0, 1) * (words.length + 4);
+      words.forEach((w, i) => { w.style.opacity = clamp(lit - i, .14, 1); });
+    }
+    typing(now);
+    PG.frame(now, dt);
+    if (now > secAt) {
+      secAt = now + 1000;
+      $('#clock').textContent = IST.format(new Date()) + ' IST';
+      const s = Math.floor((now - t0) / 1000);
+      $('#ftUp').textContent = [s / 3600, s / 60 % 60, s % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':');
+    }
+  } catch (err) { if (!errored) { errored = true; console.error(err); } }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+let rz;
+addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { measureBands(); PG.resize(); }, 150); });
+if (document.fonts) document.fonts.ready.then(() => { measureBands(); PG.resize(); });
+})();
+</script>
+</body>
+</html>
