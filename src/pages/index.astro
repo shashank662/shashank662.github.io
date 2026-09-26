@@ -2,9 +2,11 @@
 import Base from '../layouts/Base.astro';
 import Hero from '../components/home/Hero.astro';
 import Strips from '../components/home/Strips.astro';
+import About from '../components/home/About.astro';
 import { profile } from '../data/profile';
 ---
 <Base title={`${profile.name} · ${profile.role}`} description={profile.metaDescription}>
   <Hero />
   <Strips />
+  <About />
 </Base>
