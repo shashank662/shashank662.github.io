@@ -61,18 +61,20 @@ const { hero } = profile;
   }
   .ch { display: inline-block; overflow: hidden; padding-top: 0.05em; transform-origin: 50% 100%; will-change: transform; }
   .ch > span {
-    display: inline-block; transform: translateY(108%);
+    display: inline-block;
     transition: transform 1.2s var(--ease-out), color 0.3s;
     transition-delay: calc(var(--i) * 60ms + 0.1s);
   }
+  /* The letters and the line under them start hidden only when JavaScript runs, so they always show without it. */
+  :global(.js) .ch > span { transform: translateY(108%); }
   .hero:global(.go) .ch > span { transform: none; }
   .ch:global(.hot) > span { color: var(--accent); }
 
   .row2 {
     display: grid; grid-template-columns: auto 1fr; gap: 4vw; align-items: end; margin-top: 2.6vw;
-    opacity: 0; transform: translateY(24px);
     transition: opacity 1s 0.75s, transform 1.2s var(--ease-out) 0.75s;
   }
+  :global(.js) .row2 { opacity: 0; transform: translateY(24px); }
   .hero:global(.go) .row2 { opacity: 1; transform: none; }
 
   .badge { width: clamp(96px, 10.5vw, 150px); aspect-ratio: 1; position: relative; display: block; }
@@ -102,7 +104,7 @@ const { hero } = profile;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ch > span, .row2 { transform: none; opacity: 1; transition: none; }
+    :global(.js) .ch > span, :global(.js) .row2 { transform: none; opacity: 1; transition: none; }
     .badge svg, .caret { animation: none; }
   }
 </style>
