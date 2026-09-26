@@ -90,6 +90,8 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
 
   @media (max-width: 760px) {
     .axis, .head { grid-template-columns: 130px 1fr 52px; gap: 12px; }
+    /* Too narrow for every year: keep 2021, 2023, 2025 … and "now". */
+    .ticks span:nth-child(even):not(.now) { display: none; }
     .lbl { font-size: 14px; }
     .lbl small { display: none; }
     .name { white-space: normal; line-height: 1.25; }
