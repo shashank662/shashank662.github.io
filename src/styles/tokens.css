@@ -1,0 +1,47 @@
+/* Design tokens. Light is the default; dark overrides the same names. */
+:root {
+  color-scheme: light;
+  --bg: #f1ede4;
+  --ink: #141414;
+  --muted: #6b675f;
+  --line: rgba(20, 20, 20, 0.2);
+  --line2: rgba(20, 20, 20, 0.07);
+  --accent: #1f3dff;
+  --on-accent: #ffffff;
+  --ok: #15803d;
+  --warn: #c2410c;
+  --bad: #dc2626;
+  --strip1-bg: #141414;
+  --strip1-fg: #f1ede4;
+  --strip2-bg: var(--accent);
+  --strip2-fg: #f1ede4;
+  --grain-opacity: 0.55;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+
+  --font-display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+
+  --gutter: 3.2vw;
+  --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0e0d0c;
+  --ink: #efeae0;
+  --muted: #8f8a81;
+  --line: rgba(239, 234, 224, 0.17);
+  --line2: rgba(239, 234, 224, 0.07);
+  --accent: #5a78ff;
+  --on-accent: #0e0d0c;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --bad: #f87171;
+  --strip1-bg: #efeae0;
+  --strip1-fg: #0e0d0c;
+  --strip2-fg: #0e0d0c;
+  --grain-opacity: 0.5;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}

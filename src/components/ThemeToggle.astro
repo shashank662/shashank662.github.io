@@ -1,0 +1,20 @@
+---
+// The label shows the current theme; the accessible name says what a press will do.
+---
+<button class="theme-btn" type="button" data-theme-toggle aria-label="Switch theme">
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+    <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+    <path d="M8 1a7 7 0 0 1 0 14z" fill="currentColor" />
+  </svg>
+  <span data-theme-label>Theme</span>
+</button>
+
+<style>
+  .theme-btn {
+    display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px 0 9px;
+    border-radius: 999px; border: 1px solid var(--line); transition: border-color 0.25s;
+  }
+  .theme-btn:hover { border-color: var(--ink); }
+  .theme-btn svg { transition: transform 0.8s cubic-bezier(0.7, 0, 0.25, 1); }
+  :global([data-theme='dark']) .theme-btn svg { transform: rotate(180deg); }
+</style>

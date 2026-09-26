@@ -1,0 +1,108 @@
+---
+import { profile } from '../../data/profile';
+import { emphasize } from '../../lib/text';
+
+const letters = profile.firstName.toUpperCase().split('');
+const { hero } = profile;
+---
+<section class="hero" id="top" data-hero>
+  <div class="meta">
+    <div>
+      <p class="label">{hero.label}</p>
+      <p class="intro">{hero.intro}</p>
+    </div>
+    <ol class="index mono" aria-label="Sections">
+      {profile.sections.map((s) => <li><a href={s.href}><span>{s.n}</span>{s.label}</a></li>)}
+    </ol>
+  </div>
+
+  <h1 class="name display" aria-label={profile.firstName}>
+    {letters.map((c, i) => <span class="ch" aria-hidden="true"><span style={`--i:${i}`}>{c}</span></span>)}
+  </h1>
+
+  <div class="row2">
+    <a class="badge" href="#about" aria-label="Scroll to About">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <defs><path id="badge-circle" d="M50,50 m-40,0 a40,40 0 1,1 80,0 a40,40 0 1,1 -80,0" /></defs>
+        <text><textPath href="#badge-circle" textLength="249" lengthAdjust="spacing">{hero.badge}</textPath></text>
+      </svg>
+      <span class="core" aria-hidden="true">↓</span>
+    </a>
+    <div class="lede-wrap">
+      <p class="lede" set:html={emphasize(hero.lede)} />
+      <p class="typed mono" aria-hidden="true">
+        <span class="pr">~/shashank $</span> <span data-typed data-lines={JSON.stringify(hero.typedLines)}></span><i class="caret"></i>
+      </p>
+      <p class="visually-hidden">{hero.typedLines.join('. ')}</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/hero';
+</script>
+
+<style>
+  .hero {
+    position: relative; min-height: 100vh; min-height: 100svh;
+    padding: 112px var(--gutter) 54px; display: flex; flex-direction: column;
+  }
+  .meta { display: flex; justify-content: space-between; gap: 32px; }
+  .intro { max-width: 350px; margin-top: 12px; font-size: 15px; line-height: 1.55; color: var(--muted); }
+  .index { font-size: 12px; line-height: 2.1; }
+  .index a { display: flex; gap: 16px; transition: color 0.25s; }
+  .index span { color: var(--muted); }
+  .index a:hover { color: var(--accent); }
+
+  .name {
+    margin-top: auto; padding-top: 40px;
+    font-size: clamp(84px, 20.5vw, 360px); line-height: 0.8;
+    display: flex; justify-content: space-between; white-space: nowrap; user-select: none;
+  }
+  .ch { display: inline-block; overflow: hidden; padding-top: 0.05em; transform-origin: 50% 100%; will-change: transform; }
+  .ch > span {
+    display: inline-block; transform: translateY(108%);
+    transition: transform 1.2s var(--ease-out), color 0.3s;
+    transition-delay: calc(var(--i) * 60ms + 0.1s);
+  }
+  .hero:global(.go) .ch > span { transform: none; }
+  .ch:global(.hot) > span { color: var(--accent); }
+
+  .row2 {
+    display: grid; grid-template-columns: auto 1fr; gap: 4vw; align-items: end; margin-top: 2.6vw;
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 1s 0.75s, transform 1.2s var(--ease-out) 0.75s;
+  }
+  .hero:global(.go) .row2 { opacity: 1; transform: none; }
+
+  .badge { width: clamp(96px, 10.5vw, 150px); aspect-ratio: 1; position: relative; display: block; }
+  .badge svg { width: 100%; height: 100%; overflow: visible; animation: spin 14s linear infinite; }
+  .badge text { font: 600 8.4px var(--font-sans); letter-spacing: 0.14em; text-transform: uppercase; fill: var(--ink); }
+  .core {
+    position: absolute; inset: 29%; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+    display: grid; place-items: center; font-size: clamp(16px, 1.8vw, 24px);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .lede-wrap { justify-self: end; text-align: right; max-width: 920px; }
+  .lede { font-family: var(--font-serif); font-size: clamp(28px, 3.8vw, 62px); line-height: 1.02; letter-spacing: -0.01em; }
+  .lede :global(em) { color: var(--accent); }
+  .typed { margin-top: 18px; font-size: clamp(12px, 1.05vw, 14px); color: var(--muted); min-height: 1.6em; }
+  .pr { color: var(--accent); }
+  .caret {
+    display: inline-block; width: 0.55em; height: 1.1em; margin-left: 2px; vertical-align: -0.2em;
+    background: var(--accent); animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  @media (max-width: 760px) {
+    .index { display: none; }
+    .row2 { grid-template-columns: 1fr; }
+    .lede-wrap { text-align: left; justify-self: start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ch > span, .row2 { transform: none; opacity: 1; transition: none; }
+    .badge svg, .caret { animation: none; }
+  }
+</style>

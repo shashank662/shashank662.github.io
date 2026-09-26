@@ -1,0 +1,21 @@
+---
+import Status from './Status.astro';
+import { profile } from '../data/profile';
+
+const year = new Date().getFullYear();
+---
+<footer class="ft wrap mono">
+  <span>© {year} {profile.name} · built with Astro</span>
+  <span>
+    page loaded in <b data-load-ms>—</b> · uptime <b data-uptime>00:00:00</b> · <Status />
+  </span>
+</footer>
+
+<style>
+  .ft {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    padding-top: 24px; padding-bottom: 96px;
+    border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted);
+  }
+  b { color: var(--ink); font-weight: 500; }
+</style>
