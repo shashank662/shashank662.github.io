@@ -14,10 +14,15 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.local(),
-      name: 'Anton',
+      name: 'IBM Plex Sans Condensed',
       cssVariable: '--font-display',
-      fallbacks: ['Impact', 'Arial Narrow', 'sans-serif'],
-      options: { variants: [{ src: ['@fontsource/anton/files/anton-latin-400-normal.woff2'], weight: 400, style: 'normal' }] },
+      fallbacks: ['Arial Narrow', 'sans-serif'],
+      options: {
+        variants: [
+          { src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-600-normal.woff2'], weight: 600, style: 'normal' },
+          { src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff2'], weight: 700, style: 'normal' },
+        ],
+      },
     },
     {
       provider: fontProviders.local(),
@@ -33,20 +38,27 @@ export default defineConfig({
     },
     {
       provider: fontProviders.local(),
-      name: 'Inter Variable',
+      name: 'IBM Plex Sans',
       cssVariable: '--font-sans',
       fallbacks: ['-apple-system', 'system-ui'],
-      options: { variants: [{ src: ['@fontsource-variable/inter/files/inter-latin-wght-normal.woff2'], weight: '100 900', style: 'normal' }] },
+      options: {
+        variants: [
+          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-300-normal.woff2'], weight: 300, style: 'normal' },
+          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2'], weight: 400, style: 'normal' },
+          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-500-normal.woff2'], weight: 500, style: 'normal' },
+          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2'], weight: 600, style: 'normal' },
+        ],
+      },
     },
     {
       provider: fontProviders.local(),
-      name: 'JetBrains Mono',
+      name: 'IBM Plex Mono',
       cssVariable: '--font-mono',
       fallbacks: ['ui-monospace', 'Menlo', 'monospace'],
       options: {
         variants: [
-          { src: ['@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2'], weight: 400, style: 'normal' },
-          { src: ['@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2'], weight: 500, style: 'normal' },
+          { src: ['@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2'], weight: 400, style: 'normal' },
+          { src: ['@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2'], weight: 500, style: 'normal' },
         ],
       },
     },
