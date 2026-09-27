@@ -37,13 +37,13 @@ export default defineConfig({
       },
     },
     {
-      // Only for the two crossing bands on the home page, which keep their bold condensed look.
+      // Only for the two crossing bands on the home page: the one place the site slants.
       provider: fontProviders.local(),
-      name: 'IBM Plex Sans Condensed',
+      name: 'Instrument Serif',
       cssVariable: '--font-strip',
-      fallbacks: ['Arial Narrow', 'sans-serif'],
+      fallbacks: ['Georgia', 'serif'],
       options: {
-        variants: [{ src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff2'], weight: 700, style: 'normal' }],
+        variants: [{ src: ['@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2'], weight: 400, style: 'italic' }],
       },
     },
     {
