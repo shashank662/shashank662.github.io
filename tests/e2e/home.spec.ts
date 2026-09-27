@@ -154,3 +154,28 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('#span-5')).toBeVisible();
   });
 });
+
+test("hovering Let's talk never moves the arrow out from under the pointer, so it can't flicker", async ({ page }) => {
+  await page.goto('/');
+  const link = page.locator('#contact .big');
+  await link.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  // The arrow's hovered pose, as the stylesheet sets it.
+  await link.hover({ position: { x: 20, y: 40 } });
+  await page.waitForTimeout(800);
+  const hovered = await link.locator('span').evaluate((el) => getComputedStyle(el).transform);
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(800);
+  // A point flickers if it is over the link with the arrow at rest (hover starts) but not once the arrow has moved (hover ends).
+  const flickering = await link.evaluate((el, pose) => {
+    const arrow = el.querySelector('span')!;
+    arrow.style.transition = 'none';
+    const over = (x: number, y: number) => document.elementFromPoint(x, y)?.closest('#contact .big') === el;
+    const box = arrow.getBoundingClientRect();
+    const points: [number, number][] = [];
+    for (let x = box.left - 20; x <= box.right + 60; x += 4) for (let y = box.top - 60; y <= box.bottom + 60; y += 4) points.push([x, y]);
+    const atRest = points.map(([x, y]) => over(x, y));
+    arrow.style.transform = pose;
+    return points.filter((_, i) => atRest[i] && !over(...points[i])).length;
+  }, hovered);
+  expect(flickering).toBe(0);
+});
