@@ -69,6 +69,10 @@ test('a first visit opens on SHR in light letters on a dark screen', async ({ pa
 test('SHR is drawn just as the display face draws it', async ({ page }) => {
   await page.goto('/');
   await holding(page);
+  // Compare the letters alone: the blue outline crosses them on purpose.
+  await page.locator('[data-echo]').evaluate((echo) => {
+    (echo as SVGGElement).style.display = 'none';
+  });
   await keepShot(page, 'drawn');
   // The same word as text in the page's display face, set in the same place over everything.
   await page.evaluate(({ left, baseline, size }) => {
@@ -81,7 +85,10 @@ test('SHR is drawn just as the display face draws it', async ({ page }) => {
     const text = document.createElementNS(ns, 'text');
     text.setAttribute('x', String(left));
     text.setAttribute('y', String(baseline));
+    // Styled like the landing letters: a light fill with a hairline of the same colour.
     text.setAttribute('fill', '#f1ede4');
+    text.setAttribute('stroke', '#f1ede4');
+    text.setAttribute('stroke-width', '1.5');
     text.textContent = 'SHR';
     svg.append(text);
     document.body.append(svg);
