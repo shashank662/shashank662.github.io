@@ -18,22 +18,7 @@ export default defineConfig({
       cssVariable: '--font-display',
       fallbacks: ['Arial Narrow', 'sans-serif'],
       options: {
-        variants: [
-          { src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-600-normal.woff2'], weight: 600, style: 'normal' },
-          { src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff2'], weight: 700, style: 'normal' },
-        ],
-      },
-    },
-    {
-      provider: fontProviders.local(),
-      name: 'Instrument Serif',
-      cssVariable: '--font-serif',
-      fallbacks: ['Georgia', 'serif'],
-      options: {
-        variants: [
-          { src: ['@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2'], weight: 400, style: 'normal' },
-          { src: ['@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2'], weight: 400, style: 'italic' },
-        ],
+        variants: [{ src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff2'], weight: 700, style: 'normal' }],
       },
     },
     {
