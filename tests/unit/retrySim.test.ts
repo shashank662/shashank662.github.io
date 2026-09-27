@@ -94,6 +94,30 @@ describe('RetrySim', () => {
     expect(Math.abs(sim.sampleFailureRate(8000) - 0.8)).toBeLessThan(0.03);
   });
 
+  it('reports a failed delivery back through the webhook receiver and the analytics pipeline to trigger-mvc', () => {
+    const sim = new RetrySim({ random: seeded(11) });
+    const routes = new Set<string>();
+    for (let t = 0; t < 30; t += 1 / 30) {
+      sim.step(1 / 30);
+      for (const p of sim.packets) if (p.kind === 'hook') routes.add(p.path.join(' → '));
+    }
+    expect([...routes]).toEqual(['meta → wh → an → ats']);
+  });
+
+  it('holds a retry in RabbitMQ, then trigger-mvc fetches its payload and sends it out through messaging again', () => {
+    const sim = new RetrySim({ random: seeded(12) });
+    const routes = new Set<string>();
+    const events: SimEvent[] = [];
+    for (let t = 0; t < 60; t += 1 / 30) {
+      events.push(...sim.step(1 / 30));
+      for (const p of sim.packets) if (p.kind === 'retry') routes.add(p.path.join(' → '));
+    }
+    expect([...routes].sort()).toEqual(['ats → rmq', 'rmq → ats → msg → meta']);
+    const fetched = only(events, 'fetched').length;
+    expect(fetched).toBeGreaterThan(0);
+    expect(fetched).toBeLessThanOrEqual(only(events, 'queued').length);
+  });
+
   it("sends a visitor's triggers a little apart", () => {
     const sim = new RetrySim({ random: seeded(9) });
     sim.send(5);

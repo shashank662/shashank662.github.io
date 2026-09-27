@@ -167,18 +167,18 @@ The four case studies, with the facts they must contain:
 - `src/lib/retrySim.ts`: a pure simulation with no DOM access. It takes an injectable random-number function and is driven by `step(dt)`.
 - `src/scripts/playground.ts`: canvas renderer, controls, logs, visibility handling.
 
-**Nodes** (positions as fractions of the stage): integrations (.10,.22), api-gateway (.30,.22), trigger-svc (.50,.22), messaging (.70,.22), meta (.90,.22), webhooks (.90,.62), mongodb (.70,.62), rabbitmq (.50,.62), redis (.90,.88). Hovering a node shows a one-line description.
+**Nodes** (wide positions as fractions of the stage; phones use a taller arrangement): integrations (.10,.20), api-gateway (.30,.20), trigger-mvc (.50,.20), messaging (.70,.20), meta (.90,.20), redis (.60,.50), mongodb (.14,.80), rabbitmq (.32,.80), analytics (.50,.80), webhook-receiver (.86,.80). Hovering a node shows a one-line description. The flow was confirmed by the owner on 2026-09-27.
 
 **Rules**
 
 | Rule | Value |
 |---|---|
-| New triggers | 2.6 per second, path integrations → api-gateway → trigger-svc → messaging → meta, moving at 210 px/s |
+| New triggers | 2.6 per second, path integrations → api-gateway → trigger-mvc → messaging → meta, moving at 210 px/s; messaging keeps each trackerId in redis |
 | Failure chance at meta | 0.35 on the first attempt; 0.15 on retries; 0.90 during an outage |
 | On success | green pop at meta; if attempt > 1, "saved by retries" +1 |
-| On failure | a webhook packet travels meta → webhooks |
-| At webhooks | retryable with chance 0.70. Dropped (red) if non-retryable, if retries are OFF, or if attempt ≥ 3. Otherwise it travels webhooks → mongodb → rabbitmq, and redis flashes (trackerId correlation). |
-| At rabbitmq | waits 1.5 s × 2^(attempt−1), shown as a queued dot with a countdown ring; the attempt number increases; then it travels rabbitmq → messaging → meta, labelled ↻n |
+| On failure | a webhook packet travels meta → webhook-receiver → analytics (which records the reason) → trigger-mvc |
+| At trigger-mvc | retryable with chance 0.70. Dropped (red, at trigger-mvc) if non-retryable, if retries are OFF, or if attempt ≥ 3. Otherwise it travels trigger-mvc → rabbitmq. |
+| At rabbitmq | waits 1.5 s × 2^(attempt−1), shown as a queued dot with a countdown ring; the attempt number increases; then it travels rabbitmq → trigger-mvc (redis and mongodb flash: trackerId, then payload) → messaging → meta, labelled ↻n |
 | Headline failure rate | every 300 ms, a Monte Carlo sample of 400 virtual messages under the same rules, smoothed by moving 35% toward the new value. Settles near 12% (ON), 35% (OFF) and 80% (outage). |
 
 **Controls**
@@ -347,7 +347,7 @@ Building does not wait on these; placeholders use the best current values, and l
 1. Real start dates for the project spans on the timeline (retry framework, RCS billing, AI reviewer, abandoned-cart). Current values are estimates; the alternative is to drop the dates and show those spans without bars.
 2. Full-time duration: July 2024 gives "2y 2m" as of this spec; the owner mentioned 2.4 years. Confirm the start month.
 3. Education dates: shown as August 2020 – July 2024 from the résumé's "2020 – 2024".
-4. Redis's exact role in the retry flow, and whether retries re-enter at the messaging layer or at trigger-svc.
+4. ~~Redis's exact role in the retry flow, and whether retries re-enter at the messaging layer or at trigger-svc.~~ Confirmed 2026-09-27: messaging keeps each trackerId in Redis; failures return webhook-receiver → analytics → trigger-mvc, which re-enters through messaging.
 5. Any figures for the RCS billing pipeline (events a day, customers billed).
 6. Which email address, LinkedIn URL and GitHub URL to show.
 7. The public résumé PDF: it currently includes a phone number. Keep it, or supply a copy without it.

@@ -2,19 +2,21 @@ import type { NodeId } from './retrySim';
 
 /**
  * Each node's label and where it sits, as fractions of the stage's width and height.
- * `wide` is the spec's landscape layout. `tall` is for phones, where the wide one would overlap:
- * the main path runs down the left and the retry loop comes back up the right.
+ * `wide` is the spec's landscape layout: the send path along the top, trigger-mvc's stores and the webhook path
+ * below it. `tall` is for phones, where the wide one would overlap: the send path runs down the middle-left,
+ * Redis sits to its left, and the stores and the webhook path run down the right.
  */
 export const NODES: Record<NodeId, { label: string; wide: readonly [number, number]; tall: readonly [number, number] }> = {
-  src: { label: 'integrations', wide: [0.1, 0.22], tall: [0.27, 0.07] },
-  gw: { label: 'api-gateway', wide: [0.3, 0.22], tall: [0.27, 0.24] },
-  ats: { label: 'trigger-svc', wide: [0.5, 0.22], tall: [0.27, 0.41] },
-  msg: { label: 'messaging', wide: [0.7, 0.22], tall: [0.27, 0.58] },
-  meta: { label: 'meta', wide: [0.9, 0.22], tall: [0.27, 0.78] },
-  wh: { label: 'webhooks', wide: [0.9, 0.62], tall: [0.73, 0.78] },
-  mongo: { label: 'mongodb', wide: [0.7, 0.62], tall: [0.73, 0.58] },
-  rmq: { label: 'rabbitmq', wide: [0.5, 0.62], tall: [0.73, 0.41] },
-  redis: { label: 'redis', wide: [0.9, 0.88], tall: [0.73, 0.94] },
+  src: { label: 'integrations', wide: [0.1, 0.2], tall: [0.35, 0.06] },
+  gw: { label: 'api-gateway', wide: [0.3, 0.2], tall: [0.35, 0.2] },
+  ats: { label: 'trigger-mvc', wide: [0.5, 0.2], tall: [0.35, 0.36] },
+  msg: { label: 'messaging', wide: [0.7, 0.2], tall: [0.35, 0.56] },
+  meta: { label: 'meta', wide: [0.9, 0.2], tall: [0.35, 0.8] },
+  redis: { label: 'redis', wide: [0.6, 0.5], tall: [0.11, 0.46] },
+  mongo: { label: 'mongodb', wide: [0.14, 0.8], tall: [0.76, 0.2] },
+  rmq: { label: 'rabbitmq', wide: [0.32, 0.8], tall: [0.76, 0.36] },
+  an: { label: 'analytics', wide: [0.5, 0.8], tall: [0.76, 0.6] },
+  wh: { label: 'webhook-receiver', wide: [0.86, 0.8], tall: [0.76, 0.8] },
 };
 
 /** Every node box is this tall, in px. */
