@@ -103,7 +103,8 @@ Every page shares the same header, footer, and "Ask about me" button (section 9)
   - Nobody is ever stuck behind it: if its script has not started within 4 s (it failed to load), the page shows anyway, and an error during the show ends it.
 - **Build:**
   - The letters are Source Serif 4's display outlines (weight 700, optical size 60), stored as SVG paths in `src/lib/shr-glyphs.ts`. Chrome stops drawing text far below the size the dive reaches, and the outlines need no font to load, so the animation starts with the first frame.
-  - The letters cut holes in the dark screen, so the page is there, inside the S, all along. The page paints behind the screen, and its lede stays in place, so the largest paint is not held back.
+  - The letters cut holes in the dark screen, so the page is there, inside the S, all along.
+  - Behind the screen the page stays see-through until its fonts are in (or the dive starts), so no text reflows under it: a reflow there still counts as layout shift, and on Linux and Android, which lack the Mac and Windows fonts the stand-ins are tuned to, it would. See-through rather than hidden, so screen readers read the page throughout.
   - Screen readers read the page as normal: the screen is `aria-hidden`.
 
 Sections, in order:
@@ -117,7 +118,7 @@ Sections, in order:
    - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph; on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
    - The name "Shashank" in Source Serif 4 Bold, about half a laptop screen wide (13vw, up to 200px). Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent when very close.
    - Second row: a rotating circular badge ("Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺", accent core with "↓" linking to About) and the light lede "I build *reliable backends* for high-volume messaging."
-   - A mono line types and erases four lines in turn, prompt `~/shashank $`.
+   - A mono line types and erases four lines in turn, prompt `~/shashank $`. It types rightward from a prompt that stays put, in a block as wide as the longest line (right-aligned under the lede on wider screens).
 3. **Skill strips.** Two slightly rotated marquee bands: one lists skills (Java, Spring Boot, Apache Kafka, RabbitMQ, Redis, MongoDB, Spark, AWS S3, Microservices), the other highlights (Open to SDE-2 roles, Employee of the Month ×2, MongoDB certified, CGPA 9.47, Bangalore). They drift at a base speed; scroll speed adds a boost and scroll direction sets the drift direction.
 4. **(01) About.** A mono facts list (`based_in`, `engati` SDE and intern lines with computed durations, `stack`, `education`, `awards`, `status`) beside a large paragraph whose words fade from 14% to full opacity as it scrolls through the viewport. Phrases marked in the data render in serif italic accent.
 5. **(02) Experience — "Experience"**
@@ -290,7 +291,7 @@ Content is separated from layout so it can be edited without touching components
 ## 11. Interaction and motion rules
 
 - Everything that moves respects `prefers-reduced-motion: reduce`: no landing screen, no letter reveal or lean, no theme wipe, strips paused, words fully shown, bars shown filled, playground paused behind "Play".
-- Nothing that animates on its own changes the layout: the hero's typed line keeps room for its longest line (two lines on phones), so typing never pushes the name up.
+- Nothing that animates on its own changes the layout: the hero's typed line keeps room for its longest line (two lines on phones), so typing never pushes the name up, and its prompt stays put, so typing never slides it along.
 - The custom cursor (a small dot with `mix-blend-mode: difference` that grows into a thin ring over interactive targets) only appears for `(pointer: fine)`; it never carries text. Touch devices keep native behaviour.
 - One shared `requestAnimationFrame` loop drives cursor, strips, letters and the playground; each part does no work while off-screen.
 
@@ -339,7 +340,7 @@ Content is separated from layout so it can be edited without touching components
   - the chatbot opens, a suggestion chip returns an answer with a source link, a typed question gets an answer, and Escape closes the panel and returns focus
   - `/404` renders
   - a crawl of internal links finds no broken links
-  - the landing screen: it plays on a first visit and dives into the page by itself; a scroll, key press or tap skips it without scrolling the page; it does not play again in the same visit, from another page of the site, for a section link or with reduced motion; it stays dark with light letters in the dark theme; SHR matches the display face as the page draws it; the S is as deep where the dive heads as the script assumes; the page's largest paint happens behind it; and nothing shifts when it clears. Other browser tests start past it (`tests/e2e/fixtures.ts`).
+  - the landing screen: it plays on a first visit and dives into the page by itself; a scroll, key press or tap skips it without scrolling the page; it does not play again in the same visit, from another page of the site, for a section link or with reduced motion; it stays dark with light letters in the dark theme; SHR matches the display face as the page draws it; the S is as deep where the dive heads as the script assumes; the page's largest paint happens behind it; nothing shifts when it clears, even when fonts arrive late with no look-alike font installed. Other browser tests start past it (`tests/e2e/fixtures.ts`).
 - **Lighthouse:** run against the production build before launch; scores recorded in the README.
 
 ## 14. Repository, commits and deploy
