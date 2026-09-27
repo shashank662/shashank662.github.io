@@ -61,6 +61,7 @@ Adobe's Source family: a serif for headings and big numbers, a sans for text, a 
 | Source Serif 4 (variable: weight and optical size) | the hero name, section titles (semibold), case study, work and incident titles, big numbers (bold); normal case. Big sizes get its display design automatically |
 | Source Sans 3 (300–600) | ledes (light), body text and UI |
 | Source Code Pro | technical labels, logs, diagram text, the career trace |
+| IBM Plex Sans Condensed Bold | only the two crossing bands on the home page, in capitals (the owner kept their earlier look) |
 
 Emphasis is never italic: accent words are semibold in the accent colour.
 
@@ -70,7 +71,7 @@ Emphasis is never italic: accent words are semibold in the accent colour.
 - Interactive parts are small TypeScript modules loaded with Astro `<script>` tags, only on the pages that use them.
 - **Page transitions** use native cross-document view transitions (`@view-transition { navigation: auto; }`). Each work row's title and its case-study title share a `view-transition-name` (`work-<slug>`), so the title glides between pages in Chromium and Safari. Other browsers navigate normally.
 - **The theme switch** uses a same-document view transition with a circular `clip-path` wipe that starts at the click point. Without view-transition support, or with reduced motion, the theme simply switches.
-- Packages: `astro`, `@astrojs/check`, `@astrojs/sitemap`, `@fontsource-variable/source-serif-4`, `@fontsource/source-serif-4` (static, for the preview images), `@fontsource/source-sans-3`, `@fontsource/source-code-pro`, `minisearch` (the chatbot's in-browser search), `satori` + `@resvg/resvg-js` (preview images), `vitest`, `@playwright/test`.
+- Packages: `astro`, `@astrojs/check`, `@astrojs/sitemap`, `@fontsource-variable/source-serif-4`, `@fontsource/source-serif-4` (static, for the preview images), `@fontsource/source-sans-3`, `@fontsource/source-code-pro`, `@fontsource/ibm-plex-sans-condensed` (the crossing bands), `minisearch` (the chatbot's in-browser search), `satori` + `@resvg/resvg-js` (preview images), `vitest`, `@playwright/test`.
 
 ## 4. Pages and routes
 
@@ -98,7 +99,7 @@ Sections, in order:
    - After 30px of scroll the header gets a blurred `--bg` background and a hairline. A 2px accent bar across the top shows scroll progress.
 2. **Hero**
    - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph; on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
-   - The name "Shashank" in Source Serif 4 Bold, spread across the full width. Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent when very close.
+   - The name "Shashank" in Source Serif 4 Bold, about half a laptop screen wide (13vw, up to 200px). Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent when very close.
    - Second row: a rotating circular badge ("Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺", accent core with "↓" linking to About) and the light lede "I build *reliable backends* for high-volume messaging."
    - A mono line types and erases four lines in turn, prompt `~/shashank $`.
 3. **Skill strips.** Two slightly rotated marquee bands: one lists skills (Java, Spring Boot, Apache Kafka, RabbitMQ, Redis, MongoDB, Spark, AWS S3, Microservices), the other highlights (Open to SDE-2 roles, Employee of the Month ×2, MongoDB certified, CGPA 9.47, Bangalore). They drift at a base speed; scroll speed adds a boost and scroll direction sets the drift direction.
