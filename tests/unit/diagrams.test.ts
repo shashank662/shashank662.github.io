@@ -36,3 +36,9 @@ describe.each(DIAGRAM_IDS)('the %s diagram', (id) => {
     expect(spec.title).toMatch(/^How the .+ works$/);
   });
 });
+
+it('draws the retry framework with the real services', () => {
+  const titles = diagrams.retry.nodes.map((node) => node.title);
+  expect(titles).toEqual(expect.arrayContaining(['trigger-mvc', 'messaging', 'redis', 'webhook-receiver', 'analytics', 'rabbitmq', 'mongodb']));
+  expect(titles).not.toContain('trigger-svc');
+});
