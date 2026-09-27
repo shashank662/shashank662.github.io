@@ -61,9 +61,9 @@ Adobe's Source family: a serif for headings and big numbers, a sans for text, a 
 | Source Serif 4 (variable: weight and optical size) | the hero name, section titles (semibold), case study, work and incident titles, big numbers (bold); normal case. Big sizes get its display design automatically |
 | Source Sans 3 (300–600) | ledes (light), body text and UI |
 | Source Code Pro | technical labels, logs, diagram text, the career trace |
-| IBM Plex Sans Condensed Bold | only the two crossing bands on the home page, in capitals (the owner kept their earlier look) |
+| Instrument Serif italic | only the two crossing bands on the home page, in normal case: the one slanted text on the site (the owner's pick, from the site's first design) |
 
-Emphasis is never italic: accent words are semibold in the accent colour.
+Emphasis is never italic: accent words are semibold in the accent colour. The crossing bands are the one exception.
 
 ## 3. Stack
 
@@ -71,7 +71,7 @@ Emphasis is never italic: accent words are semibold in the accent colour.
 - Interactive parts are small TypeScript modules loaded with Astro `<script>` tags, only on the pages that use them.
 - **Page transitions** use native cross-document view transitions (`@view-transition { navigation: auto; }`). Each work row's title and its case-study title share a `view-transition-name` (`work-<slug>`), so the title glides between pages in Chromium and Safari. Other browsers navigate normally.
 - **The theme switch** uses a same-document view transition with a circular `clip-path` wipe that starts at the click point. Without view-transition support, or with reduced motion, the theme simply switches.
-- Packages: `astro`, `@astrojs/check`, `@astrojs/sitemap`, `@fontsource-variable/source-serif-4`, `@fontsource/source-serif-4` (static, for the preview images), `@fontsource/source-sans-3`, `@fontsource/source-code-pro`, `@fontsource/ibm-plex-sans-condensed` (the crossing bands), `minisearch` (the chatbot's in-browser search), `satori` + `@resvg/resvg-js` (preview images), `vitest`, `@playwright/test`.
+- Packages: `astro`, `@astrojs/check`, `@astrojs/sitemap`, `@fontsource-variable/source-serif-4`, `@fontsource/source-serif-4` (static, for the preview images), `@fontsource/source-sans-3`, `@fontsource/source-code-pro`, `@fontsource/instrument-serif` (the crossing bands), `minisearch` (the chatbot's in-browser search), `satori` + `@resvg/resvg-js` (preview images), `vitest`, `@playwright/test`.
 
 ## 4. Pages and routes
 
