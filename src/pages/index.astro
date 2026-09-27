@@ -26,7 +26,13 @@ import { profile } from '../data/profile';
         fromSite = new URL(document.referrer).origin === location.origin;
       } catch {}
       const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!seen && !fromSite && !location.hash && !still) document.documentElement.classList.add('landing');
+      if (seen || fromSite || location.hash || still) return;
+      const root = document.documentElement;
+      root.classList.add('landing');
+      // If the landing screen's script has not taken over by then (it failed to load), show the page anyway.
+      setTimeout(() => {
+        if (!root.classList.contains('landing-live')) root.classList.remove('landing');
+      }, 4000);
     })();
   </script>
   <Landing />
