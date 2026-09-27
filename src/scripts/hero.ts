@@ -1,3 +1,4 @@
+import { onReveal } from './landing';
 import { finePointer, onFrame, prefersReducedMotion } from './motion';
 
 const hero = document.querySelector<HTMLElement>('[data-hero]');
@@ -5,8 +6,9 @@ const hero = document.querySelector<HTMLElement>('[data-hero]');
 if (hero) {
   const reduce = prefersReducedMotion();
 
-  // Letters slide up once the first frame has painted, so the transition actually runs.
-  requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.add('go')));
+  // Letters slide up once a frame has painted, so the transition actually runs: at once, or, on a first visit,
+  // as the landing screen dives into the page.
+  onReveal(() => requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.add('go'))));
 
   // Letters lean toward a nearby mouse cursor.
   if (finePointer() && !reduce) {
