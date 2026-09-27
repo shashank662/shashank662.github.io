@@ -33,19 +33,18 @@ function originOf(url: string): string | null {
 export const LANDING = {
   /** The blue line draws across the screen. */
   lineMs: 550,
-  /** S starts to open out of the line; H and R follow, a little later each. */
+  /** The S starts to open out of the line. */
   openAt: 380,
-  openStagger: 120,
   openMs: 900,
-  /** The line fades once the letters are open. */
+  /** The line fades once the S is open. */
   lineFadeAt: 1000,
   lineFadeMs: 500,
   /** Without a scroll, click, tap or key press, the dive starts by itself. */
   diveAt: 2600,
   diveMs: 1250,
-  /** A skip opens any letter still closed this fast. */
+  /** A skip opens the S this fast, if it is still closed. */
   skipMs: 350,
-  /** Degrees the letters turn through during the dive. */
+  /** Degrees the S turns through during the dive. */
   twist: -12,
 } as const;
 
@@ -53,17 +52,17 @@ export interface LandingPose {
   /** How much of the line is drawn (0–1), and its opacity. */
   line: number;
   lineOpacity: number;
-  /** How far S, H and R have opened out of the line (0–1). */
-  open: [number, number, number];
+  /** How far the S has opened out of the line (0–1). */
+  open: number;
   /** How far the dive has gone, eased (0–1). */
   zoom: number;
-  /** How much the letters have grown, and how far they have turned (degrees). */
+  /** How much the S has grown, and how far it has turned (degrees). */
   scale: number;
   turn: number;
-  /** The blue outline runs a little ahead of the letters. */
+  /** The blue outline runs a little ahead of the S. */
   echoScale: number;
   echoTurn: number;
-  /** Opacity of the light letters' fill (their thin outline stays), the blue outline and the dark screen. */
+  /** Opacity of the light S's fill (its thin outline stays), the blue outline and the dark screen. */
   fill: number;
   echo: number;
   screen: number;
@@ -78,18 +77,16 @@ const fadeOut = (p: number, from: number, to: number) => (p <= from ? 1 : p >= t
 
 /**
  * Where everything is `t` ms into the landing screen and `dive` ms into the dive (null before it starts),
- * for letters that must grow `cover` times before the S fills the screen.
+ * for an S that must grow `cover` times before it fills the screen.
  */
 export function landingPose(t: number, dive: number | null, cover: number): LandingPose {
   const skip = dive === null ? 0 : clamp01(dive / LANDING.skipMs);
   const p = dive === null ? 0 : clamp01(dive / LANDING.diveMs);
   const zoom = easeInOutCubic(p);
-  const openOf = (i: number) =>
-    Math.max(easeOutExpo(clamp01((t - LANDING.openAt - i * LANDING.openStagger) / LANDING.openMs)), skip);
   return {
     line: easeOutExpo(clamp01(t / LANDING.lineMs)),
     lineOpacity: Math.min(fadeOut(t, LANDING.lineFadeAt, LANDING.lineFadeAt + LANDING.lineFadeMs), 1 - skip),
-    open: [openOf(0), openOf(1), openOf(2)],
+    open: Math.max(easeOutExpo(clamp01((t - LANDING.openAt) / LANDING.openMs)), skip),
     zoom,
     // Growth is exponential, so the dive feels like moving at an even speed rather than a sudden burst.
     scale: cover ** zoom,
@@ -117,12 +114,12 @@ export interface Point {
 export const S_SHAPE = { deep: { x: 0.339, y: -0.277, r: 0.068 } } as const;
 
 /**
- * The band each letter opens through, in font units (y up): centred on the capitals, and tall enough for the S's
- * overshoot and the serifs.
+ * The band the S opens through, in font units (y up): centred on the capitals, and tall enough for the S's
+ * overshoot.
  */
 export const BAND = { middle: SHR_GLYPHS.capHeight / 2, half: SHR_GLYPHS.capHeight / 2 + 60 } as const;
 
-export interface SHRLayout {
+export interface SLayout {
   /** Font size in px, and px per font unit. */
   size: number;
   k: number;
@@ -134,12 +131,12 @@ export interface SHRLayout {
   clearance: number;
 }
 
-/** SHR sized to a `width` × `height` screen: its ink centred across, its capitals centred down. */
-export function layoutSHR(width: number, height: number): SHRLayout {
+/** The S sized to a `width` × `height` screen: its ink centred across, its capital height centred down. */
+export function layoutS(width: number, height: number): SLayout {
   const size = Math.min(width * 0.4, height * 0.58);
   const k = size / SHR_GLYPHS.unitsPerEm;
-  const [S, , R] = SHR_GLYPHS.letters;
-  const inkMiddle = (S.ink[0] + R.x + R.ink[2]) / 2;
+  const [S] = SHR_GLYPHS.letters;
+  const inkMiddle = (S.ink[0] + S.ink[2]) / 2;
   const left = width / 2 - inkMiddle * k;
   const baseline = height / 2 + (SHR_GLYPHS.capHeight * k) / 2;
   return {
@@ -153,7 +150,7 @@ export function layoutSHR(width: number, height: number): SHRLayout {
 }
 
 /**
- * How many times the letters must grow around `origin`, where the S's stroke is `clearance` pixels deep,
+ * How many times the S must grow around `origin`, where the S's stroke is `clearance` pixels deep,
  * before the S covers a `width` × `height` screen. A little to spare, since the stroke is not a circle.
  */
 export function coverScale(origin: Point, clearance: number, width: number, height: number): number {
