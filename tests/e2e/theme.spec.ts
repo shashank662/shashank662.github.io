@@ -82,3 +82,21 @@ test('the picker fits on the screen', async ({ page }) => {
   expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
   expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
 });
+
+// The menu and the circular wipe are drawn above the whole page, the cursor dot included, so there the real pointer shows.
+test('the pointer never disappears: it shows over the open menu and while the theme changes', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Phones have no pointer.');
+  await page.goto('/');
+  await expect(html(page)).toHaveClass(/(^|\s)fine(\s|$)/);
+  await button(page).click();
+  const option = menu(page).getByRole('radio', { name: 'Forest' });
+  await option.hover();
+  await expect(menu(page)).toHaveCSS('cursor', 'auto');
+  await expect(option).toHaveCSS('cursor', 'pointer');
+  // The dot hides under the menu rather than peeking out at its edge beside the pointer.
+  await expect(page.locator('[data-cursor-dot]')).toHaveCSS('opacity', '0');
+
+  // During the wipe the page is a picture over everything, and the pointer takes the page's own cursor.
+  await page.evaluate(() => document.documentElement.classList.add('theme-wipe'));
+  await expect(html(page)).toHaveCSS('cursor', 'auto');
+});
