@@ -108,6 +108,14 @@ export interface Point {
 }
 
 /**
+ * The bold display S of Source Serif 4, in ems from its pen position on the baseline: the capitals' height, and the
+ * point deepest inside its stroke (on the lower curve), where the dive heads, with how deep the stroke is there.
+ * Measured once from the glyph as the browser draws it at 1000px. The browser test re-measures it on screen, since a
+ * canvas cannot draw the display cut the page uses and so cannot measure it at run time.
+ */
+export const S_SHAPE = { capHeight: 0.657, deep: { x: 0.339, y: -0.277, r: 0.068 } } as const;
+
+/**
  * How many times the letters must grow around `origin`, where the S's stroke is `clearance` pixels deep,
  * before the S covers a `width` × `height` screen. A little to spare, since the stroke is not a circle.
  */
