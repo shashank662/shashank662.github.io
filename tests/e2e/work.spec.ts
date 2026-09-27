@@ -52,7 +52,7 @@ test('case studies fit the screen, with the stats in tidy columns', async ({ pag
       screen: document.documentElement.clientWidth,
     }));
     expect(width.content, c.slug).toBeLessThanOrEqual(width.screen);
-    await expect(page.getByRole('button', { name: /Switch to/ })).toBeInViewport();
+    await expect(page.getByRole('button', { name: /^Colour theme/ })).toBeInViewport();
 
     // On a phone the stats sit in two columns, so the first and third values line up on the left.
     const lefts = await page.locator('.stats b').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left));

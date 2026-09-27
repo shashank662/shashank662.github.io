@@ -28,7 +28,7 @@ decisions:
   - title: "Retry only what can succeed"
     body: "Status codes separate temporary failures from permanent ones, so the system doesn’t keep hammering messages that will never go through."
   - title: "Back off, don’t pile on"
-    body: "Fixed-interval and exponential back-off spread retries out, so a Meta outage doesn’t turn into a retry storm."
+    body: "Fixed-interval and exponential back-off spread retries out, so a burst of failure webhooks from Meta doesn’t turn into a retry storm."
 results:
   - "Failure rate cut from **35% to 12%**."
   - "Handles **~2M API triggers** and **50K–100K retries** a day."

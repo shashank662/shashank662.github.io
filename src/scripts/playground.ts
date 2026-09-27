@@ -24,7 +24,7 @@ function start(root: HTMLElement): void {
   const logs = $<HTMLElement>('[data-logs]');
   const framework = $<HTMLButtonElement>('[data-retry-switch]');
   const frameworkLabel = $<HTMLElement>('[data-switch-label]');
-  const outageButton = $<HTMLButtonElement>('[data-outage]');
+  const burstButton = $<HTMLButtonElement>('[data-error-webhooks]');
   const sendButton = $<HTMLButtonElement>('[data-send]');
   const playButton = $<HTMLButtonElement>('[data-play]');
   const failRate = $<HTMLElement>('[data-metric="fail"]');
@@ -67,10 +67,10 @@ function start(root: HTMLElement): void {
         log('ERR', `tr_${event.id} ${DROPPED[event.reason]}`, 1.2);
       } else if (event.type === 'queued') {
         log('INFO', `tr_${event.id} queued · retry in ${event.wait.toFixed(1)}s (attempt ${event.attempt})`, 1.4);
-      } else if (event.type === 'outage-over') {
+      } else if (event.type === 'error-webhooks-over') {
         setSiteStatus('ok');
-        outageButton.disabled = false;
-        log('OK', 'meta recovered · retry queue draining');
+        burstButton.disabled = false;
+        log('OK', 'failure webhooks back to normal · retry queue draining');
       }
     }
   };
@@ -99,7 +99,7 @@ function start(root: HTMLElement): void {
     // Twenty simulated seconds, so it opens mid-flow instead of empty.
     sim.warmUp(20);
     log('INFO', 'retry framework running · ~2M triggers a day in production');
-    log('YOU', 'try it: switch it off, or simulate a Meta outage');
+    log('YOU', 'try it: switch it off, or simulate error webhooks');
     hud();
     scene.draw(sim);
     if (paused) playButton.hidden = false;
@@ -114,12 +114,12 @@ function start(root: HTMLElement): void {
     else log('WARN', 'retry framework OFF · failed deliveries are lost');
   });
 
-  outageButton.addEventListener('click', () => {
+  burstButton.addEventListener('click', () => {
     play();
-    if (!sim.startOutage()) return;
-    outageButton.disabled = true;
-    setSiteStatus('degraded', 'meta outage · retrying');
-    log('WARN', 'meta delivery failures spiking (simulated outage)');
+    if (!sim.startErrorWebhooks()) return;
+    burstButton.disabled = true;
+    setSiteStatus('degraded', 'error webhooks · retrying');
+    log('WARN', 'meta sending failure webhooks for most deliveries (simulated)');
   });
 
   const send = () => {
@@ -164,8 +164,8 @@ function start(root: HTMLElement): void {
 
   onFrame((now, dt) => {
     if (!booted || paused) return;
-    // Off-screen the model rests, except that a running outage still has to end on time.
-    if (!visible && !sim.outage) return;
+    // Off-screen the model rests, except that a running burst of error webhooks still has to end on time.
+    if (!visible && !sim.errorWebhooks) return;
     handle(sim.step(dt));
     scene.age(dt);
     if (drawn) scene.draw(sim);

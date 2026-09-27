@@ -140,7 +140,7 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
   };
 
   const draw = (sim: RetrySim) => {
-    const outage = sim.outage;
+    const erroring = sim.errorWebhooks;
     ctx.clearRect(0, 0, W, H);
     ctx.textBaseline = 'middle';
 
@@ -249,15 +249,16 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
         ctx.stroke();
       });
 
-    // Nodes on top. Meta shakes and turns red in an outage; the retry nodes fade when retries are off.
+    // Nodes on top. While Meta sends error webhooks, it and the webhook receiver glow amber: Meta is still up, just
+    // reporting failures. The retry nodes fade when retries are off.
     ctx.font = FONT;
     for (const id of IDS) {
       const n = boxes[id];
-      const down = id === 'meta' && outage;
+      const busy = erroring && (id === 'meta' || id === 'wh');
       const off = !sim.retryOn && (id === 'rmq' || id === 'mongo' || id === 'redis');
-      const x = n.x - n.w / 2 + (down ? (Math.random() - 0.5) * 2.4 : 0);
+      const x = n.x - n.w / 2;
       const y = n.y - BOX_HEIGHT / 2;
-      if (flash[id] > 0 && !down && !off) {
+      if (flash[id] > 0 && !busy && !off) {
         const pad = (1 - flash[id]) * 10;
         ctx.strokeStyle = `rgba(${theme.accent},${flash[id] * 0.45})`;
         ctx.lineWidth = 1;
@@ -266,9 +267,9 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
         ctx.stroke();
       }
       ctx.globalAlpha = off ? 0.35 : 1;
-      ctx.fillStyle = down ? `rgba(${theme.bad},.14)` : theme.bg;
-      ctx.strokeStyle = down
-        ? `rgb(${theme.bad})`
+      ctx.fillStyle = busy ? `rgba(${theme.warn},.14)` : theme.bg;
+      ctx.strokeStyle = busy
+        ? `rgb(${theme.warn})`
         : hovered === id
           ? `rgb(${theme.accent})`
           : `rgba(${theme.ink},${0.5 + flash[id] * 0.5})`;
@@ -277,11 +278,11 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
       ctx.roundRect(x, y, n.w, BOX_HEIGHT, 4);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = down ? `rgb(${theme.bad})` : `rgb(${theme.ok})`;
+      ctx.fillStyle = busy ? `rgb(${theme.warn})` : `rgb(${theme.ok})`;
       ctx.beginPath();
       ctx.arc(x + 13, n.y, 3, 0, TAU);
       ctx.fill();
-      ctx.fillStyle = down ? `rgb(${theme.bad})` : `rgb(${theme.ink})`;
+      ctx.fillStyle = busy ? `rgb(${theme.warn})` : `rgb(${theme.ink})`;
       ctx.textAlign = 'left';
       ctx.fillText(NODES[id].label, x + 23, n.y + 0.5);
       ctx.globalAlpha = 1;
@@ -302,7 +303,13 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
       ctx.font = SMALL;
       ctx.fillStyle = `rgb(${theme.accent})`;
       ctx.textAlign = right ? 'right' : 'left';
-      const text = hovered === 'meta' && outage ? 'outage · most deliveries failing' : INFO[hovered];
+      const text = !erroring
+        ? INFO[hovered]
+        : hovered === 'meta'
+          ? 'up, but sending failure webhooks for most deliveries'
+          : hovered === 'wh'
+            ? 'a burst of failure webhooks coming in'
+            : INFO[hovered];
       ctx.fillText(text, right ? n.x + n.w / 2 : n.x - n.w / 2, below ? n.y + 30 : n.y - 28);
     }
   };
