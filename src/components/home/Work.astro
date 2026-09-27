@@ -11,7 +11,7 @@ const glide = (slug: string) => `view-transition-name: work-${slug}; view-transi
 ---
 <section class="section wrap" id="work">
   <SectionHead n="03" label="Selected work · Engati" meta={`${cases.length + 1} systems · ${cases.length} case studies`} />
-  <h2 class="h2 display" set:html={emphasize(title)} />
+  <h2 class="h2" set:html={emphasize(title)} />
   <div class="rows">
     {cases.map(({ id, data }) => (
       <a
