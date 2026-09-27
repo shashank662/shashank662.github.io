@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOX_HEIGHT, layoutNodes, type NodeBox } from '../../src/lib/playgroundLayout';
+import { BOX_HEIGHT, NODES, layoutNodes, type NodeBox } from '../../src/lib/playgroundLayout';
 
 // The canvas labels are 11px IBM Plex Mono: 0.6em, about 6.6px, per character.
 const measure = (text: string) => text.length * 6.6;
@@ -27,4 +27,10 @@ describe.each([
   it('keeps nodes from touching each other', () => {
     boxes.forEach((a, i) => boxes.slice(i + 1).forEach((b) => expect(overlap(a, b)).toBe(false)));
   });
+});
+
+it('names the real services', () => {
+  const labels = Object.values(NODES).map((node) => node.label);
+  expect(labels).toEqual(expect.arrayContaining(['trigger-mvc', 'messaging', 'webhook-receiver', 'analytics']));
+  expect(labels).not.toContain('trigger-svc');
 });
