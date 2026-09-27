@@ -9,7 +9,7 @@ const { playground } = profile;
   <SectionHead n="05" label="Playground" status />
   <h2 class="h2" set:html={emphasize(playground.title)} />
   <p class="sub">{playground.sub}</p>
-  <div class="grid">
+  <div class="grid" data-model>
     <div class="stage" data-stage data-cursor>
       <canvas data-canvas role="img" aria-label={playground.canvasLabel}></canvas>
       <button type="button" class="send mono" data-send>↳ send 5 of your own triggers</button>
