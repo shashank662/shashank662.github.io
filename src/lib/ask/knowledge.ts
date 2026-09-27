@@ -1,4 +1,4 @@
-import type { Profile } from '../../data/profile';
+import type { CareerSpan, Profile } from '../../data/profile';
 import { monthsBetween, toAttr, type YearMonth } from '../dates';
 import { plainText } from '../text';
 import type { AskEntry } from './types';
@@ -29,7 +29,7 @@ const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
 /** Every answer the bot knows, built from the same data the pages use, so no fact is written twice. */
 export function buildKnowledge({ profile, cases, faq }: KnowledgeInput): AskEntry[] {
   const span = (id: 'education' | 'internship' | 'full-time') => {
-    const found = profile.career.spans.find((s) => s.id === id);
+    const found = profile.career.spans.find((s): s is CareerSpan => s.id === id);
     if (!found) throw new Error(`profile.career has no span with id "${id}"`);
     return found;
   };
