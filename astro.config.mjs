@@ -14,36 +14,37 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.local(),
-      name: 'IBM Plex Sans Condensed',
+      name: 'Source Serif 4',
       cssVariable: '--font-display',
-      fallbacks: ['Arial Narrow', 'sans-serif'],
+      fallbacks: ['Georgia', 'serif'],
+      // One variable file with weight and optical size, so big headings get the serif's display design by themselves.
       options: {
-        variants: [{ src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff2'], weight: 700, style: 'normal' }],
+        variants: [{ src: ['@fontsource-variable/source-serif-4/files/source-serif-4-latin-opsz-normal.woff2'], weight: '200 900', style: 'normal' }],
       },
     },
     {
       provider: fontProviders.local(),
-      name: 'IBM Plex Sans',
+      name: 'Source Sans 3',
       cssVariable: '--font-sans',
       fallbacks: ['-apple-system', 'system-ui'],
       options: {
         variants: [
-          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-300-normal.woff2'], weight: 300, style: 'normal' },
-          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2'], weight: 400, style: 'normal' },
-          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-500-normal.woff2'], weight: 500, style: 'normal' },
-          { src: ['@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2'], weight: 600, style: 'normal' },
+          { src: ['@fontsource/source-sans-3/files/source-sans-3-latin-300-normal.woff2'], weight: 300, style: 'normal' },
+          { src: ['@fontsource/source-sans-3/files/source-sans-3-latin-400-normal.woff2'], weight: 400, style: 'normal' },
+          { src: ['@fontsource/source-sans-3/files/source-sans-3-latin-500-normal.woff2'], weight: 500, style: 'normal' },
+          { src: ['@fontsource/source-sans-3/files/source-sans-3-latin-600-normal.woff2'], weight: 600, style: 'normal' },
         ],
       },
     },
     {
       provider: fontProviders.local(),
-      name: 'IBM Plex Mono',
+      name: 'Source Code Pro',
       cssVariable: '--font-mono',
       fallbacks: ['ui-monospace', 'Menlo', 'monospace'],
       options: {
         variants: [
-          { src: ['@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2'], weight: 400, style: 'normal' },
-          { src: ['@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2'], weight: 500, style: 'normal' },
+          { src: ['@fontsource/source-code-pro/files/source-code-pro-latin-400-normal.woff2'], weight: 400, style: 'normal' },
+          { src: ['@fontsource/source-code-pro/files/source-code-pro-latin-500-normal.woff2'], weight: 500, style: 'normal' },
         ],
       },
     },
