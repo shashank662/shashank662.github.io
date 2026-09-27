@@ -27,7 +27,17 @@ function reveal(): void {
 
 const n = (v: number) => v.toFixed(2);
 
-if (svg && !revealed) play(svg);
+if (svg && !revealed) {
+  // Tells the inline script's safety net that the show has started.
+  root.classList.add('landing-live');
+  try {
+    play(svg);
+  } catch (error) {
+    root.classList.remove('landing', 'landing-live');
+    reveal();
+    reportError(error);
+  }
+}
 
 function play(svg: SVGSVGElement): void {
   const pick = <T extends Element>(selector: string) => svg.querySelector<T>(selector) as T;
@@ -83,17 +93,23 @@ function play(svg: SVGSVGElement): void {
     removeEventListener('pointermove', onPointerMove);
     removeEventListener('pointerdown', begin);
     removeEventListener('keydown', begin);
-    root.classList.remove('landing');
+    root.classList.remove('landing', 'landing-live');
     reveal();
   }
 
   function frame(_now: number, dt: number): void {
-    t += dt * 1000;
-    if (dive === null && t >= LANDING.diveAt) begin();
-    if (dive !== null) dive += dt * 1000;
-    const pose = landingPose(t, dive, cover);
-    draw(layout, pose);
-    if (pose.done) finish();
+    try {
+      t += dt * 1000;
+      if (dive === null && t >= LANDING.diveAt) begin();
+      if (dive !== null) dive += dt * 1000;
+      const pose = landingPose(t, dive, cover);
+      draw(layout, pose);
+      if (pose.done) finish();
+    } catch (error) {
+      // Never leave anyone stuck behind the screen; report without stopping the page's shared animation loop.
+      finish();
+      reportError(error);
+    }
   }
 
   function draw({ size, k, left, baseline, origin }: SHRLayout, pose: LandingPose): void {
