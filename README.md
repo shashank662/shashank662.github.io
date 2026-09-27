@@ -11,7 +11,7 @@ The portfolio of **Shashank H R**, a backend engineer at Engati in Bangalore who
 
 ## Stack
 
-Astro 7, with every page prerendered to static HTML · TypeScript in strict mode · small plain-TypeScript modules for the interactive parts · Source Serif 4, Source Sans 3 and Source Code Pro (plus IBM Plex Sans Condensed for the home page's crossing bands), self-hosted through Astro's Fonts API · Satori and resvg for the link-preview images · Vitest and Playwright for tests · GitHub Actions, GitHub Pages and Cloudflare Workers for deploys.
+Astro 7, with every page prerendered to static HTML · TypeScript in strict mode · small plain-TypeScript modules for the interactive parts · Source Serif 4, Source Sans 3 and Source Code Pro (plus Instrument Serif italic for the home page's crossing bands), self-hosted through Astro's Fonts API · Satori and resvg for the link-preview images · Vitest and Playwright for tests · GitHub Actions, GitHub Pages and Cloudflare Workers for deploys.
 
 No UI framework, no cookies, no analytics and no third-party requests.
 
