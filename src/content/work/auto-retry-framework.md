@@ -16,12 +16,12 @@ stats:
 diagram: "retry"
 steps:
   - "LeadSquared or MoEngage sends an API trigger."
-  - "It enters through the API gateway and reaches the action trigger management service."
-  - "The message goes out through our messaging layer and Meta to the user."
-  - "Meta sends a webhook back: delivered, or failed with a status code."
-  - "Status-code checks decide whether the failure is worth retrying."
-  - "Retryable failures are pushed with a trackerId, the idempotency key, which fetches the original payload from MongoDB."
-  - "RabbitMQ triggers the retry, with fixed-interval or exponential back-off."
+  - "It enters through the API gateway and reaches trigger-mvc, the action trigger management service."
+  - "trigger-mvc hands it to the messaging pipeline, which keeps its trackerId in Redis and sends it through Meta to the user."
+  - "Meta sends a webhook back to the webhook receiver: delivered, or failed with a status code."
+  - "The analytics pipeline records why it failed and passes the failure on to trigger-mvc."
+  - "trigger-mvc checks the status code. Retryable failures wait in RabbitMQ, with fixed-interval or exponential back-off."
+  - "When the wait is over, trigger-mvc reads the trackerId from Redis, fetches the original payload from MongoDB and sends it out through messaging again."
 decisions:
   - title: "trackerId as the idempotency key"
     body: "Every retry carries the trackerId of the original message, so it finds the right payload and the same message isn’t sent twice."
@@ -35,7 +35,7 @@ results:
   - "Absorbed peaks of **300K–400K retries a day** during Meta delivery failures."
 cta: { label: "See it running: the playground is a live model of this flow", href: "/#play" }
 row:
-  description: "Retries failed Meta deliveries for LeadSquared & MoEngage triggers: webhook → MongoDB → RabbitMQ, with back-off"
+  description: "Retries failed Meta deliveries for LeadSquared & MoEngage triggers: webhook → analytics → trigger-mvc → RabbitMQ back-off → resend by trackerId"
   stack: "Java · Redis · RabbitMQ · MongoDB"
   metric: "35% → 12%"
   metricCaption: "failure rate"
