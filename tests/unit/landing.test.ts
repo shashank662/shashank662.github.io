@@ -84,9 +84,9 @@ describe('landingPose', () => {
     expect(at(4000, LANDING.diveMs / 2).scale).toBeCloseTo(Math.sqrt(COVER));
   });
 
-  it('lets the light letters fade early in the dive, so the page shows through the S while it is still an S', () => {
-    expect(at(4000, LANDING.diveMs * 0.05).fill).toBe(1);
-    expect(at(4000, LANDING.diveMs * 0.35).fill).toBe(0);
+  it('empties the light letters as the dive starts, so the page shows through the S while it is still an S', () => {
+    expect(at(4000, 0).fill).toBe(1);
+    expect(at(4000, LANDING.diveMs * 0.2).fill).toBe(0);
   });
 
   it('keeps the dark screen until the last fifth of the dive', () => {
