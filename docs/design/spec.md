@@ -100,6 +100,7 @@ Every page shares the same header, footer, and "Ask about me" button (section 9)
 - **Skipping:** a scroll, click, tap or key press starts the dive at once. The page does not scroll underneath.
 - **When it plays:** once per visit, for people arriving from outside the site at the top of the home page. It does not play on a reload, when coming from another page of the site, for links to a section (`/#work`), with reduced motion, or without JavaScript.
   - An inline script decides before first paint (`shouldPlayLanding()`, key `landing` in `sessionStorage`), so the page never flashes first.
+  - Nobody is ever stuck behind it: if its script has not started within 4 s (it failed to load), the page shows anyway, and an error during the show ends it.
 - **Build:**
   - The letters are Source Serif 4's display outlines (weight 700, optical size 60), stored as SVG paths in `src/lib/shr-glyphs.ts`. Chrome stops drawing text far below the size the dive reaches, and the outlines need no font to load, so the animation starts with the first frame.
   - The letters cut holes in the dark screen, so the page is there, inside the S, all along. The page paints behind the screen, and its lede stays in place, so the largest paint is not held back.
