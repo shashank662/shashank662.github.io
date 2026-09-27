@@ -75,22 +75,22 @@ describe('RetrySim', () => {
     expect(sim.saved).toBe(only(events, 'delivered').filter((e) => e.attempt > 1).length);
   });
 
-  it('runs a Meta outage for five seconds, one at a time', () => {
+  it('has Meta send error webhooks for five seconds, one burst at a time', () => {
     const sim = new RetrySim({ random: seeded(7) });
-    expect(sim.startOutage()).toBe(true);
-    expect(sim.outage).toBe(true);
-    expect(sim.startOutage()).toBe(false);
-    expect(only(run(sim, 5.2), 'outage-over')).toHaveLength(1);
-    expect(sim.outage).toBe(false);
+    expect(sim.startErrorWebhooks()).toBe(true);
+    expect(sim.errorWebhooks).toBe(true);
+    expect(sim.startErrorWebhooks()).toBe(false);
+    expect(only(run(sim, 5.2), 'error-webhooks-over')).toHaveLength(1);
+    expect(sim.errorWebhooks).toBe(false);
   });
 
-  it('estimates the headline rate from the same rules: ~12% on, ~35% off, ~80% in an outage', () => {
+  it('estimates the headline rate from the same rules: ~12% on, ~35% off, ~80% while Meta sends error webhooks', () => {
     const sim = new RetrySim({ random: seeded(8) });
     expect(Math.abs(sim.sampleFailureRate(8000) - 0.12)).toBeLessThan(0.03);
     sim.setRetry(false);
     expect(Math.abs(sim.sampleFailureRate(8000) - 0.35)).toBeLessThan(0.03);
     sim.setRetry(true);
-    sim.startOutage();
+    sim.startErrorWebhooks();
     expect(Math.abs(sim.sampleFailureRate(8000) - 0.8)).toBeLessThan(0.03);
   });
 
