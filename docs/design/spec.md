@@ -342,15 +342,15 @@ Content is separated from layout so it can be edited without touching components
 
 ## 15. Content to confirm before launch
 
-Building does not wait on these; placeholders use the best current values, and launch waits until each item is confirmed or removed.
+Building does not wait on these; placeholders use the best current values. On 2026-09-27 the owner approved launching with items 8 and 9 still open.
 
-1. Real start dates for the project spans on the timeline (retry framework, RCS billing, AI reviewer, abandoned-cart). Current values are estimates; the alternative is to drop the dates and show those spans without bars.
-2. Full-time duration: July 2024 gives "2y 2m" as of this spec; the owner mentioned 2.4 years. Confirm the start month.
-3. Education dates: shown as August 2020 – July 2024 from the résumé's "2020 – 2024".
+1. ~~Real start dates for the project spans on the timeline.~~ Dropped (2026-09-27): each project is drawn across the role it was built in, with no dates of its own.
+2. ~~Full-time start month.~~ July 2024, per the résumé.
+3. ~~Education dates.~~ August 2020 – July 2024, from the résumé's "2020 – 2024".
 4. ~~Redis's exact role in the retry flow, and whether retries re-enter at the messaging layer or at trigger-svc.~~ Confirmed 2026-09-27: messaging keeps each trackerId in Redis; failures return webhook-receiver → analytics → trigger-mvc, which re-enters through messaging.
-5. Any figures for the RCS billing pipeline (events a day, customers billed).
-6. Which email address, LinkedIn URL and GitHub URL to show.
-7. The public résumé PDF: it currently includes a phone number. Keep it, or supply a copy without it.
+5. ~~Figures for the RCS billing pipeline.~~ ~4M conversations and ~8M billing events a day, all in working hours: ~250 RPS on average (8M ÷ 9 h), ~500 RPS at a 2× peak.
+6. ~~Email, LinkedIn and GitHub.~~ shashankhr06@gmail.com, linkedin.com/in/shashank-hr-0606abc2002, github.com/shashank662; linked from every page's footer.
+7. ~~The public résumé PDF.~~ Published as-is, phone number included (the owner's choice); the phone number is not shown on the pages themselves.
 8. The owner's review of every "Key decisions" card and the case study 04 pull quote, since these are written in the owner's voice.
 9. Answers for the chatbot's recruiter FAQ: notice period, relocation and preferred cities, work mode, role types, and earliest joining date.
 
