@@ -2,11 +2,11 @@ import { expect, test } from './fixtures';
 
 // The site's faces. The Fonts API adds a hash to each name, e.g. "Source Sans 3-89b5f5e0".
 const SOURCE = /^"?Source (Serif 4|Sans 3|Code Pro)[-"]/;
-// The two crossing bands on the home page keep a bold condensed face of their own.
-const STRIPS = /^"?IBM Plex Sans Condensed[-"]/;
+// The two crossing bands on the home page are set in Instrument Serif italic: the one place the site slants.
+const STRIPS = /^"?Instrument Serif[-"]/;
 
 for (const path of ['/', '/work/auto-retry-framework', '/summary', '/no-such-page']) {
-  test(`every piece of text on ${path} is set in the site's faces, upright`, async ({ page }) => {
+  test(`every piece of text on ${path} is set in the site's faces, and only the crossing bands slant`, async ({ page }) => {
     await page.goto(path);
     const text = await page.evaluate(() => {
       const found: { family: string; italic: boolean; strip: boolean; text: string }[] = [];
@@ -26,7 +26,7 @@ for (const path of ['/', '/work/auto-retry-framework', '/summary', '/no-such-pag
     });
     expect(text.length).toBeGreaterThan(10);
     expect(text.filter((t) => !(t.strip ? STRIPS : SOURCE).test(t.family))).toEqual([]);
-    expect(text.filter((t) => t.italic)).toEqual([]);
+    expect(text.filter((t) => t.italic !== t.strip)).toEqual([]);
   });
 }
 
