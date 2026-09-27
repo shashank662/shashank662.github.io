@@ -22,7 +22,8 @@ test('every home section renders and scrolling through raises no errors', async 
 
 test('the hero says plainly what Shashank builds', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.lede')).toHaveText('I build reliable backends for high-volume messaging.');
+  // A non-breaking hyphen keeps "high-volume" on one line.
+  await expect(page.locator('.lede')).toHaveText('I build reliable backends for high\u2011volume messaging.');
 });
 
 test('the career trace dates the degree and roles, not the projects, and opens rows on click', async ({ page }) => {
@@ -134,7 +135,7 @@ test('incidents show their results and contact opens an email', async ({ page })
   await expect(page.locator('#incidents article')).toHaveCount(2);
   await expect(page.getByText('−60%')).toBeVisible();
   await expect(page.getByText('2.5 → 1 GB')).toBeVisible();
-  await expect(page.getByRole('link', { name: "Let's talk" })).toHaveAttribute('href', /^mailto:/);
+  await expect(page.getByRole('link', { name: 'Let\u2019s talk' })).toHaveAttribute('href', /^mailto:/);
 });
 
 test.describe('without JavaScript', () => {
