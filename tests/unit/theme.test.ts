@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { otherTheme, resolveTheme, schemeOf, THEME_KEY, THEMES } from '../../src/lib/theme';
+import { resolveTheme, schemeOf, THEME_KEY, THEMES } from '../../src/lib/theme';
 
 describe('THEMES', () => {
   it('offers the owner’s nine themes, each with its own id and name', () => {
@@ -46,13 +46,6 @@ describe('resolveTheme', () => {
     expect(resolveTheme('sepia', true)).toBe('dark');
     expect(resolveTheme('', false)).toBe('light');
     expect(resolveTheme('constructor', false)).toBe('light');
-  });
-});
-
-describe('otherTheme', () => {
-  it('flips between light and dark', () => {
-    expect(otherTheme('light')).toBe('dark');
-    expect(otherTheme('dark')).toBe('light');
   });
 });
 
