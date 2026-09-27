@@ -28,6 +28,8 @@ export interface DiagramEdge {
   /** SVG path data, e.g. "M190,68 H246". */
   d: string;
   kind: EdgeKind;
+  /** An arrowhead at the start too, for a round trip (a queue that hands the message back). */
+  both?: boolean;
 }
 
 export interface DiagramLabel {
