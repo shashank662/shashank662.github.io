@@ -85,8 +85,10 @@ function start(root: HTMLElement): void {
     savedCount.textContent = sim.saved.toLocaleString('en-IN');
   };
 
-  // Using any control also starts a paused model.
+  // Using any control starts the model (warming it up first, so its warm-up can't swallow what the control does)
+  // and unpauses it.
   const play = () => {
+    if (!booted) boot();
     paused = false;
     playButton.hidden = true;
   };
