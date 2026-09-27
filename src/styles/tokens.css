@@ -1,20 +1,19 @@
-/* Design tokens. Light is the default; dark overrides the same names. */
+/* Design tokens. Light is the default. Each theme sets its own colours, and each scheme (light or dark) the status
+   colours and the paper grain. The themes are listed in src/lib/theme.ts, and tests/unit/tokens.test.ts checks every
+   theme's contrast. [data-theme] works on any element, so the theme picker's swatches show their own colours. */
 :root {
   color-scheme: light;
-  --bg: #f1ede4;
-  --ink: #141414;
-  --muted: #6b675f;
-  --line: rgba(20, 20, 20, 0.2);
-  --line2: rgba(20, 20, 20, 0.07);
-  --accent: #1f3dff;
-  --on-accent: #ffffff;
   --ok: #15803d;
   --warn: #c2410c;
   --bad: #dc2626;
-  --strip1-bg: #141414;
-  --strip1-fg: #f1ede4;
   --strip2-bg: var(--accent);
-  --strip2-fg: #f1ede4;
+  /* The landing screen is dark with light letters in every theme; themes without their own use these. */
+  --intro-dark: #141414;
+  --intro-light: #f1ede4;
+  --intro-line: #5a78ff;
+  /* How faint the About words are before they light up: the faintest the text and accent can be and still pass 3:1. */
+  --word-dim: 0.47;
+  --word-dim-hl: 0.69;
   --grain-opacity: 0.55;
   --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 
@@ -24,8 +23,22 @@
   --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-:root[data-theme='dark'] {
-  color-scheme: dark;
+/* Colours stay six-digit hex: the playground's canvas reads them. */
+:root,
+[data-theme='light'] {
+  --bg: #f1ede4;
+  --ink: #141414;
+  --muted: #6b675f;
+  --line: rgba(20, 20, 20, 0.2);
+  --line2: rgba(20, 20, 20, 0.07);
+  --accent: #1f3dff;
+  --on-accent: #ffffff;
+  --strip1-bg: #141414;
+  --strip1-fg: #f1ede4;
+  --strip2-fg: #f1ede4;
+}
+
+[data-theme='dark'] {
   --bg: #0e0d0c;
   --ink: #efeae0;
   --muted: #8f8a81;
@@ -33,12 +46,132 @@
   --line2: rgba(239, 234, 224, 0.07);
   --accent: #5a78ff;
   --on-accent: #0e0d0c;
-  --ok: #4ade80;
-  --warn: #fbbf24;
-  --bad: #f87171;
   --strip1-bg: #efeae0;
   --strip1-fg: #0e0d0c;
   --strip2-fg: #0e0d0c;
+}
+
+[data-theme='midnight'] {
+  --bg: #0b0c14;
+  --ink: #e9e8f5;
+  --muted: #8e8ca6;
+  --line: rgba(233, 232, 245, 0.17);
+  --line2: rgba(233, 232, 245, 0.07);
+  --accent: #9b87ff;
+  --on-accent: #0b0c14;
+  --strip1-bg: #e9e8f5;
+  --strip1-fg: #0b0c14;
+  --strip2-fg: #0b0c14;
+  --intro-dark: #0b0c14;
+  --intro-light: #e9e8f5;
+  --intro-line: #9b87ff;
+}
+
+[data-theme='ocean'] {
+  --bg: #0b1a1e;
+  --ink: #e2f0ee;
+  --muted: #86a4a3;
+  --line: rgba(226, 240, 238, 0.17);
+  --line2: rgba(226, 240, 238, 0.07);
+  --accent: #3cc4b1;
+  --on-accent: #0b1a1e;
+  --strip1-bg: #e2f0ee;
+  --strip1-fg: #0b1a1e;
+  --strip2-fg: #0b1a1e;
+  --intro-dark: #0b1a1e;
+  --intro-light: #e2f0ee;
+  --intro-line: #3cc4b1;
+}
+
+[data-theme='forest'] {
+  --bg: #0e1810;
+  --ink: #e5eee2;
+  --muted: #8fa28c;
+  --line: rgba(229, 238, 226, 0.17);
+  --line2: rgba(229, 238, 226, 0.07);
+  --accent: #6cc47a;
+  --on-accent: #0e1810;
+  --strip1-bg: #e5eee2;
+  --strip1-fg: #0e1810;
+  --strip2-fg: #0e1810;
+  --intro-dark: #0e1810;
+  --intro-light: #e5eee2;
+  --intro-line: #6cc47a;
+}
+
+[data-theme='sunset'] {
+  --bg: #1a100b;
+  --ink: #f4e7dd;
+  --muted: #a8907d;
+  --line: rgba(244, 231, 221, 0.17);
+  --line2: rgba(244, 231, 221, 0.07);
+  --accent: #f0874a;
+  --on-accent: #1a100b;
+  --strip1-bg: #f4e7dd;
+  --strip1-fg: #1a100b;
+  --strip2-fg: #1a100b;
+  --intro-dark: #1a100b;
+  --intro-light: #f4e7dd;
+  --intro-line: #f0874a;
+}
+
+[data-theme='rose'] {
+  --bg: #190e15;
+  --ink: #f3e4ec;
+  --muted: #aa8d9d;
+  --line: rgba(243, 228, 236, 0.17);
+  --line2: rgba(243, 228, 236, 0.07);
+  --accent: #ee6fa6;
+  --on-accent: #190e15;
+  --strip1-bg: #f3e4ec;
+  --strip1-fg: #190e15;
+  --strip2-fg: #190e15;
+  --intro-dark: #190e15;
+  --intro-light: #f3e4ec;
+  --intro-line: #ee6fa6;
+}
+
+[data-theme='nord'] {
+  --bg: #2e3440;
+  --ink: #eceff4;
+  --muted: #aab3c3;
+  --line: rgba(236, 239, 244, 0.17);
+  --line2: rgba(236, 239, 244, 0.07);
+  --accent: #88c0d0;
+  --on-accent: #2e3440;
+  --strip1-bg: #eceff4;
+  --strip1-fg: #2e3440;
+  --strip2-fg: #2e3440;
+  --intro-dark: #2e3440;
+  --intro-light: #eceff4;
+  --intro-line: #88c0d0;
+}
+
+[data-theme='solarized'] {
+  --bg: #fdf6e3;
+  --ink: #073642;
+  --muted: #586e75;
+  --line: rgba(7, 54, 66, 0.2);
+  --line2: rgba(7, 54, 66, 0.07);
+  --accent: #1f6fb2;
+  --on-accent: #fdf6e3;
+  --strip1-bg: #073642;
+  --strip1-fg: #fdf6e3;
+  --strip2-fg: #fdf6e3;
+  /* Solarized's own dark base, so the landing screen stays dark. */
+  --intro-dark: #002b36;
+  --intro-light: #fdf6e3;
+  --intro-line: #268bd2;
+  /* Its text is less dark than the others', so faint words need a little more of it. */
+  --word-dim: 0.52;
+  --word-dim-hl: 0.73;
+}
+
+:root[data-scheme='dark'] {
+  color-scheme: dark;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --bad: #f87171;
   --grain-opacity: 0.5;
   --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
