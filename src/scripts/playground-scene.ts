@@ -5,13 +5,14 @@ import type { NodeId, RetrySim, SimEvent } from '../lib/retrySim';
 const INFO: Record<NodeId, string> = {
   src: 'LeadSquared · MoEngage send API triggers',
   gw: 'entry point for every trigger',
-  ats: 'action trigger management service',
-  msg: 'platform messaging layer',
+  ats: 'action trigger management · decides retries',
+  msg: 'messaging pipeline · keeps each trackerId in redis',
   meta: 'delivers to the user, then sends a webhook',
-  wh: 'checks status codes: retryable or not',
+  wh: "receives Meta's delivery webhooks",
+  an: 'analytics pipeline · records the failure reason',
   mongo: 'original payload, looked up by trackerId',
   rmq: 'retry queue · fixed & exponential back-off',
-  redis: 'trackerId correlation',
+  redis: 'trackerId of every message sent',
 };
 
 type EdgeKind = 'send' | 'hook' | 'retry';
@@ -20,11 +21,13 @@ const EDGES: [NodeId, NodeId, string, EdgeKind][] = [
   ['gw', 'ats', '', 'send'],
   ['ats', 'msg', '', 'send'],
   ['msg', 'meta', '', 'send'],
+  ['msg', 'redis', 'trackerId', 'retry'],
   ['meta', 'wh', 'webhook', 'hook'],
-  ['wh', 'redis', '', 'retry'],
-  ['wh', 'mongo', 'trackerId', 'retry'],
-  ['mongo', 'rmq', '', 'retry'],
-  ['rmq', 'msg', 'retry + back-off', 'retry'],
+  ['wh', 'an', 'failure reason', 'hook'],
+  ['an', 'ats', '', 'hook'],
+  ['ats', 'rmq', '', 'retry'],
+  ['ats', 'redis', '', 'retry'],
+  ['ats', 'mongo', 'payload', 'retry'],
 ];
 
 const TAU = Math.PI * 2;
@@ -95,13 +98,13 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
 
   const distance = (from: NodeId, to: NodeId) => Math.hypot(boxes[to].x - boxes[from].x, boxes[to].y - boxes[from].y);
 
-  /** Turns the latest events into short-lived effects: rings at Meta and webhooks, node flashes. */
+  /** Turns the latest events into short-lived effects: rings at Meta and trigger-mvc, node flashes. */
   const effects = (events: SimEvent[]) => {
     for (const event of events) {
       if (event.type === 'arrived') flash[event.node] = 1;
-      else if (event.type === 'retrying') flash.redis = 1;
+      else if (event.type === 'fetched') flash.redis = flash.mongo = 1;
       else if (event.type === 'delivered') pops.push({ node: 'meta', r: 6, a: 0.9, ok: true });
-      else if (event.type === 'dropped') pops.push({ node: 'wh', r: 6, a: 0.9, ok: false });
+      else if (event.type === 'dropped') pops.push({ node: 'ats', r: 6, a: 0.9, ok: false });
     }
   };
 
@@ -164,7 +167,7 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
     }
     ctx.setLineDash([]);
 
-    // Rings: green where Meta delivered, red where a webhook was dropped.
+    // Rings: green where Meta delivered, red where trigger-mvc dropped a failure.
     for (const pop of pops) {
       const n = boxes[pop.node];
       const colour = pop.ok ? theme.ok : theme.bad;

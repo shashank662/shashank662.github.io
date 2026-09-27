@@ -2,12 +2,14 @@
  * A toy, honest model of the Engati auto-retry framework. It never touches the page, so it can be tested;
  * the playground draws whatever state it is in after each `step(dt)`.
  *
- * Triggers travel integrations → api-gateway → trigger-svc → messaging → meta. Meta fails some deliveries,
- * and each failure comes back as a webhook. Retryable ones fetch their payload from MongoDB by trackerId,
- * wait in RabbitMQ with exponential back-off, then go out through messaging again.
+ * Triggers travel integrations → api-gateway → trigger-mvc → messaging → meta; messaging keeps each one's
+ * trackerId in Redis. Meta fails some deliveries, and each failure comes back as a webhook: webhook-receiver →
+ * analytics pipeline (which records the reason) → trigger-mvc. trigger-mvc checks the status code; a retryable
+ * failure waits in RabbitMQ with exponential back-off, then trigger-mvc reads its trackerId from Redis, fetches
+ * the original payload from MongoDB and sends it out through messaging again.
  */
 
-export type NodeId = 'src' | 'gw' | 'ats' | 'msg' | 'meta' | 'wh' | 'mongo' | 'rmq' | 'redis';
+export type NodeId = 'src' | 'gw' | 'ats' | 'msg' | 'meta' | 'wh' | 'an' | 'mongo' | 'rmq' | 'redis';
 export type PacketKind = 'send' | 'you' | 'hook' | 'retry';
 export type DropReason = 'non-retryable' | 'retries-off' | 'gave-up';
 
@@ -56,6 +58,8 @@ export type SimEvent =
   | { type: 'dropped'; id: string; attempt: number; reason: DropReason }
   | { type: 'retrying'; id: string }
   | { type: 'queued'; id: string; attempt: number; wait: number }
+  /** A retry is back at trigger-mvc, which reads its trackerId from Redis and its payload from MongoDB. */
+  | { type: 'fetched'; id: string }
   | { type: 'outage-over' };
 
 export interface RetrySimOptions {
@@ -184,9 +188,9 @@ export class RetrySim {
     }
     if (p.until > 0) {
       if (this.time < p.until) return;
-      // Back-off over: out again through messaging to Meta.
+      // Back-off over: back to trigger-mvc, which fetches the payload and sends it out through messaging.
       p.until = 0;
-      this.route(p, 'retry', ['rmq', 'msg', 'meta']);
+      this.route(p, 'retry', ['rmq', 'ats', 'msg', 'meta']);
     }
     const from = p.path[p.seg];
     const to = p.path[p.seg + 1];
@@ -195,6 +199,7 @@ export class RetrySim {
     p.seg += 1;
     p.t = 0;
     events.push({ type: 'arrived', node: to });
+    if (p.kind === 'retry' && from === 'rmq') events.push({ type: 'fetched', id: p.id });
     if (p.seg === p.path.length - 1) this.reach(p, to, events);
   }
 
@@ -205,9 +210,10 @@ export class RetrySim {
         if (p.attempt > 1) this.saved += 1;
         events.push({ type: 'delivered', id: p.id, attempt: p.attempt });
       } else {
-        this.route(p, 'hook', ['meta', 'wh']);
+        this.route(p, 'hook', ['meta', 'wh', 'an', 'ats']);
       }
-    } else if (node === 'wh') {
+    } else if (node === 'ats') {
+      // A failure reported back through the webhook receiver and the analytics pipeline.
       const reason: DropReason | null =
         this.random() >= RULES.retryable
           ? 'non-retryable'
@@ -220,7 +226,7 @@ export class RetrySim {
         p.dropped = true;
         events.push({ type: 'dropped', id: p.id, attempt: p.attempt, reason });
       } else {
-        this.route(p, 'retry', ['wh', 'mongo', 'rmq']);
+        this.route(p, 'retry', ['ats', 'rmq']);
         events.push({ type: 'retrying', id: p.id });
       }
     } else if (node === 'rmq') {
