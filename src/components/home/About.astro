@@ -49,11 +49,11 @@ const words = accentWords(profile.about.paragraph);
   .more { grid-column: 2; }
   .nowrap { white-space: nowrap; }
   .big { font-size: clamp(28px, 3.6vw, 58px); line-height: 1.14; letter-spacing: -0.025em; font-weight: 500; }
-  /* Unlit words stay readable: --dim is the faintest each colour can be and still pass 3:1 as large text on
-     either theme's background (ink 0.47, accent 0.69). The scroll script raises --lit from 0 to 1. */
-  .w { --dim: 0.47; transition: opacity 0.25s; }
+  /* Unlit words stay readable: --dim is the faintest each colour can be and still pass 3:1 as large text on the
+     theme's background (set per theme in tokens.css). The scroll script raises --lit from 0 to 1. */
+  .w { --dim: var(--word-dim); transition: opacity 0.25s; }
   :global(.js) .w { opacity: max(var(--dim), var(--lit, 0)); }
-  .hl { --dim: 0.69; font-weight: 600; color: var(--accent); }
+  .hl { --dim: var(--word-dim-hl); font-weight: 600; color: var(--accent); }
 
   @media (max-width: 760px) {
     .about { grid-template-columns: 1fr; }
