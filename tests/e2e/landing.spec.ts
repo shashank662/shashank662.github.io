@@ -33,6 +33,42 @@ test('a first visit opens on SHR in light letters on a dark screen', async ({ pa
   expect(errors).toEqual([]);
 });
 
+test('the dive heads into the S where its stroke is as deep as the script assumes, so the S covers the screen', async ({
+  page,
+}) => {
+  await page.goto('/');
+  // Once the line has faded, all three letters are open and holding still.
+  await expect
+    .poll(() => page.locator('[data-line]').evaluate((line) => (line as SVGRectElement).style.opacity))
+    .toBe('0');
+  const [x, y, assumed] = ((await page.locator('[data-landing]').getAttribute('data-origin')) ?? '').split(' ').map(Number);
+  const shot = await page.screenshot({ scale: 'css' });
+  const depth = await page.evaluate(
+    async ({ png, x, y }) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${png}`;
+      await image.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+      ctx.drawImage(image, 0, 0);
+      const { data } = ctx.getImageData(0, 0, image.width, image.height);
+      // Inside a letter is anything but the dark screen.
+      const inside = (px: number, py: number) => {
+        const i = (Math.round(py) * image.width + Math.round(px)) * 4;
+        return data[i] > 60 || data[i + 1] > 60 || data[i + 2] > 60;
+      };
+      const angles = Array.from({ length: 72 }, (_, a) => (a * Math.PI) / 36);
+      let r = 0;
+      while (r < 1000 && angles.every((t) => inside(x + (r + 1) * Math.cos(t), y + (r + 1) * Math.sin(t)))) r += 1;
+      return r;
+    },
+    { png: shot.toString('base64'), x, y },
+  );
+  expect(depth).toBeGreaterThanOrEqual(assumed * 0.9);
+});
+
 test('then it dives into the page by itself, and the name rises as it goes', async ({ page }) => {
   await page.goto('/');
   await expect(html(page)).toHaveClass(ON);
