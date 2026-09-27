@@ -1,0 +1,14 @@
+// Cloudflare Workers settings, read by `npx wrangler deploy` after Cloudflare's build.
+// The site is plain files from `astro build`, so the Worker only serves dist/: no server code and no Astro adapter.
+// Without this file, the deploy sets the project up by itself and adds the adapter, whose build fails on resvg.
+{
+  // Must match the Worker's name in the Cloudflare dashboard, or the deploy is refused.
+  "name": "shashank662-portfolio",
+  "compatibility_date": "2026-09-27",
+  "assets": {
+    // /summary serves summary.html by default, matching the site's links.
+    "directory": "./dist",
+    // An unknown address gets 404.html, with a 404 status.
+    "not_found_handling": "404-page"
+  }
+}
