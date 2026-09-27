@@ -7,6 +7,7 @@ The portfolio of **Shashank H R**, a backend engineer at Engati in Bangalore who
 - **Home:** opens, on a first visit, with "SHR" drawn out of a blue line on a dark screen, then dives through the S into the page (any scroll, click or key press skips ahead). Then my experience drawn as a request trace, selected work, production incidents, and a live model of the auto-retry framework I built at Engati. Switch the framework off, or cause a Meta outage, and watch the failure rate move.
 - **Case studies:** four write-ups of real Engati systems, each with a diagram, the key decisions and the results.
 - **The 60-second view** (`/summary`): everything a recruiter needs on one page. It also prints cleanly on A4.
+- **Colour themes:** Auto, which follows your system's light or dark setting, or one of nine themes (Light, Dark, Midnight, Ocean, Forest, Sunset, Rose, Nord and Solarized), from the palette button in the header. A test checks every theme's contrast.
 - **Ask about me:** a small chatbot that answers from this site's own content. It runs entirely in the browser (MiniSearch); there is no AI service behind it.
 
 ## Stack
