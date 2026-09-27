@@ -53,7 +53,7 @@ const words = accentWords(profile.about.paragraph);
      either theme's background (ink 0.47, accent 0.69). The scroll script raises --lit from 0 to 1. */
   .w { --dim: 0.47; transition: opacity 0.25s; }
   :global(.js) .w { opacity: max(var(--dim), var(--lit, 0)); }
-  .hl { --dim: 0.69; font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent); }
+  .hl { --dim: 0.69; font-weight: 600; color: var(--accent); }
 
   @media (max-width: 760px) {
     .about { grid-template-columns: 1fr; }
