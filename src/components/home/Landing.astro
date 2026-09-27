@@ -1,0 +1,52 @@
+---
+// The home page's landing screen: "SHR" opens out of a blue line on a dark screen, then the view dives through the S
+// into the page (spec §5). It shows only while html.landing is set, which the inline script in index.astro does
+// before first paint on a first visit; without JavaScript, or with reduced motion, there is nothing to see.
+const letters = ['S', 'H', 'R'];
+---
+<svg class="landing" data-landing aria-hidden="true" focusable="false">
+  <defs>
+    {letters.map((_, i) => (
+      <clipPath id={`landing-band-${i}`} clipPathUnits="userSpaceOnUse">
+        <rect data-band x="-100000" y="0" width="200000" height="0" />
+      </clipPath>
+    ))}
+    {/* The letters cut holes in the dark screen, so the page is there, inside the S, all along. */}
+    <mask id="landing-holes" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000">
+      <rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff" />
+      <g data-holes>{letters.map((c, i) => <text clip-path={`url(#landing-band-${i})`} fill="#000">{c}</text>)}</g>
+    </mask>
+  </defs>
+  <rect class="screen" data-screen width="100%" height="100%" mask="url(#landing-holes)" />
+  <g class="fill" data-fill>{letters.map((c, i) => <text clip-path={`url(#landing-band-${i})`}>{c}</text>)}</g>
+  <g class="echo" data-echo>{letters.map((c, i) => <text clip-path={`url(#landing-band-${i})`}>{c}</text>)}</g>
+  <rect class="line" data-line x="0" y="0" width="0" height="1.5" />
+  <text class="measure" data-measure>SHR</text>
+</svg>
+
+<script>
+  import '../../scripts/landing';
+</script>
+
+<style>
+  /* A dark screen with light letters, whichever theme the page is in. */
+  .landing {
+    --dark: #141414;
+    --light: #f1ede4;
+    --blue: #5a78ff;
+    display: none;
+  }
+  /* Above the header and the chat button, below the paper grain and the cursor. */
+  :global(html.landing) .landing {
+    display: block; position: fixed; inset: 0; z-index: 85; width: 100%; height: 100%;
+    font-family: var(--font-display); font-weight: 700; letter-spacing: -0.025em;
+  }
+  .screen { fill: var(--dark); }
+  .fill { fill: var(--light); }
+  .echo { fill: none; stroke: var(--blue); stroke-width: 1.4px; }
+  .line { fill: var(--blue); }
+  .measure { visibility: hidden; }
+
+  /* The page stays at the top while the screen is up. The reserved gutter keeps it from shifting when the scrollbar returns. */
+  :global(html.landing) { overflow: hidden; overscroll-behavior: none; scrollbar-gutter: stable; }
+</style>
