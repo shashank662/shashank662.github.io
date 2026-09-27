@@ -6,7 +6,7 @@ const about = { label: 'About', href: '/#about' };
 
 /**
  * Hand-written answers to common recruiter questions (spec §9).
- * PLACEHOLDERS: notice period, relocation, work mode and joining date wait for the owner's answers (spec §15, item 9).
+ * PLACEHOLDERS: relocation and work mode wait for the owner's answers (spec §15, item 9).
  * Until then they point people to Shashank instead of stating anything he hasn't said.
  */
 export const faq: AskEntry[] = [
@@ -15,15 +15,15 @@ export const faq: AskEntry[] = [
     question: 'What is your notice period?',
     alt: ['how soon can you leave your job', 'are you serving notice'],
     keywords: ['notice', 'period', 'serving'],
-    answer: 'Shashank will confirm his notice period directly. Email or LinkedIn is the quickest way to ask.',
+    answer: 'Shashank is an immediate joiner: no notice period.',
     source: contact,
   },
   {
     id: 'joining',
     question: 'When can you join?',
-    alt: ['earliest joining date', 'how soon can you start', 'start date'],
-    keywords: ['join', 'joining', 'start', 'available', 'availability'],
-    answer: 'Ask Shashank for his earliest joining date: he will answer directly.',
+    alt: ['earliest joining date', 'how soon can you start', 'start date', 'are you an immediate joiner'],
+    keywords: ['join', 'joining', 'start', 'available', 'availability', 'immediate'],
+    answer: 'Immediately. Shashank has no notice period to serve.',
     source: contact,
   },
   {
