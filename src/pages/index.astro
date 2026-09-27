@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Landing from '../components/home/Landing.astro';
 import Hero from '../components/home/Hero.astro';
 import Strips from '../components/home/Strips.astro';
 import About from '../components/home/About.astro';
@@ -11,6 +12,30 @@ import Contact from '../components/home/Contact.astro';
 import { profile } from '../data/profile';
 ---
 <Base title={`${profile.name} · ${profile.role}`} description={profile.metaDescription} ogImage="/og/home.png">
+  <script is:inline slot="head">
+    // Same rule as shouldPlayLanding() in src/lib/landing.ts, with the same key. It runs before first paint,
+    // so a first visit never glimpses the page before the landing screen covers it.
+    (() => {
+      let seen = true;
+      try {
+        seen = sessionStorage.getItem('landing') !== null;
+        sessionStorage.setItem('landing', '1');
+      } catch {}
+      let fromSite = false;
+      try {
+        fromSite = new URL(document.referrer).origin === location.origin;
+      } catch {}
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (seen || fromSite || location.hash || still) return;
+      const root = document.documentElement;
+      root.classList.add('landing');
+      // If the landing screen's script has not taken over by then (it failed to load), show the page anyway.
+      setTimeout(() => {
+        if (!root.classList.contains('landing-live')) root.classList.remove('landing');
+      }, 4000);
+    })();
+  </script>
+  <Landing />
   <Hero />
   <Strips />
   <About />

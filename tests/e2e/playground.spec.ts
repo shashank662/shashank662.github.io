@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 const percent = async (text: Promise<string | null>) => parseFloat((await text) ?? '0');
 

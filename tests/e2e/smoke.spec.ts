@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('home shows the hero and the live clock without errors', async ({ page }) => {
   const errors: string[] = [];

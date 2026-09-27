@@ -77,6 +77,8 @@ const { hero } = profile;
   }
   :global(.js) .row2 { opacity: 0; transform: translateY(24px); }
   .hero:global(.go) .row2 { opacity: 1; transform: none; }
+  /* Behind the landing screen the lede is already in place, so the page's largest text paints at once (spec §12). */
+  :global(html.landing) .row2 { opacity: 1; transform: none; transition: none; }
 
   .badge { width: clamp(96px, 10.5vw, 150px); aspect-ratio: 1; position: relative; display: block; }
   .badge svg { width: 100%; height: 100%; overflow: visible; animation: spin 14s linear infinite; }
@@ -89,7 +91,8 @@ const { hero } = profile;
 
   .lede-wrap { justify-self: end; text-align: right; max-width: 920px; }
   .lede { font-size: clamp(26px, 3.4vw, 56px); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; }
-  .typed { margin-top: 18px; font-size: clamp(12px, 1.05vw, 14px); color: var(--muted); min-height: 1.6em; }
+  /* Room for the longest line up front, so typing never grows the row and pushes the name up. */
+  .typed { margin-top: 18px; font-size: clamp(12px, 1.05vw, 14px); line-height: 1.6; color: var(--muted); min-height: 1.6em; }
   .pr { color: var(--accent); }
   .caret {
     display: inline-block; width: 0.55em; height: 1.1em; margin-left: 2px; vertical-align: -0.2em;
@@ -101,6 +104,8 @@ const { hero } = profile;
     .index { display: none; }
     .row2 { grid-template-columns: 1fr; }
     .lede-wrap { text-align: left; justify-self: start; }
+    /* On a phone the longest line wraps once. */
+    .typed { min-height: 3.2em; }
   }
 
   @media (prefers-reduced-motion: reduce) {

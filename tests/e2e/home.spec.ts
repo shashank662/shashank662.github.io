@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 const DURATION = /^(\d+y( \d+m)?|\d+m)$/;
 
@@ -24,6 +24,24 @@ test('the hero says plainly what Shashank builds', async ({ page }) => {
   await page.goto('/');
   // A non-breaking hyphen keeps "high-volume" on one line.
   await expect(page.locator('.lede')).toHaveText('I build reliable backends for high\u2011volume messaging.');
+});
+
+test('the typed line has room for its longest line, so typing never pushes the hero around', async ({ page }) => {
+  await page.goto('/');
+  // Grows are measured synchronously, between the typing script's frames.
+  const grows = await page.evaluate(() => {
+    const typed = document.querySelector<HTMLElement>('[data-typed]');
+    const line = typed?.closest('p');
+    if (!typed || !line) return [Infinity];
+    const lines: string[] = JSON.parse(typed.dataset.lines ?? '[]');
+    typed.textContent = '';
+    const empty = line.getBoundingClientRect().height;
+    return lines.map((text) => {
+      typed.textContent = text;
+      return line.getBoundingClientRect().height - empty;
+    });
+  });
+  expect(grows).toEqual(grows.map(() => 0));
 });
 
 test('the career trace dates the degree and roles, not the projects, and opens rows on click', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 const SITE = 'https://shashank662.github.io';
 const PAGES = [

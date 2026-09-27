@@ -4,7 +4,7 @@ The portfolio of **Shashank H R**, a backend engineer at Engati in Bangalore who
 
 ## What's on it
 
-- **Home:** my experience drawn as a request trace, selected work, production incidents, and a live model of the auto-retry framework I built at Engati. Switch the framework off, or cause a Meta outage, and watch the failure rate move.
+- **Home:** opens, on a first visit, with "SHR" drawn out of a blue line on a dark screen, then dives through the S into the page (any scroll, click or key press skips ahead). Then my experience drawn as a request trace, selected work, production incidents, and a live model of the auto-retry framework I built at Engati. Switch the framework off, or cause a Meta outage, and watch the failure rate move.
 - **Case studies:** four write-ups of real Engati systems, each with a diagram, the key decisions and the results.
 - **The 60-second view** (`/summary`): everything a recruiter needs on one page. It also prints cleanly on A4.
 - **Ask about me:** a small chatbot that answers from this site's own content. It runs entirely in the browser (MiniSearch); there is no AI service behind it.
@@ -50,7 +50,7 @@ Production build, 27 September 2026, Lighthouse 13.5 on mobile settings (a 412 Ã
 | Case study: auto-retry framework | 98 | 100 | 100 | 100 |
 | The 60-second view | 98 | 100 | 100 | 100 |
 
-Layout shift is at most 0.001. The home page's score is the price of the serif's display cut for the big headings: the plainer cut scores 97 but looks chunkier. The home page loads 12.3 KB of JavaScript (gzipped); the chatbot's search library and answers load only when it is first opened.
+Layout shift is at most 0.002. The home page's score is the price of the serif's display cut for the big headings: the plainer cut scores 97 but looks chunkier. The landing animation costs nothing here, because the page paints behind it. The home page loads 12.3 KB of JavaScript (gzipped); the chatbot's search library and answers load only when it is first opened.
 
 ## Where things live
 

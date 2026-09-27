@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 // The site's faces. The Fonts API adds a hash to each name, e.g. "Source Sans 3-89b5f5e0".
 const SOURCE = /^"?Source (Serif 4|Sans 3|Code Pro)[-"]/;
