@@ -18,16 +18,17 @@ export const RULES = {
   triggerRate: 2.6,
   /** Travel speed, in px a second. */
   speed: 210,
-  /** The chance Meta fails a delivery: on a first attempt, on a retry, and during an outage. */
+  /** The chance Meta fails a delivery: on a first attempt, on a retry, and while it is sending error webhooks. */
   failFirst: 0.35,
   failRetry: 0.15,
-  failOutage: 0.9,
+  failErrorWebhooks: 0.9,
   /** The chance a failure's status code is worth retrying. */
   retryable: 0.7,
   maxAttempts: 3,
   /** Retry n waits backoff × 2^(n − 1) seconds in RabbitMQ: 1.5 s, then 3 s. */
   backoff: 1.5,
-  outageSeconds: 5,
+  /** How long a burst of error webhooks lasts. */
+  errorWebhookSeconds: 5,
 } as const;
 
 export interface Packet {
@@ -60,7 +61,7 @@ export type SimEvent =
   | { type: 'queued'; id: string; attempt: number; wait: number }
   /** A retry is back at trigger-mvc, which reads its trackerId from Redis and its payload from MongoDB. */
   | { type: 'fetched'; id: string }
-  | { type: 'outage-over' };
+  | { type: 'error-webhooks-over' };
 
 export interface RetrySimOptions {
   /** Numbers in [0, 1); tests pass a seeded one. */
@@ -81,7 +82,7 @@ export class RetrySim {
   saved = 0;
   packets: Packet[] = [];
 
-  private outageUntil = -1;
+  private errorWebhooksUntil = -1;
   private due = 0;
   private visitorTimes: number[] = [];
   private readonly random: () => number;
@@ -92,8 +93,9 @@ export class RetrySim {
     this.distance = distance;
   }
 
-  get outage(): boolean {
-    return this.time < this.outageUntil;
+  /** Whether Meta is answering most deliveries with failure webhooks. It is still up: it just reports failures. */
+  get errorWebhooks(): boolean {
+    return this.time < this.errorWebhooksUntil;
   }
 
   /** Retries waiting in RabbitMQ. */
@@ -105,10 +107,10 @@ export class RetrySim {
     this.retryOn = on;
   }
 
-  /** Starts a Meta outage. Returns false while one is already running. */
-  startOutage(seconds: number = RULES.outageSeconds): boolean {
-    if (this.outage) return false;
-    this.outageUntil = this.time + seconds;
+  /** Starts a burst of error webhooks from Meta. Returns false while one is already running. */
+  startErrorWebhooks(seconds: number = RULES.errorWebhookSeconds): boolean {
+    if (this.errorWebhooks) return false;
+    this.errorWebhooksUntil = this.time + seconds;
     return true;
   }
 
@@ -126,9 +128,9 @@ export class RetrySim {
 
   step(dt: number): SimEvent[] {
     const events: SimEvent[] = [];
-    const wasOutage = this.outage;
+    const wasSending = this.errorWebhooks;
     this.time += dt;
-    if (wasOutage && !this.outage) events.push({ type: 'outage-over' });
+    if (wasSending && !this.errorWebhooks) events.push({ type: 'error-webhooks-over' });
 
     this.due += dt * RULES.triggerRate;
     while (this.due >= 1) {
@@ -153,7 +155,7 @@ export class RetrySim {
   }
 
   private failChance(attempt: number): number {
-    if (this.outage) return RULES.failOutage;
+    if (this.errorWebhooks) return RULES.failErrorWebhooks;
     return attempt > 1 ? RULES.failRetry : RULES.failFirst;
   }
 

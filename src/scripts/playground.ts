@@ -67,7 +67,7 @@ function start(root: HTMLElement): void {
         log('ERR', `tr_${event.id} ${DROPPED[event.reason]}`, 1.2);
       } else if (event.type === 'queued') {
         log('INFO', `tr_${event.id} queued · retry in ${event.wait.toFixed(1)}s (attempt ${event.attempt})`, 1.4);
-      } else if (event.type === 'outage-over') {
+      } else if (event.type === 'error-webhooks-over') {
         setSiteStatus('ok');
         outageButton.disabled = false;
         log('OK', 'meta recovered · retry queue draining');
@@ -116,7 +116,7 @@ function start(root: HTMLElement): void {
 
   outageButton.addEventListener('click', () => {
     play();
-    if (!sim.startOutage()) return;
+    if (!sim.startErrorWebhooks()) return;
     outageButton.disabled = true;
     setSiteStatus('degraded', 'meta outage · retrying');
     log('WARN', 'meta delivery failures spiking (simulated outage)');
@@ -164,8 +164,8 @@ function start(root: HTMLElement): void {
 
   onFrame((now, dt) => {
     if (!booted || paused) return;
-    // Off-screen the model rests, except that a running outage still has to end on time.
-    if (!visible && !sim.outage) return;
+    // Off-screen the model rests, except that a running burst of error webhooks still has to end on time.
+    if (!visible && !sim.errorWebhooks) return;
     handle(sim.step(dt));
     scene.age(dt);
     if (drawn) scene.draw(sim);

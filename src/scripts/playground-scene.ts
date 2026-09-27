@@ -140,7 +140,7 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
   };
 
   const draw = (sim: RetrySim) => {
-    const outage = sim.outage;
+    const erroring = sim.errorWebhooks;
     ctx.clearRect(0, 0, W, H);
     ctx.textBaseline = 'middle';
 
@@ -253,7 +253,7 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
     ctx.font = FONT;
     for (const id of IDS) {
       const n = boxes[id];
-      const down = id === 'meta' && outage;
+      const down = id === 'meta' && erroring;
       const off = !sim.retryOn && (id === 'rmq' || id === 'mongo' || id === 'redis');
       const x = n.x - n.w / 2 + (down ? (Math.random() - 0.5) * 2.4 : 0);
       const y = n.y - BOX_HEIGHT / 2;
@@ -302,7 +302,7 @@ export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
       ctx.font = SMALL;
       ctx.fillStyle = `rgb(${theme.accent})`;
       ctx.textAlign = right ? 'right' : 'left';
-      const text = hovered === 'meta' && outage ? 'outage · most deliveries failing' : INFO[hovered];
+      const text = hovered === 'meta' && erroring ? 'outage · most deliveries failing' : INFO[hovered];
       ctx.fillText(text, right ? n.x + n.w / 2 : n.x - n.w / 2, below ? n.y + 30 : n.y - 28);
     }
   };
