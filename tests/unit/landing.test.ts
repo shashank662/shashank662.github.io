@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { coverScale, deepestPoint, LANDING, LANDING_KEY, landingPose, shouldPlayLanding } from '../../src/lib/landing';
+import {
+  BAND,
+  coverScale,
+  deepestPoint,
+  LANDING,
+  LANDING_KEY,
+  landingPose,
+  layoutSHR,
+  S_SHAPE,
+  shouldPlayLanding,
+} from '../../src/lib/landing';
+import { SHR_GLYPHS } from '../../src/lib/shr-glyphs';
 
 const SITE = 'https://shashank662.github.io';
 const firstVisit = { referrer: '', origin: SITE, hash: '', seen: false, reducedMotion: false };
@@ -98,6 +109,41 @@ describe('landingPose', () => {
     const pose = at(100, LANDING.skipMs);
     expect(pose.open).toEqual([1, 1, 1]);
     expect(pose.lineOpacity).toBe(0);
+  });
+});
+
+describe('layoutSHR', () => {
+  const [S, , R] = SHR_GLYPHS.letters;
+
+  it('sizes the letters to 40% of the screen width, or 58% of its height on a wide, short screen', () => {
+    expect(layoutSHR(1000, 2000).size).toBe(400);
+    expect(layoutSHR(2000, 1000).size).toBe(580);
+  });
+
+  it('centres the ink of SHR across the screen and its capitals down it', () => {
+    const at = layoutSHR(1440, 900);
+    const inkLeft = at.left + S.ink[0] * at.k;
+    const inkRight = at.left + (R.x + R.ink[2]) * at.k;
+    expect((inkLeft + inkRight) / 2).toBeCloseTo(720);
+    expect(at.baseline - (SHR_GLYPHS.capHeight * at.k) / 2).toBeCloseTo(450);
+  });
+
+  it('aims the dive inside the S, as deep as the stroke is there', () => {
+    const at = layoutSHR(1440, 900);
+    expect(at.origin.x).toBeGreaterThan(at.left + S.ink[0] * at.k);
+    expect(at.origin.x).toBeLessThan(at.left + S.ink[2] * at.k);
+    expect(at.origin.y).toBeLessThan(at.baseline);
+    expect(at.origin.y).toBeGreaterThan(at.baseline - S.ink[3] * at.k);
+    expect(at.clearance).toBeCloseTo(S_SHAPE.deep.r * at.size);
+  });
+});
+
+describe('BAND', () => {
+  it('opens each letter to its full height, overshoot and all', () => {
+    const bottoms = SHR_GLYPHS.letters.map((letter) => letter.ink[1]);
+    const tops = SHR_GLYPHS.letters.map((letter) => letter.ink[3]);
+    expect(BAND.middle - BAND.half).toBeLessThan(Math.min(...bottoms));
+    expect(BAND.middle + BAND.half).toBeGreaterThan(Math.max(...tops));
   });
 });
 
