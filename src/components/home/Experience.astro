@@ -1,12 +1,19 @@
 ---
 import SectionHead from './SectionHead.astro';
-import { profile } from '../../data/profile';
+import { profile, type CareerSpan } from '../../data/profile';
 import { formatDuration, monthsBetween, spanPosition, toAttr, yearTicks } from '../../lib/dates';
 import { emphasize } from '../../lib/text';
 
 const { career } = profile;
 const ticks = yearTicks(career.axisStart);
 const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent)' } as const;
+/** A project is drawn across the role it was built in; everything else across its own dates. */
+const timingOf = (span: (typeof career.spans)[number]): CareerSpan => {
+  if (!span.within) return span;
+  const role = career.spans.find((s): s is CareerSpan => s.id === span.within);
+  if (!role) throw new Error(`profile.career has no span with id "${span.within}"`);
+  return role;
+};
 ---
 <section class="section wrap" id="exp">
   <SectionHead n="02" label="Experience" meta={`GET /career · ${career.spans.length} spans · 200 OK`} />
@@ -24,18 +31,23 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
     </div>
     <ol>
       {career.spans.map((span, i) => {
-        const pos = spanPosition(span.start, span.end, career.axisStart);
-        const end = span.end ? toAttr(span.end) : '';
+        const timing = timingOf(span);
+        const pos = spanPosition(timing.start, timing.end, career.axisStart);
+        const end = timing.end ? toAttr(timing.end) : '';
         return (
           <li class={`lvl${span.level}`} style={`--i:${i};--c:${colour[span.tone]}`}>
             <button type="button" class="head" data-row-toggle aria-controls={`span-${i}`}>
               <span class="lbl"><span class="name">{span.name}</span><small class="mono">{span.tag}</small></span>
               <span class="track" aria-hidden="true">
-                <span class="bar" data-bar data-start={toAttr(span.start)} data-end={end} style={`--l:${pos.left};--w:${pos.width}`}></span>
+                <span class="bar" data-bar data-start={toAttr(timing.start)} data-end={end} style={`--l:${pos.left};--w:${pos.width}`}></span>
               </span>
-              <span class="dur mono" data-duration data-start={toAttr(span.start)} data-end={end}>
-                {formatDuration(monthsBetween(span.start, span.end))}
-              </span>
+              {span.within ? (
+                <span class="dur" aria-hidden="true"></span>
+              ) : (
+                <span class="dur mono" data-duration data-start={toAttr(span.start)} data-end={end}>
+                  {formatDuration(monthsBetween(span.start, span.end))}
+                </span>
+              )}
             </button>
             <div class="more" id={`span-${i}`}><p>{span.detail}</p></div>
           </li>
@@ -78,7 +90,8 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
     background: var(--c); transform-origin: left;
     transition: transform 1.3s var(--ease-out) calc(var(--i) * 110ms);
   }
-  .lvl2 .bar { opacity: 0.55; }
+  /* A project has no dates of its own: a dotted line across the role it was built in. */
+  .lvl2 .bar { top: 5px; bottom: 5px; background: repeating-linear-gradient(90deg, var(--c) 0 4px, transparent 4px 8px); opacity: 0.8; }
   :global(.js) .trace .bar { transform: scaleX(0); }
   :global(.js) .trace:global(.in) .bar { transform: scaleX(1); }
   .dur { font-size: 12px; color: var(--muted); }
