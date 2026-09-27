@@ -25,26 +25,26 @@ test('the numbers keep moving while the controls are on screen, even with the ca
   await expect.poll(() => percent(rate.textContent()), { timeout: 5000 }).toBeGreaterThan(25);
 });
 
-test('a Meta outage turns every live status amber for about five seconds', async ({ page }) => {
+test('a burst of error webhooks turns every live status amber for about five seconds', async ({ page }) => {
   await page.goto('/#play');
-  const outage = page.getByRole('button', { name: /Simulate a Meta outage/ });
-  await outage.click();
-  await expect(outage).toBeDisabled();
+  const burst = page.getByRole('button', { name: /Simulate error webhooks/ });
+  await burst.click();
+  await expect(burst).toBeDisabled();
   for (const pill of await page.locator('[data-status]').all()) {
     await expect(pill).toHaveAttribute('data-state', 'degraded');
-    await expect(pill).toContainText('meta outage · retrying');
+    await expect(pill).toContainText('error webhooks · retrying');
   }
-  await expect(outage).toBeEnabled({ timeout: 8000 });
+  await expect(burst).toBeEnabled({ timeout: 8000 });
   await expect(page.locator('[data-status]').first()).toHaveAttribute('data-state', 'ok');
 });
 
-test('an outage started before the model is on screen still ends, and the site goes back to normal', async ({ page }) => {
+test('a burst of error webhooks started before the model is on screen still ends, and the site goes back to normal', async ({ page }) => {
   await page.goto('/');
   // Clicked where it sits, off-screen, so the model hasn't started yet.
-  const outage = page.locator('[data-outage]');
-  await outage.evaluate((button: HTMLButtonElement) => button.click());
-  await expect(outage).toBeDisabled();
-  await expect(outage).toBeEnabled({ timeout: 8000 });
+  const burst = page.locator('[data-error-webhooks]');
+  await burst.evaluate((button: HTMLButtonElement) => button.click());
+  await expect(burst).toBeDisabled();
+  await expect(burst).toBeEnabled({ timeout: 8000 });
   await expect(page.locator('[data-status]').first()).toHaveAttribute('data-state', 'ok');
 });
 
