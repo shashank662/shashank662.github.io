@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('every internal link works and every page loads without errors', async ({ page, request }) => {
   const errors: string[] = [];
