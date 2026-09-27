@@ -169,6 +169,14 @@ test('a tap skips it on a phone', async ({ page, isMobile }) => {
   await expect(html(page)).not.toHaveClass(ON, { timeout: DIVE });
 });
 
+test('if its script never arrives, the page still shows within a few seconds', async ({ page }) => {
+  await page.route(/\.js$/, (route) => route.abort());
+  await page.goto('/');
+  expect(await landingNow(page)).toBe(true);
+  await expect(html(page)).not.toHaveClass(ON, { timeout: 6000 });
+  await expect(screen(page)).toBeHidden();
+});
+
 test('it plays once per visit, so a reload goes straight to the page', async ({ page }) => {
   await page.goto('/');
   await expect(html(page)).toHaveClass(ON);
