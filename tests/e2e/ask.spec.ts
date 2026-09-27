@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('the panel opens, answers a chip and a typed question, and Escape closes it', async ({ page }) => {
   await page.goto('/');
