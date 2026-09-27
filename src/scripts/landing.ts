@@ -122,13 +122,10 @@ function play(svg: SVGSVGElement): void {
     }
     const middle = baseline - capital / 2;
     line.setAttribute('y', n(middle - 0.75));
-    return {
-      size,
-      middle,
-      half: capital / 2 + size * 0.06,
-      origin: { x: xs[0] + shape.deep.x * size, y: baseline + shape.deep.y * size },
-      clearance: shape.deep.r * size,
-    };
+    const origin = { x: xs[0] + shape.deep.x * size, y: baseline + shape.deep.y * size };
+    // Where the dive heads, for the browser tests.
+    svg.dataset.origin = `${n(origin.x)} ${n(origin.y)}`;
+    return { size, middle, half: capital / 2 + size * 0.06, origin, clearance: shape.deep.r * size };
   }
 
   function frame(_now: number, dt: number): void {
@@ -164,7 +161,7 @@ function play(svg: SVGSVGElement): void {
     const ahead = `translate(${n((0.03 + lean.x * 0.05 * calm) * size)} ${n((0.026 + lean.y * 0.035 * calm) * size)})`;
     echo.setAttribute('transform', `${ahead} ${into(pose.echoScale, pose.echoTurn)}`);
 
-    fill.style.opacity = String(pose.fill);
+    fill.style.fillOpacity = String(pose.fill);
     echo.style.opacity = String(pose.echo);
     svg.style.opacity = String(pose.screen);
   }
