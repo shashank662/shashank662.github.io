@@ -42,8 +42,11 @@ const letters = ['S', 'H', 'R'];
     font-family: var(--font-display); font-weight: 700; letter-spacing: -0.025em;
   }
   .screen { fill: var(--dark); }
-  .fill { fill: var(--light); }
+  /* When the letters empty in the dive, their thin light outline stays, so the S still shows over a dark page. */
+  .fill { fill: var(--light); stroke: var(--light); stroke-width: 1.5px; }
   .echo { fill: none; stroke: var(--blue); stroke-width: 1.4px; }
+  /* Outlines stay hairlines however far the letters grow. */
+  .fill text, .echo text { vector-effect: non-scaling-stroke; }
   .line { fill: var(--blue); }
   .measure { visibility: hidden; }
 
