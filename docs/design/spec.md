@@ -97,10 +97,10 @@ Every page shares the same header, footer, and "Ask about me" button (section 9)
 
 **Landing screen.** A first visit opens on a short animation, then the home page.
 
-- **Look:** a dark screen (`#141414`) with "SHR" in light letters (`#f1ede4`), the same in both themes.
+- **Look:** a dark screen (`#141414`) with a single "S" in a light letter (`#f1ede4`), the same in every theme. The screen is as tall as a phone screen gets once its address bar hides (`100lvh`), so no strip of the page shows at the bottom.
   1. A thin blue line (`#5a78ff`) draws across the middle.
-  2. S, H and R open out of it one after another, each with a blue outline slightly offset, like a misprinted poster. On mouse devices the letters lean a little toward the pointer, the outline more.
-  3. After about 2.6 s the view dives into the S, turning 12° as it goes, until the S fills the screen. The letters empty to a thin light outline as the dive starts, so the page shows through the S while it is still an S; the name "Shashank" rises inside it.
+  2. The S opens out of it, with a blue outline slightly offset, like a misprinted poster. On mouse devices the S leans a little toward the pointer, the outline more.
+  3. After about 2.6 s the view dives into the S, turning 12° as it goes, until the S fills the screen. The S empties to a thin light outline as the dive starts, so the page shows through it while it is still an S; the name "Shashank H R" rises inside it.
   4. The dark screen fades in the last fifth of the 1.25 s dive.
 - **Skipping:** a scroll, click, tap or key press starts the dive at once. The page does not scroll underneath.
 - **When it plays:** once per visit, for people arriving from outside the site at the top of the home page. It does not play on a reload, when coming from another page of the site, for links to a section (`/#work`), with reduced motion, or without JavaScript.
@@ -121,7 +121,7 @@ Sections, in order:
    - After 30px of scroll the header gets a blurred `--bg` background and a hairline. A 2px accent bar across the top shows scroll progress.
 2. **Hero**
    - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph; on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
-   - The name "Shashank" in Source Serif 4 Bold, about half a laptop screen wide (13vw, up to 200px). Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent when very close.
+   - The full name "Shashank H R" in Source Serif 4 Bold, under 60% of a laptop screen wide (10.5vw, up to 165px), on one line. Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent at once when very close: only the slide-up waits its turn.
    - Second row: a rotating circular badge ("Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺", accent core with "↓" linking to About) and the light lede "I build *reliable backends* for high-volume messaging."
    - A mono line types and erases four lines in turn, prompt `~/shashank $`. It types rightward from a prompt that stays put, in a block as wide as the longest line (right-aligned under the lede on wider screens).
 3. **Skill strips.** Two slightly rotated marquee bands: one lists skills (Java, Spring Boot, Apache Kafka, RabbitMQ, Redis, MongoDB, Spark, AWS S3, Microservices), the other highlights (Open to SDE-2 roles, Employee of the Month ×2, MongoDB certified, CGPA 9.47, Bangalore). They drift at a base speed; scroll speed adds a boost and scroll direction sets the drift direction.
@@ -297,7 +297,7 @@ Content is separated from layout so it can be edited without touching components
 
 - Everything that moves respects `prefers-reduced-motion: reduce`: no landing screen, no letter reveal or lean, no theme wipe, strips paused, words fully shown, bars shown filled, playground paused behind "Play".
 - Nothing that animates on its own changes the layout: the hero's typed line keeps room for its longest line (two lines on phones), so typing never pushes the name up, and its prompt stays put, so typing never slides it along.
-- The custom cursor (a small dot with `mix-blend-mode: difference` that grows into a thin ring over interactive targets) only appears for `(pointer: fine)`; it never carries text. Touch devices keep native behaviour.
+- The custom cursor (a small dot with `mix-blend-mode: difference` that grows into a thin ring over interactive targets) only appears for `(pointer: fine)`; it never carries text. Touch devices keep native behaviour. The theme menu and the theme wipe are drawn above the whole page, dot included, so over them the real pointer shows instead and the dot hides.
 - One shared `requestAnimationFrame` loop drives cursor, strips, letters and the playground; each part does no work while off-screen.
 
 ## 12. Quality
@@ -345,7 +345,7 @@ Content is separated from layout so it can be edited without touching components
   - the chatbot opens, a suggestion chip returns an answer with a source link, a typed question gets an answer, and Escape closes the panel and returns focus
   - `/404` renders
   - a crawl of internal links finds no broken links
-  - the landing screen: it plays on a first visit and dives into the page by itself; a scroll, key press or tap skips it without scrolling the page; it does not play again in the same visit, from another page of the site, for a section link or with reduced motion; it stays dark with light letters in the dark theme; SHR matches the display face as the page draws it; the S is as deep where the dive heads as the script assumes; the page's largest paint happens behind it; nothing shifts when it clears, even when fonts arrive late with no look-alike font installed. Other browser tests start past it (`tests/e2e/fixtures.ts`).
+  - the landing screen: it plays on a first visit and dives into the page by itself; a scroll, key press or tap skips it without scrolling the page; it does not play again in the same visit, from another page of the site, for a section link or with reduced motion; it stays dark with light letters in the dark theme; the S matches the display face as the page draws it; it covers a phone even once the address bar hides; the S is as deep where the dive heads as the script assumes; the page's largest paint happens behind it; nothing shifts when it clears, even when fonts arrive late with no look-alike font installed. Other browser tests start past it (`tests/e2e/fixtures.ts`).
 - **Lighthouse:** run against the production build before launch; scores recorded in the README.
 
 ## 14. Repository, commits and deploy
