@@ -1,3 +1,5 @@
+import { SHR_GLYPHS } from './shr-glyphs';
+
 /** sessionStorage key, set once the home page has been shown in a tab. The inline script on the home page uses it too. */
 export const LANDING_KEY = 'landing';
 
@@ -108,12 +110,47 @@ export interface Point {
 }
 
 /**
- * The bold display S of Source Serif 4, in ems from its pen position on the baseline: the capitals' height, and the
- * point deepest inside its stroke (on the lower curve), where the dive heads, with how deep the stroke is there.
- * Measured once from the glyph as the browser draws it at 1000px. The browser test re-measures it on screen, since a
- * canvas cannot draw the display cut the page uses and so cannot measure it at run time.
+ * The S's point deepest inside its stroke (on the lower curve), where the dive heads, in ems from its pen position on
+ * the baseline, with how deep the stroke is there. Measured once from the glyph as the browser draws it at 1000px;
+ * the browser test re-measures it on screen.
  */
 export const S_SHAPE = { capHeight: 0.657, deep: { x: 0.339, y: -0.277, r: 0.068 } } as const;
+
+/**
+ * The band each letter opens through, in font units (y up): centred on the capitals, and tall enough for the S's
+ * overshoot and the serifs.
+ */
+export const BAND = { middle: SHR_GLYPHS.capHeight / 2, half: SHR_GLYPHS.capHeight / 2 + 60 } as const;
+
+export interface SHRLayout {
+  /** Font size in px, and px per font unit. */
+  size: number;
+  k: number;
+  /** Where the S's pen starts, and the baseline, in px. */
+  left: number;
+  baseline: number;
+  /** The point the dive heads into, and how deep the S's stroke is there, in px. */
+  origin: Point;
+  clearance: number;
+}
+
+/** SHR sized to a `width` × `height` screen: its ink centred across, its capitals centred down. */
+export function layoutSHR(width: number, height: number): SHRLayout {
+  const size = Math.min(width * 0.4, height * 0.58);
+  const k = size / SHR_GLYPHS.unitsPerEm;
+  const [S, , R] = SHR_GLYPHS.letters;
+  const inkMiddle = (S.ink[0] + R.x + R.ink[2]) / 2;
+  const left = width / 2 - inkMiddle * k;
+  const baseline = height / 2 + (SHR_GLYPHS.capHeight * k) / 2;
+  return {
+    size,
+    k,
+    left,
+    baseline,
+    origin: { x: left + S_SHAPE.deep.x * size, y: baseline + S_SHAPE.deep.y * size },
+    clearance: S_SHAPE.deep.r * size,
+  };
+}
 
 /**
  * How many times the letters must grow around `origin`, where the S's stroke is `clearance` pixels deep,
