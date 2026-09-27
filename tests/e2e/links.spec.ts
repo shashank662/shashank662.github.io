@@ -1,8 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-/** Linked on purpose, added just before launch (spec §15, item 7). */
-const PENDING = new Set(['/resume.pdf']);
-
 test('every internal link works and every page loads without errors', async ({ page, request }) => {
   const errors: string[] = [];
   page.on('console', (msg) => {
@@ -15,7 +12,7 @@ test('every internal link works and every page loads without errors', async ({ p
   const broken: string[] = [];
   while (queue.length > 0) {
     const path = queue.shift()!;
-    if (seen.has(path) || PENDING.has(path)) continue;
+    if (seen.has(path)) continue;
     seen.add(path);
     const response = await request.get(path);
     if (response.status() !== 200) {
@@ -40,4 +37,10 @@ test('every internal link works and every page loads without errors', async ({ p
       '/work/abandoned-cart-recovery',
     ]),
   );
+});
+
+test('the résumé downloads as a PDF', async ({ request }) => {
+  const response = await request.get('/resume.pdf');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('application/pdf');
 });
