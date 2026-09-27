@@ -26,8 +26,9 @@ export default defineConfig({
     },
   ],
   webServer: {
+    // In CI the workflow has already built the site it will deploy, so the tests serve that build as-is.
     // --ignore-lock keeps the preview in the foreground; Astro otherwise backgrounds it when an AI agent runs it.
-    command: `npm run build && npm run preview -- --port ${PORT} --ignore-lock`,
+    command: `${process.env.CI ? '' : 'npm run build && '}npm run preview -- --port ${PORT} --ignore-lock`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

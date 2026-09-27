@@ -11,8 +11,9 @@ if (paragraph && !prefersReducedMotion()) {
     const box = paragraph.getBoundingClientRect();
     const progress = Math.min(1, Math.max(0, (innerHeight * 0.85 - box.top) / (box.height + innerHeight * 0.25)));
     const lit = progress * (words.length + 4);
+    // How lit each word is, 0–1. The stylesheet keeps it above a readable floor.
     words.forEach((word, i) => {
-      word.style.opacity = String(Math.min(1, Math.max(0.14, lit - i)));
+      word.style.setProperty('--lit', String(Math.min(1, Math.max(0, lit - i))));
     });
   };
 

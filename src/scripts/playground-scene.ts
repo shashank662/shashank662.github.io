@@ -27,8 +27,6 @@ const EDGES: [NodeId, NodeId, string, EdgeKind][] = [
   ['rmq', 'msg', 'retry + back-off', 'retry'],
 ];
 
-const FONT = '500 11px "JetBrains Mono", ui-monospace, monospace';
-const SMALL = '400 10px "JetBrains Mono", ui-monospace, monospace';
 const TAU = Math.PI * 2;
 const IDS = Object.keys(NODES) as NodeId[];
 
@@ -68,6 +66,11 @@ function readTheme(): Theme {
 export function createScene(stage: HTMLElement, canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
+
+  // The page's own mono font stack, so the labels match the rest of the site.
+  const mono = getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim() || 'monospace';
+  const FONT = `500 11px ${mono}`;
+  const SMALL = `400 10px ${mono}`;
 
   let W = 1;
   let H = 1;

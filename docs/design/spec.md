@@ -334,7 +334,7 @@ Content is separated from layout so it can be edited without touching components
    - Never backdate or rewrite commit times.
    - No Claude co-author or attribution lines.
 5. **Branches and pull requests.** One branch and pull request per phase: `feat/scaffold`, `feat/home`, `feat/case-studies`, `feat/playground`, `feat/ask-me`, `feat/summary-404-seo`, `feat/deploy`. Pushing and opening pull requests happens only after the owner says so.
-6. **Deploy.** `.github/workflows/deploy.yml` runs on pushes to `main` and on manual dispatch: install (npm ci) → `astro check` → Vitest → build → Playwright against the built site → upload and deploy to GitHub Pages. Node 22 LTS.
+6. **Deploy.** `.github/workflows/deploy.yml` runs on pushes to `main` and on manual dispatch: install (npm ci) → `astro check` → Vitest → build → Playwright against the built site → upload and deploy to GitHub Pages. CI uses Node 24 LTS (Node 22 leaves long-term support in April 2027); the site still supports Node 22.12+. The build job gets a read-only token; only the deploy job may publish.
    - The repository's Pages source switches from "Deploy from a branch" to "GitHub Actions" once, after the owner approves.
 7. **Git-ignored:** `node_modules/`, `dist/`, `.astro/`, test reports, `.superpowers/` (brainstorm files) and `docs/superpowers/` (implementation plans stay local). This spec and the approved mockup are tracked in `docs/design/`.
 8. **Custom domain** (optional, later): add `public/CNAME` and DNS records; nothing else changes.

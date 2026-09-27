@@ -99,6 +99,29 @@ test('with reduced motion, the About words are fully visible', async ({ page }) 
   expect(opacity).toBe('1');
 });
 
+test('before they light up, the About words still meet 3:1 contrast in both themes', async ({ page }) => {
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme });
+    await page.goto('/');
+    // Unscrolled, the paragraph is below the hero, so every word is at its faintest.
+    const faintest = await page.locator('[data-word-reveal]').evaluate((paragraph) => {
+      const rgb = (css: string) => css.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+      const channel = (c: number) => (c / 255 <= 0.04045 ? c / 255 / 12.92 : ((c / 255 + 0.055) / 1.055) ** 2.4);
+      const luminance = ([r, g, b]: number[]) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+      const bg = rgb(getComputedStyle(document.body).backgroundColor);
+      const ratios = [...paragraph.querySelectorAll<HTMLElement>('.w')].map((word) => {
+        const style = getComputedStyle(word);
+        const alpha = Number(style.opacity);
+        const shown = rgb(style.color).map((c, i) => alpha * c + (1 - alpha) * bg[i]);
+        const [light, dark] = [luminance(shown), luminance(bg)].sort((a, b) => b - a);
+        return (light + 0.05) / (dark + 0.05);
+      });
+      return Math.min(...ratios);
+    });
+    expect(faintest, `faintest About word in ${colorScheme} mode`).toBeGreaterThanOrEqual(3);
+  }
+});
+
 test('incidents show their results and contact opens an email', async ({ page }) => {
   await page.goto('/#incidents');
   await expect(page.locator('#incidents article')).toHaveCount(2);
