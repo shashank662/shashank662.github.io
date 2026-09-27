@@ -1,4 +1,5 @@
-import { expect, test, type Page } from './fixtures';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 const NAMES = ['Auto', 'Light', 'Dark', 'Midnight', 'Ocean', 'Forest', 'Sunset', 'Rose', 'Nord', 'Solarized'];
 
