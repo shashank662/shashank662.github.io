@@ -114,7 +114,7 @@ export interface Point {
  * the baseline, with how deep the stroke is there. Measured once from the glyph as the browser draws it at 1000px;
  * the browser test re-measures it on screen.
  */
-export const S_SHAPE = { capHeight: 0.657, deep: { x: 0.339, y: -0.277, r: 0.068 } } as const;
+export const S_SHAPE = { deep: { x: 0.339, y: -0.277, r: 0.068 } } as const;
 
 /**
  * The band each letter opens through, in font units (y up): centred on the capitals, and tall enough for the S's
@@ -160,38 +160,4 @@ export function coverScale(origin: Point, clearance: number, width: number, heig
   const corners: [number, number][] = [[0, 0], [width, 0], [0, height], [width, height]];
   const far = Math.max(...corners.map(([x, y]) => Math.hypot(x - origin.x, y - origin.y)));
   return (far / clearance) * 1.15;
-}
-
-export interface Box {
-  x0: number;
-  y0: number;
-  x1: number;
-  y1: number;
-}
-
-const DIRECTIONS = Array.from({ length: 24 }, (_, i) => [Math.cos((i * Math.PI) / 12), Math.sin((i * Math.PI) / 12)]);
-
-/**
- * The point of a shape farthest from its edge, and how far that is, searched on a `step`-pixel grid within `box`.
- * `inside(x, y)` says whether a pixel belongs to the shape. Distances are checked along 24 directions.
- */
-export function deepestPoint(
-  inside: (x: number, y: number) => boolean,
-  box: Box,
-  step = 2,
-): (Point & { r: number }) | null {
-  const ring = (x: number, y: number, r: number) =>
-    DIRECTIONS.every(([dx, dy]) => inside(Math.round(x + r * dx), Math.round(y + r * dy)));
-  const limit = Math.max(box.x1 - box.x0, box.y1 - box.y0) + 1;
-  let best: (Point & { r: number }) | null = null;
-  for (let y = box.y0; y <= box.y1; y += step) {
-    for (let x = box.x0; x <= box.x1; x += step) {
-      // A point can only beat the best so far if the ring at the best depth is still all inside.
-      if (!inside(x, y) || (best && !ring(x, y, best.r))) continue;
-      let r = 1;
-      while (r < limit && ring(x, y, r)) r += 1;
-      if (!best || r > best.r) best = { x, y, r };
-    }
-  }
-  return best;
 }
