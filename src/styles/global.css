@@ -102,6 +102,10 @@ main:focus { outline: none; }
   background: transparent; box-shadow: inset 0 0 0 1.5px #fff;
 }
 .fine, .fine * { cursor: none; }
+/* The theme menu and the theme wipe are drawn above the whole page, the dot included, so there the real pointer shows. */
+.fine [popover], .fine [popover] * { cursor: auto; }
+.fine [popover] button { cursor: pointer; }
+html.fine.theme-wipe { cursor: auto; }
 
 /* ---------- live status pill ---------- */
 .status { display: inline-flex; align-items: center; gap: 8px; color: var(--ok); transition: color 0.3s; }
