@@ -224,3 +224,17 @@ test('the name at the top takes at most 60% of a laptop screen', async ({ page, 
   });
   expect(share).toBeLessThanOrEqual(0.6);
 });
+
+test('a letter of the name turns accent at once near the pointer, without waiting on its slide-in delay', async ({ page }) => {
+  await page.goto('/');
+  const timing = await page.locator('[data-hero] .ch > span').last().evaluate((span) => {
+    const style = getComputedStyle(span);
+    const props = style.transitionProperty.split(', ');
+    const at = props.indexOf('color');
+    // A shorter list repeats to cover every property, as CSS does.
+    const pick = (list: string) => list.split(', ')[at % list.split(', ').length];
+    return { delay: pick(style.transitionDelay), duration: parseFloat(pick(style.transitionDuration)) };
+  });
+  expect(timing.delay).toBe('0s');
+  expect(timing.duration).toBeLessThanOrEqual(0.15);
+});
