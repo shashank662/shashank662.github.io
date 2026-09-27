@@ -23,6 +23,8 @@ export interface CareerSpan extends Span {
   level: 0 | 1 | 2;
   tone: 'muted' | 'ink' | 'accent';
   detail: string;
+  /** For a project: the role it was built in. It is drawn across that role's time, not dates of its own. */
+  within?: 'internship' | 'full-time';
 }
 
 export interface Incident {
@@ -159,11 +161,11 @@ export const profile: Profile = {
       { name: 'GET /career', tag: 'root span', level: 0, start: [2020, 8], end: null, tone: 'muted', detail: 'Everything so far. Still running, status 200.' },
       { id: 'education', name: EDUCATION.degree, tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: `${EDUCATION.school}. Graduated with a ${EDUCATION.cgpa} CGPA.` },
       { id: 'internship', name: 'Engati · SDE intern', tag: '6 months', level: 1, ...INTERNSHIP, tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
-      { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, start: [2024, 3], end: [2024, 3], tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
+      { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, within: 'internship', start: [2024, 3], end: [2024, 3], tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
       { id: 'full-time', name: 'Engati · Software Engineer', tag: 'full-time', level: 1, ...FULL_TIME, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
-      { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', level: 2, start: [2024, 10], end: null, tone: 'accent', detail: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day. Failure rate 35% → 12%.' },
-      { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', level: 2, start: [2025, 4], end: null, tone: 'accent', detail: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
-      { name: 'AI code reviewer', tag: 'spring boot · llm', level: 2, start: [2025, 9], end: null, tone: 'accent', detail: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
+      { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', level: 2, within: 'full-time', start: [2024, 10], end: null, tone: 'accent', detail: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day. Failure rate 35% → 12%.' },
+      { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', level: 2, within: 'full-time', start: [2025, 4], end: null, tone: 'accent', detail: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
+      { name: 'AI code reviewer', tag: 'spring boot · llm', level: 2, within: 'full-time', start: [2025, 9], end: null, tone: 'accent', detail: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
     ],
   },
   incidents: {
