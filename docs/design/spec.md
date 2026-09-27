@@ -290,7 +290,7 @@ Content is separated from layout so it can be edited without touching components
 
 **Performance budgets**
 
-- Lighthouse mobile at least 95 in all four categories. Exception (2026-09-27): home performance is 94–95 with the serif's display cut, which the owner chose over the plainer cut (97).
+- Lighthouse mobile at least 95 in all four categories. Exception (2026-09-27): home performance is 94–95 with the serif's display cut, which gives the look the owner picked; the plainer cut scores 97 but looks chunkier.
 - Home JS under 50 KB gzipped (the chatbot's search library and index load only when the panel is first opened, and are not counted).
 - No layout shift above 0.05.
 - No third-party requests.
