@@ -14,7 +14,6 @@ export const THEMES = [
 ] as const satisfies readonly { id: string; name: string; scheme: Scheme }[];
 
 export type ThemeId = (typeof THEMES)[number]['id'];
-export type Theme = 'light' | 'dark';
 
 /** localStorage key. The inline script in Base.astro reads the same key. */
 export const THEME_KEY = 'theme';
@@ -31,8 +30,4 @@ export function resolveTheme(stored: string | null, prefersDark: boolean): Theme
 
 export function schemeOf(id: ThemeId): Scheme {
   return THEMES.find((theme) => theme.id === id)?.scheme ?? 'light';
-}
-
-export function otherTheme(theme: Theme): Theme {
-  return theme === 'dark' ? 'light' : 'dark';
 }
