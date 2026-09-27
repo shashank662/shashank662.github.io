@@ -214,9 +214,9 @@ export const profile: Profile = {
   },
   playground: {
     title: 'The retry flow, live',
-    sub: 'My Engati auto-retry framework, running live. Triggers flow out to Meta; failed deliveries come back as webhooks. Retryable ones fetch their original payload from MongoDB by trackerId and go back out through RabbitMQ with back-off. Switch the framework off, or cause a Meta outage, and watch the failure rate.',
+    sub: 'My Engati auto-retry framework, running live. Triggers flow out to Meta; failures come back as webhooks, through the analytics pipeline, to trigger-mvc. Retryable ones wait in RabbitMQ with back-off, then go out again with their original payload, fetched from MongoDB by trackerId. Switch the framework off, or cause a Meta outage, and watch the failure rate.',
     canvasLabel:
-      'Live model of the auto-retry framework. Triggers travel from the integrations through the API gateway, trigger service and messaging layer to Meta. Failed deliveries come back as webhooks; retryable ones go through MongoDB and RabbitMQ and are sent again.',
+      'Live model of the auto-retry framework. Triggers travel from the integrations through the API gateway, trigger-mvc and the messaging pipeline to Meta; messaging keeps each trackerId in Redis. Failed deliveries come back through the webhook receiver and the analytics pipeline to trigger-mvc. Retryable ones wait in RabbitMQ, then trigger-mvc fetches the original payload from MongoDB and sends them again.',
   },
   contact: {
     prompt: 'Got a role in mind?',
