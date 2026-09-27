@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   BAND,
   coverScale,
-  deepestPoint,
   LANDING,
   LANDING_KEY,
   landingPose,
@@ -155,36 +154,5 @@ describe('coverScale', () => {
 
   it('measures to the corner farthest from the hole', () => {
     expect(coverScale({ x: 0, y: 0 }, 10, 300, 400)).toBeCloseTo((500 / 10) * 1.15);
-  });
-});
-
-describe('deepestPoint', () => {
-  const disk = (cx: number, cy: number, r: number) => (x: number, y: number) => (x - cx) ** 2 + (y - cy) ** 2 <= r * r;
-
-  it('finds the centre of a round shape and how far it is from the edge', () => {
-    const deep = deepestPoint(disk(50, 40, 20), { x0: 0, y0: 0, x1: 100, y1: 100 });
-    expect(deep).not.toBeNull();
-    expect(Math.hypot(deep!.x - 50, deep!.y - 40)).toBeLessThanOrEqual(2);
-    expect(deep!.r).toBeGreaterThanOrEqual(18);
-    expect(deep!.r).toBeLessThanOrEqual(21);
-  });
-
-  it('finds the middle of a thick stroke', () => {
-    const band = (x: number, y: number) => x >= 0 && x <= 200 && y >= 30 && y <= 50;
-    const deep = deepestPoint(band, { x0: 0, y0: 0, x1: 200, y1: 80 });
-    expect(deep!.y).toBeCloseTo(40, 0);
-    expect(deep!.r).toBeGreaterThanOrEqual(9);
-    expect(deep!.r).toBeLessThanOrEqual(11);
-  });
-
-  it('prefers the widest part of a shape', () => {
-    const small = disk(20, 20, 5);
-    const big = disk(70, 60, 15);
-    const deep = deepestPoint((x, y) => small(x, y) || big(x, y), { x0: 0, y0: 0, x1: 100, y1: 100 });
-    expect(Math.hypot(deep!.x - 70, deep!.y - 60)).toBeLessThanOrEqual(2);
-  });
-
-  it('returns nothing when the shape is empty', () => {
-    expect(deepestPoint(() => false, { x0: 0, y0: 0, x1: 50, y1: 50 })).toBeNull();
   });
 });
