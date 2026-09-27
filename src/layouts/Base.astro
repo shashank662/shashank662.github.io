@@ -67,6 +67,8 @@ const person = {
         document.documentElement.classList.add('js');
       })();
     </script>
+    {/* A page's own scripts that must run before first paint (the home page's landing screen). */}
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
