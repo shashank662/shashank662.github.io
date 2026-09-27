@@ -1,4 +1,4 @@
-import { coverScale, deepestPoint, LANDING, landingPose, type LandingPose, type Point } from '../lib/landing';
+import { coverScale, LANDING, landingPose, S_SHAPE, type LandingPose, type Point } from '../lib/landing';
 import { onFrame } from './motion';
 
 // The home page's landing screen (spec §5): "SHR" opens out of a blue line on a dark screen, then the view dives
@@ -109,8 +109,7 @@ function play(svg: SVGSVGElement): void {
   function place(): Layout {
     const size = Math.min(innerWidth * 0.4, innerHeight * 0.58);
     svg.style.fontSize = `${size}px`;
-    const shape = shapeOfS(font);
-    const capital = shape.capHeight * size;
+    const capital = S_SHAPE.capHeight * size;
     const baseline = innerHeight / 2 + capital / 2;
     const left = (innerWidth - measure.getComputedTextLength()) / 2;
     const xs = [0, 1, 2].map((i) => left + measure.getStartPositionOfChar(i).x);
@@ -122,10 +121,11 @@ function play(svg: SVGSVGElement): void {
     }
     const middle = baseline - capital / 2;
     line.setAttribute('y', n(middle - 0.75));
-    const origin = { x: xs[0] + shape.deep.x * size, y: baseline + shape.deep.y * size };
-    // Where the dive heads, for the browser tests.
-    svg.dataset.origin = `${n(origin.x)} ${n(origin.y)}`;
-    return { size, middle, half: capital / 2 + size * 0.06, origin, clearance: shape.deep.r * size };
+    const origin = { x: xs[0] + S_SHAPE.deep.x * size, y: baseline + S_SHAPE.deep.y * size };
+    const clearance = S_SHAPE.deep.r * size;
+    // Where the dive heads and how deep it takes the stroke to be there, for the browser tests.
+    svg.dataset.origin = `${n(origin.x)} ${n(origin.y)} ${n(clearance)}`;
+    return { size, middle, half: capital / 2 + size * 0.06, origin, clearance };
   }
 
   function frame(_now: number, dt: number): void {
@@ -165,29 +165,4 @@ function play(svg: SVGSVGElement): void {
     echo.style.opacity = String(pose.echo);
     svg.style.opacity = String(pose.screen);
   }
-}
-
-/** The S's proportions in ems: the capitals' height, and the point deepest inside its stroke. Drawn off-screen at 200px. */
-function shapeOfS(font: string): { capHeight: number; deep: Point & { r: number } } {
-  const size = 200;
-  const canvas = document.createElement('canvas');
-  canvas.width = 240;
-  canvas.height = 260;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
-  ctx.font = font;
-  const capHeight = ctx.measureText('H').actualBoundingBoxAscent / size;
-  const [x0, base] = [20, 220];
-  ctx.fillText('S', x0, base);
-  const m = ctx.measureText('S');
-  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  const inside = (x: number, y: number) =>
-    x >= 0 && y >= 0 && x < canvas.width && y < canvas.height && pixels[(y * canvas.width + x) * 4 + 3] > 127;
-  const box = {
-    x0: Math.floor(x0 - m.actualBoundingBoxLeft),
-    y0: Math.floor(base - m.actualBoundingBoxAscent),
-    x1: Math.ceil(x0 + m.actualBoundingBoxRight),
-    y1: Math.ceil(base + m.actualBoundingBoxDescent),
-  };
-  const deep = deepestPoint(inside, box) ?? { x: (box.x0 + box.x1) / 2, y: (box.y0 + box.y1) / 2, r: 8 };
-  return { capHeight, deep: { x: (deep.x - x0) / size, y: (deep.y - base) / size, r: deep.r / size } };
 }
