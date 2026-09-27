@@ -99,11 +99,11 @@ Sections, in order:
 2. **Hero**
    - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph; on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
    - The name "SHASHANK" in Plex Sans Condensed Bold, spread across the full width. Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent when very close.
-   - Second row: a rotating circular badge ("Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺", accent core with "↓" linking to About) and the serif lede "I build *backends* that never wake anyone up at 3 a.m."
+   - Second row: a rotating circular badge ("Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺", accent core with "↓" linking to About) and the light lede "I build *reliable backends* for high-volume messaging."
    - A mono line types and erases four lines in turn, prompt `~/shashank $`.
 3. **Skill strips.** Two slightly rotated marquee bands: one lists skills (Java, Spring Boot, Apache Kafka, RabbitMQ, Redis, MongoDB, Spark, AWS S3, Microservices), the other highlights (Open to SDE-2 roles, Employee of the Month ×2, MongoDB certified, CGPA 9.47, Bangalore). They drift at a base speed; scroll speed adds a boost and scroll direction sets the drift direction.
 4. **(01) About.** A mono facts list (`based_in`, `engati` SDE and intern lines with computed durations, `stack`, `education`, `awards`, `status`) beside a large paragraph whose words fade from 14% to full opacity as it scrolls through the viewport. Phrases marked in the data render in serif italic accent.
-5. **(02) Experience — "My career, traced."**
+5. **(02) Experience — "Experience"**
    - Section label shows `GET /career · <N> spans · 200 OK`, where N is counted from the data.
    - A trace table: a year axis from 2021 to the current year plus "now"; one row per span with a label, a small tag, a bar positioned by start and end month, and the duration.
    - Nesting: projects sit under their role (level 2), and the root span is shown in mono.
@@ -112,8 +112,8 @@ Sections, in order:
    - Columns: number, title, one-line description, stack, key metric with a small caption.
    - Hover: a soft `--line2` tint; the title shifts 10px right and turns accent; a 230px card follows the cursor, offset down and right (flipping left near the right edge), showing tag, "Case study ↗" or "Click to expand", a big accent metric and a short label.
    - No card on touch devices. The sandbox row expands its text in place (button semantics, `aria-expanded`).
-7. **(04) Incidents — "War stories, resolved."** Two postmortem cards (INC-01 MongoDB M20 memory, INC-02 FastAPI memory leak), each with Impact, Cause and Fix, a big accent delta, and before/after bars that grow in on first view.
-8. **(05) Playground — "Go on, break something."** The retry-flow simulation (section 8).
+7. **(04) Incidents — "Production incidents"** Two postmortem cards (INC-01 MongoDB M20 memory, INC-02 FastAPI memory leak), each with Impact, Cause and Fix, a big accent delta, and before/after bars that grow in on first view.
+8. **(05) Playground — "The retry flow, live"** The retry-flow simulation (section 8).
 9. **(06) Contact.** A giant "Let's talk →" (mailto link) and links: Email, LinkedIn, GitHub, Résumé (PDF).
 10. **Footer** (mono): "© <year> Shashank H R · built with Astro", real page-load time (from the Navigation Timing API), a session uptime counter, and the same live status as the header.
 
