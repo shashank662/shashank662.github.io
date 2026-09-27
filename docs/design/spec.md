@@ -197,17 +197,17 @@ The four case studies, with the facts they must contain:
 | Rule | Value |
 |---|---|
 | New triggers | 2.6 per second, path integrations → api-gateway → trigger-mvc → messaging → meta, moving at 210 px/s; messaging keeps each trackerId in redis |
-| Failure chance at meta | 0.35 on the first attempt; 0.15 on retries; 0.90 during an outage |
+| Failure chance at meta | 0.35 on the first attempt; 0.15 on retries; 0.90 while it sends error webhooks |
 | On success | green pop at meta; if attempt > 1, "saved by retries" +1 |
 | On failure | a webhook packet travels meta → webhook-receiver → analytics (which records the reason) → trigger-mvc |
 | At trigger-mvc | retryable with chance 0.70. Dropped (red, at trigger-mvc) if non-retryable, if retries are OFF, or if attempt ≥ 3. Otherwise it travels trigger-mvc → rabbitmq. |
 | At rabbitmq | waits 1.5 s × 2^(attempt−1), shown as a queued dot with a countdown ring; the attempt number increases; then it travels rabbitmq → trigger-mvc (redis and mongodb flash: trackerId, then payload) → messaging → meta, labelled ↻n |
-| Headline failure rate | every 300 ms, a Monte Carlo sample of 400 virtual messages under the same rules, smoothed by moving 35% toward the new value. Settles near 12% (ON), 35% (OFF) and 80% (outage). |
+| Headline failure rate | every 300 ms, a Monte Carlo sample of 400 virtual messages under the same rules, smoothed by moving 35% toward the new value. Settles near 12% (ON), 35% (OFF) and 80% (error webhooks). |
 
 **Controls**
 
 - "Retry framework" switch (`role="switch"`, `aria-checked`).
-- "⚡ Simulate a Meta outage" lasts 5 seconds and disables itself while running. During the outage, every live status on the page reads "meta outage · retrying" in `--warn`.
+- "⚡ Simulate error webhooks" lasts 5 seconds and disables itself while running. Meta stays up but answers most deliveries with failure webhooks, so Meta and the webhook receiver glow amber, and every live status on the page reads "error webhooks · retrying" in `--warn`.
 - Clicking the canvas sends 5 visitor triggers.
 
 **Panel:** failure rate (coloured ok below 20%, warn from 20% to 50%, bad above 50%), retries in queue, saved by retries, and a six-line log throttled so it stays readable.
