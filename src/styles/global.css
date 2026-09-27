@@ -45,7 +45,7 @@ em { font-style: normal; font-weight: 600; color: var(--accent); }
 
 /* ---------- utilities ---------- */
 .mono { font-family: var(--font-mono); }
-.display { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; }
+.display { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.025em; }
 .label { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 .wrap { padding-left: var(--gutter); padding-right: var(--gutter); }
 .visually-hidden {
@@ -70,7 +70,7 @@ em { font-style: normal; font-weight: 600; color: var(--accent); }
 .pill.accent:hover { background: var(--ink); border-color: var(--ink); color: var(--bg); }
 
 /* ---------- section titles ---------- */
-.h2 { margin-top: 30px; font-size: clamp(40px, 6vw, 96px); font-weight: 600; line-height: 1; letter-spacing: -0.03em; }
+.h2 { margin-top: 30px; font-family: var(--font-display); font-size: clamp(40px, 6vw, 96px); font-weight: 600; line-height: 1; letter-spacing: -0.025em; }
 .sub { max-width: 640px; margin-top: 22px; font-size: 17px; line-height: 1.6; color: var(--muted); }
 .section { padding-top: 9vw; padding-bottom: 5vw; }
 /* Jump links land below the fixed header instead of under it. */
