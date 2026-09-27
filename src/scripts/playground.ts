@@ -24,7 +24,7 @@ function start(root: HTMLElement): void {
   const logs = $<HTMLElement>('[data-logs]');
   const framework = $<HTMLButtonElement>('[data-retry-switch]');
   const frameworkLabel = $<HTMLElement>('[data-switch-label]');
-  const outageButton = $<HTMLButtonElement>('[data-outage]');
+  const burstButton = $<HTMLButtonElement>('[data-error-webhooks]');
   const sendButton = $<HTMLButtonElement>('[data-send]');
   const playButton = $<HTMLButtonElement>('[data-play]');
   const failRate = $<HTMLElement>('[data-metric="fail"]');
@@ -69,8 +69,8 @@ function start(root: HTMLElement): void {
         log('INFO', `tr_${event.id} queued · retry in ${event.wait.toFixed(1)}s (attempt ${event.attempt})`, 1.4);
       } else if (event.type === 'error-webhooks-over') {
         setSiteStatus('ok');
-        outageButton.disabled = false;
-        log('OK', 'meta recovered · retry queue draining');
+        burstButton.disabled = false;
+        log('OK', 'failure webhooks back to normal · retry queue draining');
       }
     }
   };
@@ -99,7 +99,7 @@ function start(root: HTMLElement): void {
     // Twenty simulated seconds, so it opens mid-flow instead of empty.
     sim.warmUp(20);
     log('INFO', 'retry framework running · ~2M triggers a day in production');
-    log('YOU', 'try it: switch it off, or simulate a Meta outage');
+    log('YOU', 'try it: switch it off, or simulate error webhooks');
     hud();
     scene.draw(sim);
     if (paused) playButton.hidden = false;
@@ -114,12 +114,12 @@ function start(root: HTMLElement): void {
     else log('WARN', 'retry framework OFF · failed deliveries are lost');
   });
 
-  outageButton.addEventListener('click', () => {
+  burstButton.addEventListener('click', () => {
     play();
     if (!sim.startErrorWebhooks()) return;
-    outageButton.disabled = true;
-    setSiteStatus('degraded', 'meta outage · retrying');
-    log('WARN', 'meta delivery failures spiking (simulated outage)');
+    burstButton.disabled = true;
+    setSiteStatus('degraded', 'error webhooks · retrying');
+    log('WARN', 'meta sending failure webhooks for most deliveries (simulated)');
   });
 
   const send = () => {
