@@ -44,3 +44,13 @@ test('the résumé downloads as a PDF', async ({ request }) => {
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/pdf');
 });
+
+test('every page links to GitHub, LinkedIn and email from its footer', async ({ page }) => {
+  for (const path of ['/', '/work/rcs-billing-pipeline', '/summary', '/no-such-page']) {
+    await page.goto(path);
+    const footer = page.getByRole('contentinfo');
+    await expect(footer.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/shashank662');
+    await expect(footer.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute('href', 'https://www.linkedin.com/in/shashank-hr-0606abc2002');
+    await expect(footer.getByRole('link', { name: 'Email' })).toHaveAttribute('href', 'mailto:shashankhr06@gmail.com');
+  }
+});
