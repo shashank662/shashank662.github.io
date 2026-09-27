@@ -33,7 +33,12 @@ Motion is calm and purposeful. Hover effects are subtle (a soft row tint and a s
 
 ### 2.1 Design tokens
 
-Both themes are first-class. The theme follows the visitor's system setting on the first visit and remembers an explicit choice in `localStorage`.
+Nine colour themes, all first-class: Light and Dark (the table below), plus Midnight, Ocean, Forest, Sunset, Rose and Nord (dark) and Solarized (light), added on 2026-09-27 at the owner's request. A visitor picks one in the header's theme picker, or keeps **Auto**, which follows the system's light or dark setting (the default, and it follows the system live). An explicit choice is remembered in `localStorage` (`theme`) and applied before first paint, with `data-theme` (the theme) and `data-scheme` (light or dark) on `<html>`.
+
+- The themes are listed in `src/lib/theme.ts`; their colours live in `src/styles/tokens.css`, as `[data-theme='…']` rules that work on any element, so the picker's swatches draw themselves in their own colours.
+- Colours stay six-digit hex, because the playground's canvas reads them.
+- `tests/unit/tokens.test.ts` reads every theme from the stylesheet and checks: text, muted text, accent text and text on the accent at 4.5:1 or more; the crossing bands at 4.5:1; the About words at 3:1 before they light up, at the theme's own faintest opacity (`--word-dim`, `--word-dim-hl`: 0.47 and 0.69, or 0.52 and 0.73 for Solarized, whose text is less dark); and a dark landing screen with light letters (`--intro-dark`, `--intro-light`, `--intro-line`; Light and Dark keep `#141414`, `#F1EDE4` and `#5A78FF`).
+- The status colours and the grain follow the scheme, light or dark.
 
 | Token | Light | Dark | Used for |
 |---|---|---|---|
@@ -70,7 +75,7 @@ Emphasis is never italic: accent words are semibold in the accent colour. The cr
 - **Astro 7** (7.3.x at the time of writing; Node 22.12+) with **TypeScript in strict mode**. No UI framework: every page is prerendered to static HTML.
 - Interactive parts are small TypeScript modules loaded with Astro `<script>` tags, only on the pages that use them.
 - **Page transitions** use native cross-document view transitions (`@view-transition { navigation: auto; }`). Each work row's title and its case-study title share a `view-transition-name` (`work-<slug>`), so the title glides between pages in Chromium and Safari. Other browsers navigate normally.
-- **The theme switch** uses a same-document view transition with a circular `clip-path` wipe that starts at the click point. Without view-transition support, or with reduced motion, the theme simply switches.
+- **A theme change** uses a same-document view transition with a circular `clip-path` wipe that starts at the click point (or at the chosen swatch, from the keyboard). Without view-transition support, or with reduced motion, the theme simply switches.
 - Packages: `astro`, `@astrojs/check`, `@astrojs/sitemap`, `@fontsource-variable/source-serif-4`, `@fontsource/source-serif-4` (static, for the preview images), `@fontsource/source-sans-3`, `@fontsource/source-code-pro`, `@fontsource/instrument-serif` (the crossing bands), `minisearch` (the chatbot's in-browser search), `satori` + `@resvg/resvg-js` (preview images), `vitest`, `@playwright/test`.
 
 ## 4. Pages and routes
@@ -112,7 +117,7 @@ Sections, in order:
 1. **Header** (fixed)
    - Left: "Shashank H R · Backend Engineer".
    - Centre: live status (`● all systems operational`) and India time (`HH:MM:SS IST`); hidden below 1000px.
-   - Right: `Work`, `Playground`, `Contact` (hidden below 760px), an accent pill `60-sec view` linking to `/summary`, and the theme button (◐ plus "Light" or "Dark").
+   - Right: `Work`, `Playground`, `Contact` (hidden below 760px), an accent pill `60-sec view` linking to `/summary`, and the colour theme picker: a pill with a palette icon and the current choice ("Auto", "Forest"…). It opens a native popover under it, "Colour theme", with Auto and the nine themes as radio buttons, each drawn as a small page in its own colours; the choice is ticked. Arrow keys move through the themes and choose as they go, Escape closes and returns focus to the button, and clicking outside closes it. Hidden without JavaScript, which it needs.
    - After 30px of scroll the header gets a blurred `--bg` background and a hairline. A 2px accent bar across the top shows scroll progress.
 2. **Hero**
    - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph; on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
@@ -304,7 +309,7 @@ Content is separated from layout so it can be edited without touching components
 - A "Skip to content" link.
 - Semantic landmarks (`header`, `main`, `footer`, `nav`).
 - Headings in order.
-- The theme button announces the theme it switches to.
+- The theme picker's button names the current choice ("Colour theme: Forest"); the menu is a labelled dialog holding a radio group.
 
 **Performance budgets**
 
@@ -333,7 +338,7 @@ Content is separated from layout so it can be edited without touching components
   - the chatbot matcher against a table of at least 40 real phrasings, including typos and shorthand ("how many yrs of exp", "notice period?", "tell me abt the retry thing"), each mapped to its expected answer, plus at least 10 off-topic questions ("what's the weather", "write me a poem") that must get the fallback
 - **Playwright browser tests** (Chromium, desktop and a 390px mobile viewport):
   - every route loads with no console errors
-  - the theme toggles and persists after reload
+  - the theme picker (`theme.spec.ts`): it lists Auto and the nine themes with the current one ticked; choosing one recolours the page and survives a reload; Auto follows the system again, live, and forgets the stored choice; Enter, the arrow keys and Escape work, and focus returns to the button; the menu fits a phone screen
   - a work row opens its case study, and "Back to work" returns to `/#work`
   - the playground switch moves the failure rate above 25% within 5 seconds
   - the sandbox row expands
