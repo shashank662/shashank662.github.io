@@ -21,7 +21,10 @@ const landingNow = (page: Page) => page.evaluate(() => document.documentElement.
 async function openPaused(page: Page): Promise<void> {
   await page.clock.install();
   await page.goto('/');
-  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 100);
+  // The page's clock runs until it is paused, so pause a minute ahead: a tighter aim can land in the past on a busy
+  // machine. The jump costs nothing: the landing screen moves on by one short step per frame however long the jump,
+  // and its script has taken over by the time the page has loaded, so its safety net stays quiet.
+  await page.clock.pauseAt(Date.now() + 60_000);
 }
 
 /** Moves the stopped clock on until the line has faded: all three letters are then open and holding still. */
