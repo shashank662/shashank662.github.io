@@ -93,6 +93,9 @@ const { hero } = profile;
   .lede { font-size: clamp(26px, 3.4vw, 56px); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; }
   /* Room for the longest line up front, so typing never grows the row and pushes the name up. */
   .typed { margin-top: 18px; font-size: clamp(12px, 1.05vw, 14px); line-height: 1.6; color: var(--muted); min-height: 1.6em; }
+  /* Typing grows rightward from a prompt that stays put, like a terminal: in a right-aligned line every key would slide
+     the prompt left, and each slide counts as layout shift. The block is as wide as the longest line, prompt and caret. */
+  .typed { width: fit-content; min-width: 59ch; margin-left: auto; text-align: left; }
   .pr { color: var(--accent); }
   .caret {
     display: inline-block; width: 0.55em; height: 1.1em; margin-left: 2px; vertical-align: -0.2em;
@@ -104,8 +107,8 @@ const { hero } = profile;
     .index { display: none; }
     .row2 { grid-template-columns: 1fr; }
     .lede-wrap { text-align: left; justify-self: start; }
-    /* On a phone the longest line wraps once. */
-    .typed { min-height: 3.2em; }
+    /* On a phone the line starts at the left already, and the longest one wraps once. */
+    .typed { min-height: 3.2em; min-width: 0; margin-left: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
