@@ -1,10 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import { profile } from '../data/profile';
+import { profile, type CareerSpan } from '../data/profile';
 import { formatDuration, monthsBetween, toAttr } from '../lib/dates';
 
 const span = (id: 'internship' | 'full-time') => {
-  const found = profile.career.spans.find((s) => s.id === id);
+  const found = profile.career.spans.find((s): s is CareerSpan => s.id === id);
   if (!found) throw new Error(`profile.career has no span with id "${id}"`);
   return found;
 };

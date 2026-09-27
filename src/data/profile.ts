@@ -15,14 +15,27 @@ export interface Fact {
   tone?: 'ok';
 }
 
-export interface CareerSpan extends Span {
-  /** Lets other parts of the site (the chatbot) find this span. */
-  id?: 'education' | 'internship' | 'full-time';
+interface CareerRow {
   name: string;
   tag: string;
-  level: 0 | 1 | 2;
   tone: 'muted' | 'ink' | 'accent';
   detail: string;
+}
+
+/** A dated span on the career trace: the whole career, the degree or a role. */
+export interface CareerSpan extends Span, CareerRow {
+  /** Lets other parts of the site (the chatbot) find this span. */
+  id?: 'education' | 'internship' | 'full-time';
+  level: 0 | 1;
+  within?: never;
+}
+
+/** Something built inside a role. It has no dates of its own, so it is drawn across that role's time. */
+export interface CareerProject extends CareerRow {
+  level: 2;
+  /** The role it was built in. */
+  within: 'internship' | 'full-time';
+  id?: never;
 }
 
 export interface Incident {
@@ -70,7 +83,7 @@ export interface Profile {
   education: { degree: string; school: string; cgpa: string };
   /** The 60-second view: a one-line description and the top wins, each with its number. */
   summary: { description: string; wins: { metric: string; text: string; href: string }[] };
-  career: { axisStart: YearMonth; title: string; sub: string; spans: CareerSpan[] };
+  career: { axisStart: YearMonth; title: string; sub: string; spans: (CareerSpan | CareerProject)[] };
   incidents: { title: string; sub: string; items: Incident[] };
   work: { title: string; brief: WorkRow & { title: string; more: string } };
   playground: { title: string; sub: string; canvasLabel: string };
@@ -159,11 +172,11 @@ export const profile: Profile = {
       { name: 'GET /career', tag: 'root span', level: 0, start: [2020, 8], end: null, tone: 'muted', detail: 'Everything so far. Still running, status 200.' },
       { id: 'education', name: EDUCATION.degree, tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: `${EDUCATION.school}. Graduated with a ${EDUCATION.cgpa} CGPA.` },
       { id: 'internship', name: 'Engati · SDE intern', tag: '6 months', level: 1, ...INTERNSHIP, tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
-      { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, start: [2024, 3], end: [2024, 3], tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
+      { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, within: 'internship', tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
       { id: 'full-time', name: 'Engati · Software Engineer', tag: 'full-time', level: 1, ...FULL_TIME, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
-      { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', level: 2, start: [2024, 10], end: null, tone: 'accent', detail: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day. Failure rate 35% → 12%.' },
-      { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', level: 2, start: [2025, 4], end: null, tone: 'accent', detail: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
-      { name: 'AI code reviewer', tag: 'spring boot · llm', level: 2, start: [2025, 9], end: null, tone: 'accent', detail: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
+      { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', level: 2, within: 'full-time', tone: 'accent', detail: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day. Failure rate 35% → 12%.' },
+      { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', level: 2, within: 'full-time', tone: 'accent', detail: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
+      { name: 'AI code reviewer', tag: 'spring boot · llm', level: 2, within: 'full-time', tone: 'accent', detail: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
     ],
   },
   incidents: {
