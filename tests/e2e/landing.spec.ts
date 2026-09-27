@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { LANDING } from '../../src/lib/landing';
+import { LANDING, layoutSHR } from '../../src/lib/landing';
 
 // This file uses @playwright/test directly: every test starts as a first visit, when the landing screen plays.
 
@@ -13,6 +13,37 @@ const screen = (page: Page) => page.locator('[data-landing]');
 /** Read straight after a navigation, before the landing screen could have ended by itself. */
 const landingNow = (page: Page) => page.evaluate(() => document.documentElement.classList.contains('landing'));
 
+/** Waits until the line has faded: all three letters are then open and holding still. */
+const holding = (page: Page) =>
+  expect
+    .poll(() => page.locator('[data-line]').evaluate((line) => (line as SVGRectElement).style.opacity))
+    .toBe('0');
+
+/** Where the landing screen puts SHR on this page's screen: the same layout the page's script uses. */
+const layoutOf = (page: Page) => {
+  const { width, height } = page.viewportSize() ?? { width: 0, height: 0 };
+  return layoutSHR(width, height);
+};
+
+/** Takes a screenshot and keeps its pixels in the page as window[name], for the checks below to read. */
+async function keepShot(page: Page, name: string): Promise<void> {
+  const png = (await page.screenshot({ scale: 'css' })).toString('base64');
+  await page.evaluate(
+    async ({ png, name }) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${png}`;
+      await image.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+      ctx.drawImage(image, 0, 0);
+      Object.assign(window, { [name]: ctx.getImageData(0, 0, image.width, image.height) });
+    },
+    { png, name },
+  );
+}
+
 test('a first visit opens on SHR in light letters on a dark screen', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (msg) => {
@@ -23,7 +54,9 @@ test('a first visit opens on SHR in light letters on a dark screen', async ({ pa
   await page.goto('/');
   await expect(html(page)).toHaveClass(ON);
   await expect(screen(page)).toBeVisible();
-  await expect(page.locator('[data-fill]')).toHaveText('SHR');
+  await expect
+    .poll(() => page.$$eval('[data-fill] use', (letters) => letters.map((letter) => letter.getAttribute('href'))))
+    .toEqual(['#landing-S', '#landing-H', '#landing-R']);
   // Each letter opens out of the line.
   await expect
     .poll(() => page.$$eval('[data-band]', (bands) => bands.map((band) => Number(band.getAttribute('height')) > 0)))
@@ -33,40 +66,63 @@ test('a first visit opens on SHR in light letters on a dark screen', async ({ pa
   expect(errors).toEqual([]);
 });
 
+test('SHR is drawn just as the display face draws it', async ({ page }) => {
+  await page.goto('/');
+  await holding(page);
+  await keepShot(page, 'drawn');
+  // The same word as text in the page's display face, set in the same place over everything.
+  await page.evaluate(({ left, baseline, size }) => {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute(
+      'style',
+      `position:fixed;inset:0;width:100%;height:100%;z-index:1000;background:#141414;font-family:var(--font-display);font-weight:700;font-size:${size}px;letter-spacing:-0.025em`,
+    );
+    const text = document.createElementNS(ns, 'text');
+    text.setAttribute('x', String(left));
+    text.setAttribute('y', String(baseline));
+    text.setAttribute('fill', '#f1ede4');
+    text.textContent = 'SHR';
+    svg.append(text);
+    document.body.append(svg);
+  }, layoutOf(page));
+  await keepShot(page, 'typeset');
+  const overlap = await page.evaluate(() => {
+    const { drawn, typeset } = window as unknown as Record<string, ImageData>;
+    const light = (image: ImageData, i: number) => image.data[i] > 150 && image.data[i + 1] > 150 && image.data[i + 2] > 150;
+    let both = 0;
+    let either = 0;
+    for (let i = 0; i < drawn.data.length; i += 4) {
+      const a = light(drawn, i);
+      const b = light(typeset, i);
+      if (a && b) both += 1;
+      if (a || b) either += 1;
+    }
+    return both / either;
+  });
+  expect(overlap).toBeGreaterThan(0.97);
+});
+
 test('the dive heads into the S where its stroke is as deep as the script assumes, so the S covers the screen', async ({
   page,
 }) => {
   await page.goto('/');
-  // Once the line has faded, all three letters are open and holding still.
-  await expect
-    .poll(() => page.locator('[data-line]').evaluate((line) => (line as SVGRectElement).style.opacity))
-    .toBe('0');
-  const [x, y, assumed] = ((await page.locator('[data-landing]').getAttribute('data-origin')) ?? '').split(' ').map(Number);
-  const shot = await page.screenshot({ scale: 'css' });
-  const depth = await page.evaluate(
-    async ({ png, x, y }) => {
-      const image = new Image();
-      image.src = `data:image/png;base64,${png}`;
-      await image.decode();
-      const canvas = document.createElement('canvas');
-      canvas.width = image.width;
-      canvas.height = image.height;
-      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-      ctx.drawImage(image, 0, 0);
-      const { data } = ctx.getImageData(0, 0, image.width, image.height);
-      // Inside a letter is anything but the dark screen.
-      const inside = (px: number, py: number) => {
-        const i = (Math.round(py) * image.width + Math.round(px)) * 4;
-        return data[i] > 60 || data[i + 1] > 60 || data[i + 2] > 60;
-      };
-      const angles = Array.from({ length: 72 }, (_, a) => (a * Math.PI) / 36);
-      let r = 0;
-      while (r < 1000 && angles.every((t) => inside(x + (r + 1) * Math.cos(t), y + (r + 1) * Math.sin(t)))) r += 1;
-      return r;
-    },
-    { png: shot.toString('base64'), x, y },
-  );
-  expect(depth).toBeGreaterThanOrEqual(assumed * 0.9);
+  await holding(page);
+  await keepShot(page, 'held');
+  const { origin, clearance } = layoutOf(page);
+  const depth = await page.evaluate(({ x, y }) => {
+    const { held } = window as unknown as Record<string, ImageData>;
+    // Inside a letter is anything but the dark screen.
+    const inside = (px: number, py: number) => {
+      const i = (Math.round(py) * held.width + Math.round(px)) * 4;
+      return held.data[i] > 60 || held.data[i + 1] > 60 || held.data[i + 2] > 60;
+    };
+    const angles = Array.from({ length: 72 }, (_, a) => (a * Math.PI) / 36);
+    let r = 0;
+    while (r < 1000 && angles.every((t) => inside(x + (r + 1) * Math.cos(t), y + (r + 1) * Math.sin(t)))) r += 1;
+    return r;
+  }, origin);
+  expect(depth).toBeGreaterThanOrEqual(clearance * 0.9);
 });
 
 test('then it dives into the page by itself, and the name rises as it goes', async ({ page }) => {
