@@ -314,6 +314,17 @@ test.describe('in the dark theme', () => {
   });
 });
 
+test.describe('in a colour theme of its own', () => {
+  test('the screen takes the theme\'s dark and light', async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('theme', 'forest'));
+    await openPaused(page);
+    await expect(html(page)).toHaveAttribute('data-theme', 'forest');
+    await expect(html(page)).toHaveClass(ON);
+    await expect(page.locator('[data-screen]')).toHaveCSS('fill', 'rgb(14, 24, 16)');
+    await expect(page.locator('[data-fill]')).toHaveCSS('fill', 'rgb(229, 238, 226)');
+  });
+});
+
 test.describe('with reduced motion', () => {
   test.use({ reducedMotion: 'reduce' });
 
