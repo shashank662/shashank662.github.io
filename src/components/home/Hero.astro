@@ -56,9 +56,9 @@ const { hero } = profile;
 
   .name {
     margin-top: auto; padding-top: 40px;
-    /* "Shashank" in Source Serif 4 Bold is 3.91em wide: 23.9vw fills the width between the gutters. */
-    font-size: clamp(64px, 23.9vw, 420px); line-height: 0.8;
-    display: flex; justify-content: space-between; white-space: nowrap; user-select: none;
+    /* A masthead, not a wall: "Shashank" in Source Serif 4 Bold is 3.91em wide, so 13vw is about half a laptop screen. */
+    font-size: clamp(56px, 13vw, 200px); line-height: 0.8;
+    display: flex; white-space: nowrap; user-select: none;
   }
   .ch { display: inline-block; overflow: hidden; padding-top: 0.05em; transform-origin: 50% 100%; will-change: transform; }
   .ch > span {
