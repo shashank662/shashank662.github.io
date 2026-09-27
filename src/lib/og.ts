@@ -20,19 +20,14 @@ const ACCENT = '#1f3dff';
 const require = createRequire(import.meta.url);
 const font = (file: string) => readFileSync(require.resolve(`@fontsource/${file}`));
 const FONTS = [
-  { name: 'Anton', data: font('anton/files/anton-latin-400-normal.woff'), weight: 400 as const, style: 'normal' as const },
   {
-    name: 'Instrument Serif',
-    data: font('instrument-serif/files/instrument-serif-latin-400-italic.woff'),
-    weight: 400 as const,
-    style: 'italic' as const,
-  },
-  {
-    name: 'JetBrains Mono',
-    data: font('jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff'),
-    weight: 500 as const,
+    name: 'IBM Plex Sans Condensed',
+    data: font('ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff'),
+    weight: 700 as const,
     style: 'normal' as const,
   },
+  { name: 'IBM Plex Sans', data: font('ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff'), weight: 400 as const, style: 'normal' as const },
+  { name: 'IBM Plex Mono', data: font('ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff'), weight: 500 as const, style: 'normal' as const },
 ];
 
 /** A Satori element: plain objects instead of JSX. */
@@ -44,7 +39,7 @@ const clip = (text: string, max: number) => {
   return `${cut.slice(0, cut.lastIndexOf(' ')).replace(/[\s,;:·]+$/, '')}…`;
 };
 
-/** A 1200 × 630 PNG for link previews: kicker, big title, serif subtitle, owner line. */
+/** A 1200 × 630 PNG for link previews: kicker, big title, subtitle, owner line. */
 export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard): Promise<Uint8Array<ArrayBuffer>> {
   const card = el(
     'div',
@@ -62,18 +57,18 @@ export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard)
     [
       el(
         'div',
-        { display: 'flex', justifyContent: 'space-between', fontFamily: 'JetBrains Mono', fontSize: 22, color: MUTED, letterSpacing: 2, textTransform: 'uppercase' },
+        { display: 'flex', justifyContent: 'space-between', fontFamily: 'IBM Plex Mono', fontSize: 22, color: MUTED, letterSpacing: 2, textTransform: 'uppercase' },
         [el('span', {}, kicker), el('span', {}, 'shashank662.github.io')],
       ),
       el('div', { display: 'flex', flexDirection: 'column', gap: 22 }, [
-        el('div', { fontFamily: 'Anton', fontSize: title.length > 18 ? 104 : 132, lineHeight: 0.92, textTransform: 'uppercase' }, title),
+        el('div', { fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: title.length > 18 ? 92 : 116, lineHeight: 0.95, textTransform: 'uppercase' }, title),
         el(
           'div',
-          { fontFamily: 'Instrument Serif', fontStyle: 'italic', fontSize: 40, lineHeight: 1.15, color: ACCENT, maxWidth: 1000 },
+          { fontFamily: 'IBM Plex Sans', fontSize: 36, lineHeight: 1.3, color: INK, maxWidth: 1000 },
           clip(subtitle, 130),
         ),
       ]),
-      el('div', { display: 'flex', alignItems: 'center', gap: 14, fontFamily: 'JetBrains Mono', fontSize: 22 }, [
+      el('div', { display: 'flex', alignItems: 'center', gap: 14, fontFamily: 'IBM Plex Mono', fontSize: 22 }, [
         el('div', { width: 14, height: 14, borderRadius: 7, background: ACCENT }),
         el('span', {}, footer),
       ]),
