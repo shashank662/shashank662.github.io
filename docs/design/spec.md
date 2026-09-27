@@ -90,6 +90,21 @@ Every page shares the same header, footer, and "Ask about me" button (section 9)
 
 ## 5. Home page
 
+**Landing screen.** A first visit opens on a short animation, then the home page.
+
+- **Look:** a dark screen (`#141414`) with "SHR" in light letters (`#f1ede4`), the same in both themes.
+  1. A thin blue line (`#5a78ff`) draws across the middle.
+  2. S, H and R open out of it one after another, each with a blue outline slightly offset, like a misprinted poster. On mouse devices the letters lean a little toward the pointer, the outline more.
+  3. After about 2.6 s the view dives into the S, turning 12° as it goes, until the S fills the screen. The letters empty to a thin light outline as the dive starts, so the page shows through the S while it is still an S; the name "Shashank" rises inside it.
+  4. The dark screen fades in the last fifth of the 1.25 s dive.
+- **Skipping:** a scroll, click, tap or key press starts the dive at once. The page does not scroll underneath.
+- **When it plays:** once per visit, for people arriving from outside the site at the top of the home page. It does not play on a reload, when coming from another page of the site, for links to a section (`/#work`), with reduced motion, or without JavaScript.
+  - An inline script decides before first paint (`shouldPlayLanding()`, key `landing` in `sessionStorage`), so the page never flashes first.
+- **Build:**
+  - The letters are Source Serif 4's display outlines (weight 700, optical size 60), stored as SVG paths in `src/lib/shr-glyphs.ts`. Chrome stops drawing text far below the size the dive reaches, and the outlines need no font to load, so the animation starts with the first frame.
+  - The letters cut holes in the dark screen, so the page is there, inside the S, all along. The page paints behind the screen, and its lede stays in place, so the largest paint is not held back.
+  - Screen readers read the page as normal: the screen is `aria-hidden`.
+
 Sections, in order:
 
 1. **Header** (fixed)
@@ -273,7 +288,8 @@ Content is separated from layout so it can be edited without touching components
 
 ## 11. Interaction and motion rules
 
-- Everything that moves respects `prefers-reduced-motion: reduce`: no letter reveal or lean, no theme wipe, strips paused, words fully shown, bars shown filled, playground paused behind "Play".
+- Everything that moves respects `prefers-reduced-motion: reduce`: no landing screen, no letter reveal or lean, no theme wipe, strips paused, words fully shown, bars shown filled, playground paused behind "Play".
+- Nothing that animates on its own changes the layout: the hero's typed line keeps room for its longest line (two lines on phones), so typing never pushes the name up.
 - The custom cursor (a small dot with `mix-blend-mode: difference` that grows into a thin ring over interactive targets) only appears for `(pointer: fine)`; it never carries text. Touch devices keep native behaviour.
 - One shared `requestAnimationFrame` loop drives cursor, strips, letters and the playground; each part does no work while off-screen.
 
@@ -290,7 +306,7 @@ Content is separated from layout so it can be edited without touching components
 
 **Performance budgets**
 
-- Lighthouse mobile at least 95 in all four categories. Exception (2026-09-27): home performance is 94–95 with the serif's display cut, which gives the look the owner picked; the plainer cut scores 97 but looks chunkier.
+- Lighthouse mobile at least 95 in all four categories. Exception (2026-09-27): home performance is 94–95 with the serif's display cut, which gives the look the owner picked; the plainer cut scores 97 but looks chunkier. The landing screen costs nothing here: the page paints behind it.
 - Home JS under 50 KB gzipped (the chatbot's search library and index load only when the panel is first opened, and are not counted).
 - No layout shift above 0.05.
 - No third-party requests.
@@ -322,6 +338,7 @@ Content is separated from layout so it can be edited without touching components
   - the chatbot opens, a suggestion chip returns an answer with a source link, a typed question gets an answer, and Escape closes the panel and returns focus
   - `/404` renders
   - a crawl of internal links finds no broken links
+  - the landing screen: it plays on a first visit and dives into the page by itself; a scroll, key press or tap skips it without scrolling the page; it does not play again in the same visit, from another page of the site, for a section link or with reduced motion; it stays dark with light letters in the dark theme; SHR matches the display face as the page draws it; the S is as deep where the dive heads as the script assumes; the page's largest paint happens behind it; and nothing shifts when it clears. Other browser tests start past it (`tests/e2e/fixtures.ts`).
 - **Lighthouse:** run against the production build before launch; scores recorded in the README.
 
 ## 14. Repository, commits and deploy
