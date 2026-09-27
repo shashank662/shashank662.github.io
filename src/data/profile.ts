@@ -104,7 +104,7 @@ export const profile: Profile = {
     label: 'Portfolio · 2026 edition',
     intro:
       'Backend engineer at Engati, Bangalore. 2+ years full-time (after a 6-month internship) building Java & Spring Boot services for a high-volume B2B messaging platform.',
-    lede: 'I build *backends* that never wake anyone up at 3 a.m.',
+    lede: 'I build *reliable backends* for high-volume messaging.',
     badge: 'Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺',
     typedLines: [
       '~2M api triggers a day · 50k–100k retries',
@@ -153,7 +153,7 @@ export const profile: Profile = {
   },
   career: {
     axisStart: [2020, 7],
-    title: 'My career, *traced.*',
+    title: 'Experience',
     sub: 'Read it like a request trace: my degree, internship, full-time role and the systems I built are spans on one timeline. Hover a row to open it.',
     spans: [
       { name: 'GET /career', tag: 'root span', level: 0, start: [2020, 8], end: null, tone: 'muted', detail: 'Everything so far. Still running, status 200.' },
@@ -167,7 +167,7 @@ export const profile: Profile = {
     ],
   },
   incidents: {
-    title: 'War stories, *resolved.*',
+    title: 'Production incidents',
     sub: 'Production problems I tracked down, written up the way a postmortem would be.',
     items: [
       {
@@ -199,7 +199,7 @@ export const profile: Profile = {
     ],
   },
   work: {
-    title: "Things I've *shipped.*",
+    title: 'Selected work',
     brief: {
       title: 'Prod sandbox',
       description: 'Production-isolated test environment for engineering, FDE and support, built with Nginx rerouting',
@@ -213,7 +213,7 @@ export const profile: Profile = {
     },
   },
   playground: {
-    title: 'Go on, *break* something.',
+    title: 'The retry flow, live',
     sub: 'My Engati auto-retry framework, running live. Triggers flow out to Meta; failed deliveries come back as webhooks. Retryable ones fetch their original payload from MongoDB by trackerId and go back out through RabbitMQ with back-off. Switch the framework off, or cause a Meta outage, and watch the failure rate.',
     canvasLabel:
       'Live model of the auto-retry framework. Triggers travel from the integrations through the API gateway, trigger service and messaging layer to Meta. Failed deliveries come back as webhooks; retryable ones go through MongoDB and RabbitMQ and are sent again.',
