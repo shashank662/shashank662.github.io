@@ -330,3 +330,23 @@ test.describe('with reduced motion', () => {
     await expect(screen(page)).toBeHidden();
   });
 });
+
+// On a phone, 100% is the screen with the address bar showing. When the bar hides, the screen grows and a strip of the
+// page (the moving skill bands) showed at the bottom. Test browsers have no address bar to hide, so this reads the rule:
+// the screen must be as tall as the largest the screen gets.
+test('the screen covers a phone even when its address bar hides', async ({ page }) => {
+  await openPaused(page);
+  await expect(html(page)).toHaveClass(ON);
+  const heights = await page.evaluate(() =>
+    [...document.styleSheets].flatMap((sheet) =>
+      [...sheet.cssRules]
+        .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule && /html\.landing .*\.landing/.test(rule.selectorText))
+        .map((rule) => rule.style.height),
+    ),
+  );
+  expect(heights).toContain('100lvh');
+  // And it still covers the whole screen here.
+  const box = await screen(page).boundingBox();
+  const viewport = page.viewportSize();
+  expect(box && viewport && box.y <= 0 && box.y + box.height >= viewport.height).toBeTruthy();
+});
