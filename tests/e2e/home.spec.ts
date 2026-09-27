@@ -25,13 +25,16 @@ test('the hero says plainly what Shashank builds', async ({ page }) => {
   await expect(page.locator('.lede')).toHaveText('I build reliable backends for high-volume messaging.');
 });
 
-test('the career trace lists every span with a duration and opens rows on click', async ({ page }) => {
+test('the career trace dates the degree and roles, not the projects, and opens rows on click', async ({ page }) => {
   await page.goto('/#exp');
   await expect(page.getByText('GET /career · 8 spans · 200 OK')).toBeVisible();
 
+  // The root span, the degree and the two roles show how long they took; the projects built in them carry no dates.
   const durations = page.locator('#exp [data-duration]');
-  await expect(durations).toHaveCount(8);
+  await expect(durations).toHaveCount(4);
   for (const text of await durations.allTextContents()) expect(text.trim()).toMatch(DURATION);
+  await expect(page.locator('#exp li.lvl2')).toHaveCount(4);
+  await expect(page.locator('#exp li.lvl2 [data-duration]')).toHaveCount(0);
 
   const first = page.locator('#exp [data-row-toggle]').first();
   await expect(first).toHaveAttribute('aria-expanded', 'false');
