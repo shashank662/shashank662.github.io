@@ -38,6 +38,8 @@ npm run test:e2e   # browser tests in Chromium, desktop and phone sizes, against
 
 Every push to `main` runs [`deploy.yml`](.github/workflows/deploy.yml): `npm ci` → `astro check` → unit tests → build → browser tests against that build → publish to GitHub Pages. Nothing is published unless every step passes. The build runs with a read-only token; only the publishing job may publish.
 
+Cloudflare Workers also builds every push to `main`, with the build command `npm run check && npm test && npm run build` (the browser tests run on GitHub only). Then `npx wrangler deploy` publishes `dist/` as plain files, as set in [`wrangler.jsonc`](wrangler.jsonc). The site needs no Astro adapter, and adding one breaks the build.
+
 ## Lighthouse
 
 Production build, 27 September 2026, Lighthouse 13.5 on mobile settings (a 412 × 823 screen, simulated slow 4G and a 4× slower CPU).
