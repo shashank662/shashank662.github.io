@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { LANDING, layoutSHR } from '../../src/lib/landing';
+import { LANDING, layoutS } from '../../src/lib/landing';
 
 // This file uses @playwright/test directly: every test starts as a first visit, when the landing screen plays.
 //
@@ -27,17 +27,17 @@ async function openPaused(page: Page): Promise<void> {
   await page.clock.pauseAt(Date.now() + 60_000);
 }
 
-/** Moves the stopped clock on until the line has faded: all three letters are then open and holding still. */
+/** Moves the stopped clock on until the line has faded: the S is then open and holding still. */
 async function toHold(page: Page): Promise<void> {
   const lineOpacity = () => page.locator('[data-line]').evaluate((line) => (line as SVGRectElement).style.opacity);
   for (let step = 0; step < 40 && (await lineOpacity()) !== '0'; step += 1) await page.clock.runFor(100);
   expect(await lineOpacity()).toBe('0');
 }
 
-/** Where the landing screen puts SHR on this page's screen: the same layout the page's script uses. */
+/** Where the landing screen puts the S on this page's screen: the same layout the page's script uses. */
 const layoutOf = (page: Page) => {
   const { width, height } = page.viewportSize() ?? { width: 0, height: 0 };
-  return layoutSHR(width, height);
+  return layoutS(width, height);
 };
 
 /** Takes a screenshot and keeps its pixels in the page as window[name], for the checks below to read. */
@@ -59,7 +59,7 @@ async function keepShot(page: Page, name: string): Promise<void> {
   );
 }
 
-test('a first visit opens on SHR in light letters on a dark screen', async ({ page }) => {
+test('a first visit opens on the S alone, in a light letter on a dark screen', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (msg) => {
     if (msg.type() === 'error') errors.push(msg.text());
@@ -71,14 +71,10 @@ test('a first visit opens on SHR in light letters on a dark screen', async ({ pa
   await expect(screen(page)).toBeVisible();
   expect(await page.$$eval('[data-fill] use', (letters) => letters.map((letter) => letter.getAttribute('href')))).toEqual([
     '#landing-S',
-    '#landing-H',
-    '#landing-R',
   ]);
-  // Each letter opens out of the line.
+  // The S opens out of the line.
   await toHold(page);
   expect(await page.$$eval('[data-band]', (bands) => bands.map((band) => Number(band.getAttribute('height')) > 0))).toEqual([
-    true,
-    true,
     true,
   ]);
   await expect(page.locator('[data-screen]')).toHaveCSS('fill', 'rgb(20, 20, 20)');
@@ -86,16 +82,16 @@ test('a first visit opens on SHR in light letters on a dark screen', async ({ pa
   expect(errors).toEqual([]);
 });
 
-test('SHR is drawn just as the display face draws it', async ({ page, isMobile }) => {
+test('the S is drawn just as the display face draws it', async ({ page, isMobile }) => {
   test.skip(isMobile, 'Measured on the big desktop letters: the outlines and layout are the same at every size.');
   await openPaused(page);
   await toHold(page);
-  // Compare the letters alone: the blue outline crosses them on purpose.
+  // Compare the letter alone: the blue outline crosses it on purpose.
   await page.locator('[data-echo]').evaluate((echo) => {
     (echo as SVGGElement).style.display = 'none';
   });
   await keepShot(page, 'drawn');
-  // The same word as text in the page's display face, set in the same place over everything.
+  // The same letter as text in the page's display face, set in the same place over everything.
   await page.evaluate(({ left, baseline, size }) => {
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg');
@@ -106,11 +102,11 @@ test('SHR is drawn just as the display face draws it', async ({ page, isMobile }
     const text = document.createElementNS(ns, 'text');
     text.setAttribute('x', String(left));
     text.setAttribute('y', String(baseline));
-    // Styled like the landing letters: a light fill with a hairline of the same colour.
+    // Styled like the landing letter: a light fill with a hairline of the same colour.
     text.setAttribute('fill', '#f1ede4');
     text.setAttribute('stroke', '#f1ede4');
     text.setAttribute('stroke-width', '1.5');
-    text.textContent = 'SHR';
+    text.textContent = 'S';
     svg.append(text);
     document.body.append(svg);
   }, layoutOf(page));
