@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Ask from '../components/Ask.astro';
 import { profile } from '../data/profile';
+import { THEMES } from '../lib/theme';
 
 interface Props {
   title: string;
@@ -16,6 +17,8 @@ interface Props {
 }
 
 const { title, description, ogImage = '/og/home.png', noindex = false } = Astro.props;
+// Each theme's scheme, light or dark, for the inline script below.
+const schemes = Object.fromEntries(THEMES.map((theme) => [theme.id, theme.scheme]));
 // Pages are built as single files, so they see their own path with ".html"; the public address has none.
 const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, '') || '/', Astro.site);
 // Who the site is about, for search engines (spec §12).
@@ -56,16 +59,16 @@ const person = {
     <Font cssVariable="--font-sans" preload={[{ weight: 300 }, { weight: 400 }]} />
     <Font cssVariable="--font-mono" />
     <Font cssVariable="--font-strip" />
-    <script is:inline>
+    <script is:inline define:vars={{ schemes }}>
       // Same rule as resolveTheme() in src/lib/theme.ts. Runs before first paint so the page never flashes.
-      (() => {
-        let stored = null;
-        try { stored = localStorage.getItem('theme'); } catch {}
-        const dark = stored === 'dark' || (stored !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        // Content that animates in is only hidden when this class is present, so it always shows without JavaScript.
-        document.documentElement.classList.add('js');
-      })();
+      let stored = null;
+      try { stored = localStorage.getItem('theme'); } catch {}
+      const known = Object.prototype.hasOwnProperty.call(schemes, stored);
+      const theme = known ? stored : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.dataset.scheme = schemes[theme];
+      // Content that animates in is only hidden when this class is present, so it always shows without JavaScript.
+      document.documentElement.classList.add('js');
     </script>
     {/* A page's own scripts that must run before first paint (the home page's landing screen). */}
     <slot name="head" />
