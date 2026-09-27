@@ -38,6 +38,16 @@ test('a Meta outage turns every live status amber for about five seconds', async
   await expect(page.locator('[data-status]').first()).toHaveAttribute('data-state', 'ok');
 });
 
+test('an outage started before the model is on screen still ends, and the site goes back to normal', async ({ page }) => {
+  await page.goto('/');
+  // Clicked where it sits, off-screen, so the model hasn't started yet.
+  const outage = page.locator('[data-outage]');
+  await outage.evaluate((button: HTMLButtonElement) => button.click());
+  await expect(outage).toBeDisabled();
+  await expect(outage).toBeEnabled({ timeout: 8000 });
+  await expect(page.locator('[data-status]').first()).toHaveAttribute('data-state', 'ok');
+});
+
 test('visitors can send their own triggers', async ({ page }) => {
   await page.goto('/#play');
   await page.getByRole('button', { name: /send 5 of your own triggers/ }).click();
