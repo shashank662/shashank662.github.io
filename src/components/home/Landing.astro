@@ -35,11 +35,11 @@ const uses = letters.map((letter, i) => ({ href: `#landing-${letter.char}`, x: l
 </script>
 
 <style>
-  /* A dark screen with light letters, whichever theme the page is in. */
+  /* A dark screen with light letters in every theme: each theme sets its own (tokens.css). */
   .landing {
-    --dark: #141414;
-    --light: #f1ede4;
-    --blue: #5a78ff;
+    --dark: var(--intro-dark);
+    --light: var(--intro-light);
+    --blue: var(--intro-line);
     display: none;
   }
   /* Above the header and the chat button, below the paper grain and the cursor. */
