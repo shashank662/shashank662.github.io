@@ -2,22 +2,34 @@ import { expect, test, type Page } from '@playwright/test';
 import { LANDING, layoutSHR } from '../../src/lib/landing';
 
 // This file uses @playwright/test directly: every test starts as a first visit, when the landing screen plays.
+//
+// Most tests stop the page's clock once it has loaded and move it on by hand, so each check sees exactly the moment it
+// asks for however slow the machine. The largest-paint and layout-shift checks need real frames, so they run in real time.
 
 const ON = /(^|\s)landing(\s|$)/;
-/** Long enough for the letters to open, hold and dive, with room for a slow machine. */
-const WHOLE = LANDING.diveAt + LANDING.diveMs + 3000;
-const DIVE = LANDING.diveMs + 1500;
+/** Long enough, in real time, for the letters to open, hold and dive, with plenty of room for a slow CI machine. */
+const WHOLE = 15_000;
+/** Enough clock time for the dive to finish once it starts. */
+const DIVE = LANDING.diveMs + 300;
 
 const html = (page: Page) => page.locator('html');
 const screen = (page: Page) => page.locator('[data-landing]');
 /** Read straight after a navigation, before the landing screen could have ended by itself. */
 const landingNow = (page: Page) => page.evaluate(() => document.documentElement.classList.contains('landing'));
 
-/** Waits until the line has faded: all three letters are then open and holding still. */
-const holding = (page: Page) =>
-  expect
-    .poll(() => page.locator('[data-line]').evaluate((line) => (line as SVGRectElement).style.opacity))
-    .toBe('0');
+/** Opens the home page, then stops its clock. */
+async function openPaused(page: Page): Promise<void> {
+  await page.clock.install();
+  await page.goto('/');
+  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 100);
+}
+
+/** Moves the stopped clock on until the line has faded: all three letters are then open and holding still. */
+async function toHold(page: Page): Promise<void> {
+  const lineOpacity = () => page.locator('[data-line]').evaluate((line) => (line as SVGRectElement).style.opacity);
+  for (let step = 0; step < 40 && (await lineOpacity()) !== '0'; step += 1) await page.clock.runFor(100);
+  expect(await lineOpacity()).toBe('0');
+}
 
 /** Where the landing screen puts SHR on this page's screen: the same layout the page's script uses. */
 const layoutOf = (page: Page) => {
@@ -51,24 +63,30 @@ test('a first visit opens on SHR in light letters on a dark screen', async ({ pa
   });
   page.on('pageerror', (err) => errors.push(err.message));
 
-  await page.goto('/');
+  await openPaused(page);
   await expect(html(page)).toHaveClass(ON);
   await expect(screen(page)).toBeVisible();
-  await expect
-    .poll(() => page.$$eval('[data-fill] use', (letters) => letters.map((letter) => letter.getAttribute('href'))))
-    .toEqual(['#landing-S', '#landing-H', '#landing-R']);
+  expect(await page.$$eval('[data-fill] use', (letters) => letters.map((letter) => letter.getAttribute('href')))).toEqual([
+    '#landing-S',
+    '#landing-H',
+    '#landing-R',
+  ]);
   // Each letter opens out of the line.
-  await expect
-    .poll(() => page.$$eval('[data-band]', (bands) => bands.map((band) => Number(band.getAttribute('height')) > 0)))
-    .toEqual([true, true, true]);
+  await toHold(page);
+  expect(await page.$$eval('[data-band]', (bands) => bands.map((band) => Number(band.getAttribute('height')) > 0))).toEqual([
+    true,
+    true,
+    true,
+  ]);
   await expect(page.locator('[data-screen]')).toHaveCSS('fill', 'rgb(20, 20, 20)');
   await expect(page.locator('[data-fill]')).toHaveCSS('fill', 'rgb(241, 237, 228)');
   expect(errors).toEqual([]);
 });
 
-test('SHR is drawn just as the display face draws it', async ({ page }) => {
-  await page.goto('/');
-  await holding(page);
+test('SHR is drawn just as the display face draws it', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Measured on the big desktop letters: the outlines and layout are the same at every size.');
+  await openPaused(page);
+  await toHold(page);
   // Compare the letters alone: the blue outline crosses them on purpose.
   await page.locator('[data-echo]').evaluate((echo) => {
     (echo as SVGGElement).style.display = 'none';
@@ -112,9 +130,11 @@ test('SHR is drawn just as the display face draws it', async ({ page }) => {
 
 test('the dive heads into the S where its stroke is as deep as the script assumes, so the S covers the screen', async ({
   page,
+  isMobile,
 }) => {
-  await page.goto('/');
-  await holding(page);
+  test.skip(isMobile, 'Measured on the big desktop letters: the outlines and layout are the same at every size.');
+  await openPaused(page);
+  await toHold(page);
   await keepShot(page, 'held');
   const { origin, clearance } = layoutOf(page);
   const depth = await page.evaluate(({ x, y }) => {
@@ -129,15 +149,18 @@ test('the dive heads into the S where its stroke is as deep as the script assume
     while (r < 1000 && angles.every((t) => inside(x + (r + 1) * Math.cos(t), y + (r + 1) * Math.sin(t)))) r += 1;
     return r;
   }, origin);
-  expect(depth).toBeGreaterThanOrEqual(clearance * 0.9);
+  // The dive grows the letters 15% more than the assumed depth needs, so the S still covers the screen when the real
+  // stroke is as little as 1 / 1.15 of it.
+  expect(depth).toBeGreaterThanOrEqual(clearance / 1.15);
 });
 
 test('then it dives into the page by itself, and the name rises as it goes', async ({ page }) => {
-  await page.goto('/');
+  await openPaused(page);
   await expect(html(page)).toHaveClass(ON);
   await expect(page.locator('[data-hero]')).not.toHaveClass(/\bgo\b/);
 
-  await expect(html(page)).not.toHaveClass(ON, { timeout: WHOLE });
+  await page.clock.runFor(LANDING.diveAt + DIVE);
+  await expect(html(page)).not.toHaveClass(ON);
   await expect(screen(page)).toBeHidden();
   await expect(page.locator('[data-hero]')).toHaveClass(/\bgo\b/);
   await expect(page.getByRole('heading', { level: 1, name: 'Shashank' })).toBeVisible();
@@ -145,28 +168,31 @@ test('then it dives into the page by itself, and the name rises as it goes', asy
 
 test('a scroll skips straight to the dive, without scrolling the page', async ({ page, isMobile }) => {
   test.skip(isMobile, 'Phones have no mouse wheel; the tap test covers them.');
-  await page.goto('/');
+  await openPaused(page);
   await expect(html(page)).toHaveClass(ON);
   await page.mouse.move(400, 300);
   await page.mouse.wheel(0, 600);
-  await expect(html(page)).not.toHaveClass(ON, { timeout: DIVE });
+  await page.clock.runFor(DIVE);
+  await expect(html(page)).not.toHaveClass(ON);
   expect(await page.evaluate(() => scrollY)).toBe(0);
 });
 
 test('a key press skips it too', async ({ page }) => {
-  await page.goto('/');
+  await openPaused(page);
   await expect(html(page)).toHaveClass(ON);
   await page.keyboard.press('ArrowDown');
-  await expect(html(page)).not.toHaveClass(ON, { timeout: DIVE });
+  await page.clock.runFor(DIVE);
+  await expect(html(page)).not.toHaveClass(ON);
   expect(await page.evaluate(() => scrollY)).toBe(0);
 });
 
 test('a tap skips it on a phone', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'Touch only.');
-  await page.goto('/');
+  await openPaused(page);
   await expect(html(page)).toHaveClass(ON);
   await page.touchscreen.tap(195, 420);
-  await expect(html(page)).not.toHaveClass(ON, { timeout: DIVE });
+  await page.clock.runFor(DIVE);
+  await expect(html(page)).not.toHaveClass(ON);
 });
 
 test('if its script never arrives, the page still shows within a few seconds', async ({ page }) => {
@@ -178,10 +204,11 @@ test('if its script never arrives, the page still shows within a few seconds', a
 });
 
 test('it plays once per visit, so a reload goes straight to the page', async ({ page }) => {
-  await page.goto('/');
+  await openPaused(page);
   await expect(html(page)).toHaveClass(ON);
   await page.keyboard.press('Escape');
-  await expect(html(page)).not.toHaveClass(ON, { timeout: DIVE });
+  await page.clock.runFor(DIVE);
+  await expect(html(page)).not.toHaveClass(ON);
   await page.reload();
   expect(await landingNow(page)).toBe(false);
 });
@@ -199,7 +226,7 @@ test('a link to a section goes straight there', async ({ page }) => {
 });
 
 test('the page is there for screen readers from the start', async ({ page }) => {
-  await page.goto('/');
+  await openPaused(page);
   await expect(html(page)).toHaveClass(ON);
   await expect(screen(page)).toHaveAttribute('aria-hidden', 'true');
   await expect(page.getByRole('heading', { level: 1, name: 'Shashank' })).toBeAttached();
@@ -243,7 +270,7 @@ test.describe('in the dark theme', () => {
   test.use({ colorScheme: 'dark' });
 
   test('the screen stays dark and the letters stay light', async ({ page }) => {
-    await page.goto('/');
+    await openPaused(page);
     await expect(html(page)).toHaveAttribute('data-theme', 'dark');
     await expect(html(page)).toHaveClass(ON);
     await expect(page.locator('[data-screen]')).toHaveCSS('fill', 'rgb(20, 20, 20)');
