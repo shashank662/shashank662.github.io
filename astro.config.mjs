@@ -37,6 +37,16 @@ export default defineConfig({
       },
     },
     {
+      // Only for the two crossing bands on the home page, which keep their bold condensed look.
+      provider: fontProviders.local(),
+      name: 'IBM Plex Sans Condensed',
+      cssVariable: '--font-strip',
+      fallbacks: ['Arial Narrow', 'sans-serif'],
+      options: {
+        variants: [{ src: ['@fontsource/ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff2'], weight: 700, style: 'normal' }],
+      },
+    },
+    {
       provider: fontProviders.local(),
       name: 'Source Code Pro',
       cssVariable: '--font-mono',
