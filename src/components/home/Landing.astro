@@ -54,4 +54,9 @@ const uses = letters.map((letter, i) => ({ href: `#landing-${letter.char}`, x: l
 
   /* The page stays at the top while the screen is up. The reserved gutter keeps it from shifting when the scrollbar returns. */
   :global(html.landing) { overflow: hidden; overscroll-behavior: none; scrollbar-gutter: stable; }
+  /* Behind the screen the page waits, see-through, for its fonts, so no text reflows once it shows: a reflow counts as
+     layout shift even under the screen. See-through rather than hidden, so screen readers still read the page. The
+     cursor stays, since it stands in for the pointer. */
+  :global(html.landing:not(.landing-fonts) body > :not(main, .cursor)),
+  :global(html.landing:not(.landing-fonts) main > :not([data-landing])) { opacity: 0; }
 </style>

@@ -44,6 +44,22 @@ test('the typed line has room for its longest line, so typing never pushes the h
   expect(grows).toEqual(grows.map(() => 0));
 });
 
+test('the typed line grows from a prompt that stays put, so typing never slides it along', async ({ page }) => {
+  await page.goto('/');
+  // Measured synchronously, between the typing script's frames.
+  const prompts = await page.evaluate(() => {
+    const typed = document.querySelector<HTMLElement>('[data-typed]');
+    const prompt = document.querySelector<HTMLElement>('.typed .pr');
+    if (!typed || !prompt) return [Infinity];
+    const lines: string[] = JSON.parse(typed.dataset.lines ?? '[]');
+    return ['', ...lines].map((text) => {
+      typed.textContent = text;
+      return prompt.getBoundingClientRect().x;
+    });
+  });
+  expect(new Set(prompts).size).toBe(1);
+});
+
 test('the career trace dates the degree and roles, not the projects, and opens rows on click', async ({ page }) => {
   await page.goto('/#exp');
   await expect(page.getByText('GET /career · 8 spans · 200 OK')).toBeVisible();

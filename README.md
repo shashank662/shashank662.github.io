@@ -50,7 +50,7 @@ Production build, 27 September 2026, Lighthouse 13.5 on mobile settings (a 412 Ã
 | Case study: auto-retry framework | 98 | 100 | 100 | 100 |
 | The 60-second view | 98 | 100 | 100 | 100 |
 
-Layout shift is at most 0.002. The home page's score is the price of the serif's display cut for the big headings: the plainer cut scores 97 but looks chunkier. The landing animation costs nothing here, because the page paints behind it. The home page loads 12.3 KB of JavaScript (gzipped); the chatbot's search library and answers load only when it is first opened.
+Layout shift is 0 on the home page and at most 0.001 elsewhere. The home page's score is the price of the serif's display cut for the big headings: the plainer cut scores 97 but looks chunkier. The landing animation costs nothing here, because the page paints behind it. The home page loads 12.3 KB of JavaScript (gzipped); the chatbot's search library and answers load only when it is first opened.
 
 ## Where things live
 

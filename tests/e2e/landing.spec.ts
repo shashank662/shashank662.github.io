@@ -266,6 +266,39 @@ test('nothing on the page moves when the screen clears', async ({ page }) => {
   expect(shift).toBeLessThan(0.01);
 });
 
+test('nothing shifts behind the screen even when fonts arrive late and no look-alike is installed, as on Linux', async ({
+  page,
+}) => {
+  // The page's stand-in fonts are tuned to Mac and Windows fonts; without them, text reflows when the real fonts land.
+  await page.route(
+    (url) => url.pathname === '/',
+    async (route) => {
+      const response = await route.fetch();
+      const body = (await response.text()).replace(/local\("[^"]+"\)/g, 'local("No Such Font")');
+      await route.fulfill({ response, body });
+    },
+  );
+  await page.route(/\.woff2$/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await route.continue();
+  });
+  await page.goto('/');
+  await expect(html(page)).not.toHaveClass(ON, { timeout: WHOLE });
+  const shift = await page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        let total = 0;
+        new PerformanceObserver((list) => {
+          for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) {
+            if (!entry.hadRecentInput) total += entry.value;
+          }
+        }).observe({ type: 'layout-shift', buffered: true });
+        setTimeout(() => resolve(total), 300);
+      }),
+  );
+  expect(shift).toBeLessThan(0.01);
+});
+
 test.describe('in the dark theme', () => {
   test.use({ colorScheme: 'dark' });
 
