@@ -56,7 +56,8 @@ const { hero } = profile;
 
   .name {
     margin-top: auto; padding-top: 40px;
-    font-size: clamp(84px, 20.5vw, 360px); line-height: 0.8;
+    /* "SHASHANK" in Plex Sans Condensed Bold is 4.94em wide: 18.8vw fills the width between the gutters. */
+    font-size: clamp(64px, 18.8vw, 330px); line-height: 0.8;
     display: flex; justify-content: space-between; white-space: nowrap; user-select: none;
   }
   .ch { display: inline-block; overflow: hidden; padding-top: 0.05em; transform-origin: 50% 100%; will-change: transform; }
@@ -87,8 +88,7 @@ const { hero } = profile;
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .lede-wrap { justify-self: end; text-align: right; max-width: 920px; }
-  .lede { font-family: var(--font-serif); font-size: clamp(28px, 3.8vw, 62px); line-height: 1.02; letter-spacing: -0.01em; }
-  .lede :global(em) { color: var(--accent); }
+  .lede { font-size: clamp(26px, 3.4vw, 56px); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; }
   .typed { margin-top: 18px; font-size: clamp(12px, 1.05vw, 14px); color: var(--muted); min-height: 1.6em; }
   .pr { color: var(--accent); }
   .caret {

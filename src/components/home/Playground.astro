@@ -7,9 +7,9 @@ const { playground } = profile;
 ---
 <section class="section wrap" id="play" data-playground>
   <SectionHead n="05" label="Playground" status />
-  <h2 class="h2 display" set:html={emphasize(playground.title)} />
+  <h2 class="h2" set:html={emphasize(playground.title)} />
   <p class="sub">{playground.sub}</p>
-  <div class="grid">
+  <div class="grid" data-model>
     <div class="stage" data-stage data-cursor>
       <canvas data-canvas role="img" aria-label={playground.canvasLabel}></canvas>
       <button type="button" class="send mono" data-send>↳ send 5 of your own triggers</button>
@@ -86,7 +86,7 @@ const { playground } = profile;
 
   .kill {
     margin: 12px 18px 14px; padding: 16px; background: var(--ink); color: var(--bg);
-    font-size: 19px; letter-spacing: 0.02em; transition: background 0.25s, color 0.25s, opacity 0.25s;
+    font-size: 16px; letter-spacing: 0.01em; transition: background 0.25s, color 0.25s, opacity 0.25s;
   }
   .kill:hover:not(:disabled) { background: var(--accent); color: var(--on-accent); }
   .kill:disabled { opacity: 0.45; }

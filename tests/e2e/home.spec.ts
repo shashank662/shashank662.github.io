@@ -14,11 +14,15 @@ test('every home section renders and scrolling through raises no errors', async 
     await page.locator(`#${id}`).scrollIntoViewIfNeeded();
     await expect(page.locator(`#${id}`)).toBeVisible();
   }
-  await expect(page.getByRole('heading', { name: /My career, traced\./ })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Things I've shipped\./ })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Go on, break something\./ })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /War stories, resolved\./ })).toBeVisible();
+  for (const name of ['Experience', 'Selected work', 'Production incidents', 'The retry flow, live']) {
+    await expect(page.getByRole('heading', { level: 2, name, exact: true })).toBeVisible();
+  }
   expect(errors).toEqual([]);
+});
+
+test('the hero says plainly what Shashank builds', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.lede')).toHaveText('I build reliable backends for high-volume messaging.');
 });
 
 test('the career trace lists every span with a duration and opens rows on click', async ({ page }) => {

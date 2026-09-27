@@ -7,7 +7,7 @@ const { incidents } = profile;
 ---
 <section class="section wrap" id="incidents">
   <SectionHead n="04" label="Incidents" meta={`${incidents.items.length} resolved · 0 open`} />
-  <h2 class="h2 display" set:html={emphasize(incidents.title)} />
+  <h2 class="h2" set:html={emphasize(incidents.title)} />
   <p class="sub">{incidents.sub}</p>
   <div class="grid">
     {incidents.items.map((inc) => (

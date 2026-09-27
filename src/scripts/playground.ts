@@ -18,6 +18,7 @@ function start(root: HTMLElement): void {
     if (!el) throw new Error(`Playground markup is missing ${selector}`);
     return el;
   };
+  const model = $<HTMLElement>('[data-model]');
   const stage = $<HTMLElement>('[data-stage]');
   const canvas = $<HTMLCanvasElement>('[data-canvas]');
   const logs = $<HTMLElement>('[data-logs]');
@@ -33,7 +34,9 @@ function start(root: HTMLElement): void {
   if (!scene) return;
 
   const sim = new RetrySim({ distance: scene.distance });
+  // The model runs while its area is on screen; the canvas is only redrawn while it is itself on screen.
   let visible = false;
+  let drawn = false;
   let booted = false;
   // With reduced motion the model waits behind a Play button.
   let paused = prefersReducedMotion();
@@ -82,8 +85,10 @@ function start(root: HTMLElement): void {
     savedCount.textContent = sim.saved.toLocaleString('en-IN');
   };
 
-  // Using any control also starts a paused model.
+  // Using any control starts the model (warming it up first, so its warm-up can't swallow what the control does)
+  // and unpauses it.
   const play = () => {
+    if (!booted) boot();
     paused = false;
     playButton.hidden = true;
   };
@@ -144,13 +149,18 @@ function start(root: HTMLElement): void {
     if (booted) scene.draw(sim);
   });
 
+  // The whole area, not just the canvas: on phones the numbers and the switch sit below the canvas,
+  // and flipping the switch there must still move them.
   new IntersectionObserver(
     ([entry]) => {
       visible = entry.isIntersecting;
       if (visible && !booted) boot();
     },
     { threshold: 0.15 },
-  ).observe(stage);
+  ).observe(model);
+  new IntersectionObserver(([entry]) => {
+    drawn = entry.isIntersecting;
+  }).observe(stage);
 
   onFrame((now, dt) => {
     if (!booted || paused) return;
@@ -158,7 +168,7 @@ function start(root: HTMLElement): void {
     if (!visible && !sim.outage) return;
     handle(sim.step(dt));
     scene.age(dt);
-    if (visible) scene.draw(sim);
+    if (drawn) scene.draw(sim);
     if (now >= hudAt) {
       hudAt = now + 300;
       hud();

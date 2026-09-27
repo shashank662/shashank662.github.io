@@ -14,6 +14,17 @@ test('switching the framework off pushes the failure rate above 25% within five 
   await expect.poll(() => percent(rate.textContent()), { timeout: 5000 }).toBeGreaterThan(25);
 });
 
+test('the numbers keep moving while the controls are on screen, even with the canvas scrolled away', async ({ page }) => {
+  await page.goto('/');
+  // On a phone the controls sit under the canvas, so centring the log scrolls the canvas off the screen.
+  await page.locator('[data-logs]').evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  const framework = page.getByRole('switch', { name: 'Retry framework' });
+  await framework.click();
+  await expect(framework).toHaveAttribute('aria-checked', 'false');
+  const rate = page.locator('[data-metric="fail"]');
+  await expect.poll(() => percent(rate.textContent()), { timeout: 5000 }).toBeGreaterThan(25);
+});
+
 test('a Meta outage turns every live status amber for about five seconds', async ({ page }) => {
   await page.goto('/#play');
   const outage = page.getByRole('button', { name: /Simulate a Meta outage/ });
@@ -23,6 +34,16 @@ test('a Meta outage turns every live status amber for about five seconds', async
     await expect(pill).toHaveAttribute('data-state', 'degraded');
     await expect(pill).toContainText('meta outage · retrying');
   }
+  await expect(outage).toBeEnabled({ timeout: 8000 });
+  await expect(page.locator('[data-status]').first()).toHaveAttribute('data-state', 'ok');
+});
+
+test('an outage started before the model is on screen still ends, and the site goes back to normal', async ({ page }) => {
+  await page.goto('/');
+  // Clicked where it sits, off-screen, so the model hasn't started yet.
+  const outage = page.locator('[data-outage]');
+  await outage.evaluate((button: HTMLButtonElement) => button.click());
+  await expect(outage).toBeDisabled();
   await expect(outage).toBeEnabled({ timeout: 8000 });
   await expect(page.locator('[data-status]').first()).toHaveAttribute('data-state', 'ok');
 });

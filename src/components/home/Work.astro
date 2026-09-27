@@ -11,7 +11,7 @@ const glide = (slug: string) => `view-transition-name: work-${slug}; view-transi
 ---
 <section class="section wrap" id="work">
   <SectionHead n="03" label="Selected work · Engati" meta={`${cases.length + 1} systems · ${cases.length} case studies`} />
-  <h2 class="h2 display" set:html={emphasize(title)} />
+  <h2 class="h2" set:html={emphasize(title)} />
   <div class="rows">
     {cases.map(({ id, data }) => (
       <a
@@ -70,7 +70,7 @@ const glide = (slug: string) => `view-transition-name: work-${slug}; view-transi
     transition: background 0.35s;
   }
   .n { font-size: 13px; color: var(--muted); }
-  .t { font-size: clamp(30px, 4.2vw, 64px); line-height: 1; transition: transform 0.5s var(--ease-out), color 0.3s; }
+  .t { font-size: clamp(26px, 3.2vw, 50px); line-height: 1; transition: transform 0.5s var(--ease-out), color 0.3s; }
   .d { font-size: 15px; line-height: 1.5; color: color-mix(in srgb, var(--ink) 82%, var(--bg)); }
   .s { font-size: 12px; line-height: 1.5; color: var(--muted); }
   .st { font-size: 13px; font-weight: 500; text-align: right; color: var(--accent); }
