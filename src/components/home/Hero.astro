@@ -63,8 +63,8 @@ const { hero } = profile;
   .ch { display: inline-block; overflow: hidden; padding-top: 0.05em; transform-origin: 50% 100%; will-change: transform; }
   .ch > span {
     display: inline-block;
-    transition: transform 1.2s var(--ease-out), color 0.3s;
-    transition-delay: calc(var(--i) * 60ms + 0.1s);
+    /* Only the slide-in waits its turn; the accent near the pointer comes at once. */
+    transition: transform 1.2s var(--ease-out) calc(var(--i) * 60ms + 0.1s), color 0.1s;
   }
   /* The letters and the line under them start hidden only when JavaScript runs, so they always show without it. */
   :global(.js) .ch > span { transform: translateY(108%); }
