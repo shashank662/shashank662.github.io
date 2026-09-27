@@ -184,7 +184,7 @@ test("hovering Let's talk never moves the arrow out from under the pointer, so i
 test('the name at the top takes at most 60% of a laptop screen', async ({ page, isMobile }) => {
   test.skip(isMobile, 'on phones the name is sized to the screen');
   await page.goto('/');
-  const share = await page.locator('.name').evaluate((name) => {
+  const share = await page.locator('[data-hero] h1.name').evaluate((name) => {
     const letters = [...name.querySelectorAll('.ch')].map((c) => c.getBoundingClientRect());
     return (letters.at(-1)!.right - letters[0].left) / innerWidth;
   });
