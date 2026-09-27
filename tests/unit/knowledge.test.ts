@@ -4,6 +4,12 @@ import { realKnowledge } from './support/knowledge';
 describe('buildKnowledge', () => {
   const entries = realKnowledge();
 
+  it('says Shashank can join immediately, with no notice period', () => {
+    const answer = (id: string) => entries.find((e) => e.id === id)?.answer ?? '';
+    expect(answer('notice-period')).toMatch(/no notice period/i);
+    expect(answer('joining')).toMatch(/immediately/i);
+  });
+
   it('builds a full set of answers with unique ids', () => {
     expect(entries.length).toBeGreaterThanOrEqual(25);
     expect(new Set(entries.map((e) => e.id)).size).toBe(entries.length);
