@@ -61,7 +61,7 @@ export interface LandingPose {
   /** The blue outline runs a little ahead of the letters. */
   echoScale: number;
   echoTurn: number;
-  /** Opacity of the light letters, the blue outline and the dark screen. */
+  /** Opacity of the light letters' fill (their thin outline stays), the blue outline and the dark screen. */
   fill: number;
   echo: number;
   screen: number;
@@ -94,7 +94,8 @@ export function landingPose(t: number, dive: number | null, cover: number): Land
     turn: dive === null ? 0 : LANDING.twist * zoom,
     echoScale: cover ** Math.min(1, zoom * 1.35),
     echoTurn: dive === null ? 0 : LANDING.twist * 1.5 * zoom,
-    fill: fadeOut(p, 0.05, 0.35),
+    // Emptied quickly: over a dark page a half-faded fill reads as grey.
+    fill: fadeOut(p, 0.02, 0.2),
     echo: fadeOut(p, 0, 0.45),
     screen: fadeOut(p, 0.8, 1),
     done: p >= 1,
