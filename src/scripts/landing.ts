@@ -47,6 +47,10 @@ function play(svg: SVGSVGElement): void {
   const echo = pick<SVGGElement>('[data-echo]');
   const line = pick<SVGRectElement>('[data-line]');
 
+  // The page behind shows once its fonts are in (see Landing.astro), and when the dive starts at the latest.
+  const showPage = () => root.classList.add('landing-fonts');
+  Promise.all(firstScreenFonts().map((font) => document.fonts.load(font))).then(showPage, showPage);
+
   // The letters are outlines, not text, so there is no font to wait for: the show starts with the first frame.
   let layout: SHRLayout = layoutSHR(innerWidth, innerHeight);
   let cover = 1;
@@ -82,6 +86,7 @@ function play(svg: SVGSVGElement): void {
     if (dive !== null) return;
     dive = 0;
     cover = coverScale(layout.origin, layout.clearance, innerWidth, innerHeight);
+    showPage();
     reveal();
   }
 
@@ -93,7 +98,7 @@ function play(svg: SVGSVGElement): void {
     removeEventListener('pointermove', onPointerMove);
     removeEventListener('pointerdown', begin);
     removeEventListener('keydown', begin);
-    root.classList.remove('landing', 'landing-live');
+    root.classList.remove('landing', 'landing-live', 'landing-fonts');
     reveal();
   }
 
@@ -143,4 +148,15 @@ function play(svg: SVGSVGElement): void {
     echo.style.opacity = String(pose.echo);
     svg.style.opacity = String(pose.screen);
   }
+}
+
+/**
+ * The faces the first screen uses. Each is asked for by its own family name only: a stand-in named after it that is
+ * missing here (a Mac font on Linux, say) would otherwise fail the load before the real font arrives.
+ */
+function firstScreenFonts(): string[] {
+  const family = (variable: string) =>
+    getComputedStyle(root).getPropertyValue(variable).trim().match(/^("[^"]*"|'[^']*'|[^,]+)/)?.[0] ?? 'serif';
+  const [display, sans, mono] = ['--font-display', '--font-sans', '--font-mono'].map(family);
+  return [`700 1em ${display}`, `300 1em ${sans}`, `400 1em ${sans}`, `600 1em ${sans}`, `400 1em ${mono}`];
 }
