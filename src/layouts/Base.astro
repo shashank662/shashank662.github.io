@@ -51,10 +51,9 @@ const person = {
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(person).replace(/</g, '\\u003c')} />
-    {/* Mono is only small text, so it isn't worth a preload. */}
+    {/* Preload what the first screen of most pages uses: the display face and the light and regular text weights. */}
     <Font cssVariable="--font-display" preload />
-    <Font cssVariable="--font-serif" preload />
-    <Font cssVariable="--font-sans" preload />
+    <Font cssVariable="--font-sans" preload={[{ weight: 300 }, { weight: 400 }]} />
     <Font cssVariable="--font-mono" />
     <script is:inline>
       // Same rule as resolveTheme() in src/lib/theme.ts. Runs before first paint so the page never flashes.
