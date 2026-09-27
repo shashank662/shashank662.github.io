@@ -1,13 +1,15 @@
 import { expect, test } from '@playwright/test';
 
-// The site's only faces. The Fonts API adds a hash to each name, e.g. "Source Sans 3-89b5f5e0".
+// The site's faces. The Fonts API adds a hash to each name, e.g. "Source Sans 3-89b5f5e0".
 const SOURCE = /^"?Source (Serif 4|Sans 3|Code Pro)[-"]/;
+// The two crossing bands on the home page keep a bold condensed face of their own.
+const STRIPS = /^"?IBM Plex Sans Condensed[-"]/;
 
 for (const path of ['/', '/work/auto-retry-framework', '/summary', '/no-such-page']) {
-  test(`every piece of text on ${path} is set in the Source family, upright`, async ({ page }) => {
+  test(`every piece of text on ${path} is set in the site's faces, upright`, async ({ page }) => {
     await page.goto(path);
     const text = await page.evaluate(() => {
-      const found: { family: string; italic: boolean; text: string }[] = [];
+      const found: { family: string; italic: boolean; strip: boolean; text: string }[] = [];
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       for (let node = walker.nextNode(); node; node = walker.nextNode()) {
         const element = node.parentElement;
@@ -16,13 +18,14 @@ for (const path of ['/', '/work/auto-retry-framework', '/summary', '/no-such-pag
         found.push({
           family: style.fontFamily.split(',')[0].trim(),
           italic: style.fontStyle !== 'normal',
+          strip: element.closest('[data-strips]') !== null,
           text: node.textContent.trim().slice(0, 40),
         });
       }
       return found;
     });
     expect(text.length).toBeGreaterThan(10);
-    expect(text.filter((t) => !SOURCE.test(t.family))).toEqual([]);
+    expect(text.filter((t) => !(t.strip ? STRIPS : SOURCE).test(t.family))).toEqual([]);
     expect(text.filter((t) => t.italic)).toEqual([]);
   });
 }
