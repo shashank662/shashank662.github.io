@@ -11,7 +11,7 @@ The portfolio of **Shashank H R**, a backend engineer at Engati in Bangalore who
 
 ## Stack
 
-Astro 7, with every page prerendered to static HTML · TypeScript in strict mode · small plain-TypeScript modules for the interactive parts · IBM Plex, self-hosted through Astro's Fonts API · Satori and resvg for the link-preview images · Vitest and Playwright for tests · GitHub Actions and GitHub Pages for deploys.
+Astro 7, with every page prerendered to static HTML · TypeScript in strict mode · small plain-TypeScript modules for the interactive parts · Source Serif 4, Source Sans 3 and Source Code Pro, self-hosted through Astro's Fonts API · Satori and resvg for the link-preview images · Vitest and Playwright for tests · GitHub Actions and GitHub Pages for deploys.
 
 No UI framework, no cookies, no analytics and no third-party requests.
 
@@ -44,11 +44,11 @@ Production build, 27 September 2026, Lighthouse 13.5 on mobile settings (a 412 �
 
 | Page | Performance | Accessibility | Best practices | SEO |
 |---|---|---|---|---|
-| Home | 98 | 100 | 100 | 100 |
-| Case study: auto-retry framework | 99 | 100 | 100 | 100 |
+| Home | 96 | 100 | 100 | 100 |
+| Case study: auto-retry framework | 98 | 100 | 100 | 100 |
 | The 60-second view | 98 | 100 | 100 | 100 |
 
-Layout shift is 0 on the home page and 0.001 elsewhere. The home page loads 12.3 KB of JavaScript (gzipped); the chatbot's search library and answers load only when it is first opened.
+Layout shift is at most 0.001. The home page loads 12.3 KB of JavaScript (gzipped); the chatbot's search library and answers load only when it is first opened.
 
 ## Where things live
 

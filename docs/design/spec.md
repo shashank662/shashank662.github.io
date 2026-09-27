@@ -54,13 +54,13 @@ A subtle grain texture (tiled SVG noise, dark specks in light mode, light specks
 
 ### 2.2 Typography
 
-One family, IBM Plex, for a formal and technical voice (changed 2026-09-27 from Anton, Instrument Serif, Inter and JetBrains Mono, which read as playful). Self-hosted from the installed Fontsource files through Astro's Fonts API, Latin subset only, `font-display: swap`, with size-matched local backup fonts so text doesn't move when the real fonts arrive. The display face and the light and regular text weights are preloaded.
+Adobe's Source family: a serif for headings and big numbers, a sans for text, a mono for technical labels. Chosen by the owner on 2026-09-27 for a formal, well-set look, after IBM Plex and, before that, Anton, Instrument Serif, Inter and JetBrains Mono, which read as playful. Self-hosted from the installed Fontsource files through Astro's Fonts API, Latin subset only, `font-display: swap`, with size-matched local backup fonts so text doesn't move when the real fonts arrive. The serif and the light and regular text weights are preloaded.
 
 | Face | Role |
 |---|---|
-| IBM Plex Sans Condensed Bold | the hero name, case study titles, work and incident titles, big numbers; always uppercase |
-| IBM Plex Sans (300–600) | section titles (semibold, sentence case), ledes (light), body text and UI |
-| IBM Plex Mono | technical labels, logs, diagram text, the career trace |
+| Source Serif 4 (variable: weight and optical size) | the hero name, section titles (semibold), case study, work and incident titles, big numbers (bold); normal case. Big sizes get its display design automatically |
+| Source Sans 3 (300–600) | ledes (light), body text and UI |
+| Source Code Pro | technical labels, logs, diagram text, the career trace |
 
 Emphasis is never italic: accent words are semibold in the accent colour.
 
@@ -70,7 +70,7 @@ Emphasis is never italic: accent words are semibold in the accent colour.
 - Interactive parts are small TypeScript modules loaded with Astro `<script>` tags, only on the pages that use them.
 - **Page transitions** use native cross-document view transitions (`@view-transition { navigation: auto; }`). Each work row's title and its case-study title share a `view-transition-name` (`work-<slug>`), so the title glides between pages in Chromium and Safari. Other browsers navigate normally.
 - **The theme switch** uses a same-document view transition with a circular `clip-path` wipe that starts at the click point. Without view-transition support, or with reduced motion, the theme simply switches.
-- Packages: `astro`, `@astrojs/check`, `@astrojs/sitemap`, `@fontsource/ibm-plex-sans`, `@fontsource/ibm-plex-sans-condensed`, `@fontsource/ibm-plex-mono`, `minisearch` (the chatbot's in-browser search), `satori` + `@resvg/resvg-js` (preview images), `vitest`, `@playwright/test`.
+- Packages: `astro`, `@astrojs/check`, `@astrojs/sitemap`, `@fontsource-variable/source-serif-4`, `@fontsource/source-serif-4` (static, for the preview images), `@fontsource/source-sans-3`, `@fontsource/source-code-pro`, `minisearch` (the chatbot's in-browser search), `satori` + `@resvg/resvg-js` (preview images), `vitest`, `@playwright/test`.
 
 ## 4. Pages and routes
 
@@ -98,7 +98,7 @@ Sections, in order:
    - After 30px of scroll the header gets a blurred `--bg` background and a hairline. A 2px accent bar across the top shows scroll progress.
 2. **Hero**
    - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph; on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
-   - The name "SHASHANK" in Plex Sans Condensed Bold, spread across the full width. Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent when very close.
+   - The name "Shashank" in Source Serif 4 Bold, spread across the full width. Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent when very close.
    - Second row: a rotating circular badge ("Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺", accent core with "↓" linking to About) and the light lede "I build *reliable backends* for high-volume messaging."
    - A mono line types and erases four lines in turn, prompt `~/shashank $`.
 3. **Skill strips.** Two slightly rotated marquee bands: one lists skills (Java, Spring Boot, Apache Kafka, RabbitMQ, Redis, MongoDB, Spark, AWS S3, Microservices), the other highlights (Open to SDE-2 roles, Employee of the Month ×2, MongoDB certified, CGPA 9.47, Bangalore). They drift at a base speed; scroll speed adds a boost and scroll direction sets the drift direction.
@@ -122,7 +122,7 @@ Sections, in order:
 One template renders all four from content files (section 10). Layout, top to bottom:
 
 1. **Top bar:** "← Back to work" (links to `/#work`) and "Case study NN / 04".
-2. **Hero:** kicker, the title in Plex Sans Condensed (shares the row's `view-transition-name`), a light lede with accent emphasis, and a four-item meta row (for example Role / Stack / Scale / Status).
+2. **Hero:** kicker, the title in Source Serif 4 (shares the row's `view-transition-name`), a light lede with accent emphasis, and a four-item meta row (for example Role / Stack / Scale / Status).
 3. **Stats strip:** four accent values with captions; values never wrap.
 4. **(01) The problem:** one to three paragraphs.
 5. **(02) How it works:** an SVG diagram with numbered accent dots, then a matching numbered list of steps.
@@ -352,7 +352,7 @@ Building does not wait on these; placeholders use the best current values. On 20
 6. ~~Email, LinkedIn and GitHub.~~ shashankhr06@gmail.com, linkedin.com/in/shashank-hr-0606abc2002, github.com/shashank662; linked from every page's footer.
 7. ~~The public résumé PDF.~~ Published as-is, phone number included (the owner's choice); the phone number is not shown on the pages themselves.
 8. The owner's review of every "Key decisions" card and the case study 04 pull quote, since these are written in the owner's voice.
-9. Answers for the chatbot's recruiter FAQ: notice period, relocation and preferred cities, work mode, role types, and earliest joining date.
+9. Answers for the chatbot's recruiter FAQ: relocation and preferred cities, work mode and role types. Notice period and joining date are answered (2026-09-27): an immediate joiner, no notice period.
 
 ## 16. Out of scope
 

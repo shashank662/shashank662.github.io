@@ -20,14 +20,9 @@ const ACCENT = '#1f3dff';
 const require = createRequire(import.meta.url);
 const font = (file: string) => readFileSync(require.resolve(`@fontsource/${file}`));
 const FONTS = [
-  {
-    name: 'IBM Plex Sans Condensed',
-    data: font('ibm-plex-sans-condensed/files/ibm-plex-sans-condensed-latin-700-normal.woff'),
-    weight: 700 as const,
-    style: 'normal' as const,
-  },
-  { name: 'IBM Plex Sans', data: font('ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff'), weight: 400 as const, style: 'normal' as const },
-  { name: 'IBM Plex Mono', data: font('ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff'), weight: 500 as const, style: 'normal' as const },
+  { name: 'Source Serif 4', data: font('source-serif-4/files/source-serif-4-latin-700-normal.woff'), weight: 700 as const, style: 'normal' as const },
+  { name: 'Source Sans 3', data: font('source-sans-3/files/source-sans-3-latin-400-normal.woff'), weight: 400 as const, style: 'normal' as const },
+  { name: 'Source Code Pro', data: font('source-code-pro/files/source-code-pro-latin-500-normal.woff'), weight: 500 as const, style: 'normal' as const },
 ];
 
 /** A Satori element: plain objects instead of JSX. */
@@ -39,8 +34,15 @@ const clip = (text: string, max: number) => {
   return `${cut.slice(0, cut.lastIndexOf(' ')).replace(/[\s,;:·]+$/, '')}…`;
 };
 
+/**
+ * Satori has no fallback for a character its fonts lack, and the Source fonts have no non-breaking hyphen
+ * (browsers quietly swap in a plain one), so the card does the same.
+ */
+const plainHyphens = (text: string) => text.replace(/\u2011/g, '-');
+
 /** A 1200 × 630 PNG for link previews: kicker, big title, subtitle, owner line. */
-export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard): Promise<Uint8Array<ArrayBuffer>> {
+export async function renderOgImage(content: OgCard): Promise<Uint8Array<ArrayBuffer>> {
+  const [kicker, title, subtitle, footer] = [content.kicker, content.title, content.subtitle, content.footer].map(plainHyphens);
   const card = el(
     'div',
     {
@@ -57,18 +59,18 @@ export async function renderOgImage({ kicker, title, subtitle, footer }: OgCard)
     [
       el(
         'div',
-        { display: 'flex', justifyContent: 'space-between', fontFamily: 'IBM Plex Mono', fontSize: 22, color: MUTED, letterSpacing: 2, textTransform: 'uppercase' },
+        { display: 'flex', justifyContent: 'space-between', fontFamily: 'Source Code Pro', fontSize: 22, color: MUTED, letterSpacing: 2, textTransform: 'uppercase' },
         [el('span', {}, kicker), el('span', {}, 'shashank662.github.io')],
       ),
       el('div', { display: 'flex', flexDirection: 'column', gap: 22 }, [
-        el('div', { fontFamily: 'IBM Plex Sans Condensed', fontWeight: 700, fontSize: title.length > 18 ? 92 : 116, lineHeight: 0.95, textTransform: 'uppercase' }, title),
+        el('div', { fontFamily: 'Source Serif 4', fontWeight: 700, fontSize: title.length > 18 ? 96 : 120, lineHeight: 1, letterSpacing: -2 }, title),
         el(
           'div',
-          { fontFamily: 'IBM Plex Sans', fontSize: 36, lineHeight: 1.3, color: INK, maxWidth: 1000 },
+          { fontFamily: 'Source Sans 3', fontSize: 38, lineHeight: 1.3, color: INK, maxWidth: 1000 },
           clip(subtitle, 130),
         ),
       ]),
-      el('div', { display: 'flex', alignItems: 'center', gap: 14, fontFamily: 'IBM Plex Mono', fontSize: 22 }, [
+      el('div', { display: 'flex', alignItems: 'center', gap: 14, fontFamily: 'Source Code Pro', fontSize: 22 }, [
         el('div', { width: 14, height: 14, borderRadius: 7, background: ACCENT }),
         el('span', {}, footer),
       ]),

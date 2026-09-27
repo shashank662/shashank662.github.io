@@ -2,7 +2,7 @@
 import { profile } from '../../data/profile';
 import { emphasize } from '../../lib/text';
 
-const letters = profile.firstName.toUpperCase().split('');
+const letters = profile.firstName.split('');
 const { hero } = profile;
 ---
 <section class="hero" id="top" data-hero>
@@ -56,8 +56,8 @@ const { hero } = profile;
 
   .name {
     margin-top: auto; padding-top: 40px;
-    /* "SHASHANK" in Plex Sans Condensed Bold is 4.94em wide: 18.8vw fills the width between the gutters. */
-    font-size: clamp(64px, 18.8vw, 330px); line-height: 0.8;
+    /* "Shashank" in Source Serif 4 Bold is 3.91em wide: 23.9vw fills the width between the gutters. */
+    font-size: clamp(64px, 23.9vw, 420px); line-height: 0.8;
     display: flex; justify-content: space-between; white-space: nowrap; user-select: none;
   }
   .ch { display: inline-block; overflow: hidden; padding-top: 0.05em; transform-origin: 50% 100%; will-change: transform; }

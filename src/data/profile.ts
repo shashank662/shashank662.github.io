@@ -117,7 +117,7 @@ export const profile: Profile = {
     label: 'Portfolio · 2026 edition',
     intro:
       'Backend engineer at Engati, Bangalore. 2+ years full-time (after a 6-month internship) building Java & Spring Boot services for a high-volume B2B messaging platform.',
-    lede: 'I build *reliable backends* for high-volume messaging.',
+    lede: 'I build *reliable backends* for high‑volume messaging.',
     badge: 'Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺',
     typedLines: [
       '~2M api triggers a day · 50k–100k retries',
@@ -233,6 +233,6 @@ export const profile: Profile = {
   },
   contact: {
     prompt: 'Got a role in mind?',
-    cta: "Let's talk",
+    cta: 'Let’s talk',
   },
 };
