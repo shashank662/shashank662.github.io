@@ -10,7 +10,7 @@ const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent
 ---
 <section class="section wrap" id="exp">
   <SectionHead n="02" label="Experience" meta={`GET /career · ${career.spans.length} spans · 200 OK`} />
-  <h2 class="h2 display" set:html={emphasize(career.title)} />
+  <h2 class="h2" set:html={emphasize(career.title)} />
   <p class="sub">{career.sub}</p>
 
   <div class="trace" data-trace data-in-view data-axis={toAttr(career.axisStart)}>
