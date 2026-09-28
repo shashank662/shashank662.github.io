@@ -1,9 +1,9 @@
-import { BAND, coverScale, LANDING, landingPose, layoutSHR, type LandingPose, type SHRLayout } from '../lib/landing';
+import { BAND, coverScale, LANDING, landingPose, layoutS, type LandingPose, type SLayout } from '../lib/landing';
 import { SHR_GLYPHS } from '../lib/shr-glyphs';
 import { onFrame } from './motion';
 
-// The home page's landing screen (spec §5): "SHR" opens out of a blue line on a dark screen, then the view dives
-// through the S into the page. The inline script in index.astro decides before first paint whether it plays and
+// The home page's landing screen (spec §5): an "S" opens out of a blue line on a dark screen, then the view dives
+// through it into the page. The inline script in index.astro decides before first paint whether it plays and
 // adds html.landing; without that class this module only answers onReveal().
 
 const root = document.documentElement;
@@ -41,7 +41,7 @@ if (svg && !revealed) {
 
 function play(svg: SVGSVGElement): void {
   const pick = <T extends Element>(selector: string) => svg.querySelector<T>(selector) as T;
-  const bands = [...svg.querySelectorAll<SVGRectElement>('[data-band]')];
+  const band = pick<SVGRectElement>('[data-band]');
   const holes = pick<SVGGElement>('[data-holes]');
   const fill = pick<SVGGElement>('[data-fill]');
   const echo = pick<SVGGElement>('[data-echo]');
@@ -51,8 +51,8 @@ function play(svg: SVGSVGElement): void {
   const showPage = () => root.classList.add('landing-fonts');
   Promise.all(firstScreenFonts().map((font) => document.fonts.load(font))).then(showPage, showPage);
 
-  // The letters are outlines, not text, so there is no font to wait for: the show starts with the first frame.
-  let layout: SHRLayout = layoutSHR(innerWidth, innerHeight);
+  // The S is an outline, not text, so there is no font to wait for: the show starts with the first frame.
+  let layout: SLayout = layoutS(innerWidth, innerHeight);
   let cover = 1;
   let t = 0;
   let dive: number | null = null;
@@ -60,7 +60,7 @@ function play(svg: SVGSVGElement): void {
   const lean = { x: 0, y: 0 };
 
   const onResize = () => {
-    if (dive === null) layout = layoutSHR(innerWidth, innerHeight);
+    if (dive === null) layout = layoutS(innerWidth, innerHeight);
   };
   const onWheel = (event: WheelEvent) => {
     event.preventDefault();
@@ -117,24 +117,22 @@ function play(svg: SVGSVGElement): void {
     }
   }
 
-  function draw({ size, k, left, baseline, origin }: SHRLayout, pose: LandingPose): void {
+  function draw({ size, k, left, baseline, origin }: SLayout, pose: LandingPose): void {
     const width = innerWidth * 1.1 * pose.line;
     line.setAttribute('x', n((innerWidth - width) / 2));
     line.setAttribute('y', n(baseline - (SHR_GLYPHS.capHeight * k) / 2 - 0.75));
     line.setAttribute('width', n(width));
     line.style.opacity = String(pose.lineOpacity);
-    // Bands are in the letters' own units, so they stay put whatever the screen size.
-    bands.forEach((band, i) => {
-      const h = BAND.half * pose.open[i];
-      band.setAttribute('y', n(BAND.middle - h));
-      band.setAttribute('height', n(2 * h));
-    });
+    // The band is in the letter's own units, so it stays put whatever the screen size.
+    const h = BAND.half * pose.open;
+    band.setAttribute('y', n(BAND.middle - h));
+    band.setAttribute('height', n(2 * h));
 
-    // The outlines are in font units with y up: scale and flip them onto the screen.
+    // The outline is in font units with y up: scale and flip it onto the screen.
     const place = `translate(${n(left)} ${n(baseline)}) scale(${k.toFixed(5)} ${(-k).toFixed(5)})`;
     const into = (scale: number, turn: number) =>
       `translate(${n(origin.x)} ${n(origin.y)}) rotate(${n(turn)}) scale(${scale.toFixed(4)}) translate(${n(-origin.x)} ${n(-origin.y)})`;
-    // The letters lean a little toward the pointer, and their blue outline, which sits in front, leans more.
+    // The S leans a little toward the pointer, and its blue outline, which sits in front, leans more.
     const calm = 1 - pose.zoom;
     lean.x += (pointer.x - lean.x) * 0.07;
     lean.y += (pointer.y - lean.y) * 0.07;

@@ -5,7 +5,7 @@ import {
   LANDING,
   LANDING_KEY,
   landingPose,
-  layoutSHR,
+  layoutS,
   S_SHAPE,
   shouldPlayLanding,
 } from '../../src/lib/landing';
@@ -52,7 +52,7 @@ describe('landingPose', () => {
   it('starts on a plain dark screen', () => {
     const pose = at(0);
     expect(pose.line).toBe(0);
-    expect(pose.open).toEqual([0, 0, 0]);
+    expect(pose.open).toBe(0);
     expect(pose.scale).toBe(1);
     expect(pose.screen).toBe(1);
     expect(pose.fill).toBe(1);
@@ -63,15 +63,14 @@ describe('landingPose', () => {
     expect(at(LANDING.lineMs).line).toBe(1);
   });
 
-  it('opens S, then H, then R out of the line', () => {
-    const [s, h, r] = at(600).open;
-    expect(s).toBeGreaterThan(h);
-    expect(h).toBeGreaterThan(r);
-    expect(r).toBe(0);
+  it('opens the S out of the line once the line is under way', () => {
+    expect(at(LANDING.openAt).open).toBe(0);
+    expect(at(600).open).toBeGreaterThan(0);
+    expect(at(600).open).toBeLessThan(1);
   });
 
-  it('has every letter open well before it dives by itself', () => {
-    expect(at(1800).open).toEqual([1, 1, 1]);
+  it('has the S open well before it dives by itself', () => {
+    expect(at(1800).open).toBe(1);
     expect(LANDING.diveAt).toBeGreaterThan(1800);
   });
 
@@ -104,31 +103,31 @@ describe('landingPose', () => {
     expect(at(4000, LANDING.diveMs * 0.9).screen).toBeCloseTo(0.5);
   });
 
-  it('opens any letter still closed at once when someone skips ahead', () => {
+  it('opens the S at once if it is still closed when someone skips ahead', () => {
     const pose = at(100, LANDING.skipMs);
-    expect(pose.open).toEqual([1, 1, 1]);
+    expect(pose.open).toBe(1);
     expect(pose.lineOpacity).toBe(0);
   });
 });
 
-describe('layoutSHR', () => {
-  const [S, , R] = SHR_GLYPHS.letters;
+describe('layoutS', () => {
+  const [S] = SHR_GLYPHS.letters;
 
   it('sizes the letters to 40% of the screen width, or 58% of its height on a wide, short screen', () => {
-    expect(layoutSHR(1000, 2000).size).toBe(400);
-    expect(layoutSHR(2000, 1000).size).toBe(580);
+    expect(layoutS(1000, 2000).size).toBe(400);
+    expect(layoutS(2000, 1000).size).toBe(580);
   });
 
-  it('centres the ink of SHR across the screen and its capitals down it', () => {
-    const at = layoutSHR(1440, 900);
+  it('centres the ink of the S across the screen and its capitals down it', () => {
+    const at = layoutS(1440, 900);
     const inkLeft = at.left + S.ink[0] * at.k;
-    const inkRight = at.left + (R.x + R.ink[2]) * at.k;
+    const inkRight = at.left + S.ink[2] * at.k;
     expect((inkLeft + inkRight) / 2).toBeCloseTo(720);
     expect(at.baseline - (SHR_GLYPHS.capHeight * at.k) / 2).toBeCloseTo(450);
   });
 
   it('aims the dive inside the S, as deep as the stroke is there', () => {
-    const at = layoutSHR(1440, 900);
+    const at = layoutS(1440, 900);
     expect(at.origin.x).toBeGreaterThan(at.left + S.ink[0] * at.k);
     expect(at.origin.x).toBeLessThan(at.left + S.ink[2] * at.k);
     expect(at.origin.y).toBeLessThan(at.baseline);

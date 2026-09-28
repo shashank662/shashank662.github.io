@@ -224,3 +224,38 @@ test('the name at the top takes at most 60% of a laptop screen', async ({ page, 
   });
   expect(share).toBeLessThanOrEqual(0.6);
 });
+
+test('a letter of the name turns accent at once near the pointer, without waiting on its slide-in delay', async ({ page }) => {
+  await page.goto('/');
+  const timing = await page.locator('[data-hero] .ch > span').last().evaluate((span) => {
+    const style = getComputedStyle(span);
+    const props = style.transitionProperty.split(', ');
+    const at = props.indexOf('color');
+    // A shorter list repeats to cover every property, as CSS does.
+    const pick = (list: string) => list.split(', ')[at % list.split(', ').length];
+    return { delay: pick(style.transitionDelay), duration: parseFloat(pick(style.transitionDuration)) };
+  });
+  expect(timing.delay).toBe('0s');
+  expect(timing.duration).toBeLessThanOrEqual(0.15);
+});
+
+test('the name reads "Shashank H R" in full, on one line and inside the screen', async ({ page }) => {
+  await page.goto('/');
+  const name = page.getByRole('heading', { level: 1, name: 'Shashank H R', exact: true });
+  await expect(name).toBeVisible();
+  // Wait for the letters to finish sliding up before measuring them.
+  await expect(page.locator('[data-hero]')).toHaveClass(/\bgo\b/);
+  await page.waitForTimeout(1800);
+  const boxes = await page.locator('[data-hero] .ch').evaluateAll((letters) =>
+    letters.map((letter) => letter.getBoundingClientRect()).map(({ left, right, top }) => ({ left, right, top })),
+  );
+  expect(boxes).toHaveLength('ShashankHR'.length);
+  expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBe(1);
+  const width = page.viewportSize()?.width ?? 0;
+  expect(Math.min(...boxes.map((box) => box.left))).toBeGreaterThanOrEqual(0);
+  expect(Math.max(...boxes.map((box) => box.right))).toBeLessThanOrEqual(width);
+  // The initials stand apart from "Shashank" as words, not run together.
+  const [k, h, r] = [boxes[7], boxes[8], boxes[9]];
+  expect(h.left - k.right).toBeGreaterThan(8);
+  expect(r.left - h.right).toBeGreaterThan(8);
+});

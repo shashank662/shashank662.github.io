@@ -13,8 +13,9 @@ if (dot && finePointer()) {
     (event) => {
       target.x = event.clientX;
       target.y = event.clientY;
-      visible = true;
       const el = event.target instanceof Element ? event.target : null;
+      // An open popover sits above the dot, and the real pointer shows there instead (global.css).
+      visible = !el?.closest('[popover]');
       dot.classList.toggle('ring', Boolean(el?.closest('a, button, [data-cursor]')));
     },
     { passive: true },
