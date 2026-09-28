@@ -9,6 +9,7 @@ The portfolio of **Shashank H R**, a backend engineer at Engati in Bangalore who
 - **The 60-second view** (`/summary`): everything a recruiter needs on one page. It also prints cleanly on A4.
 - **Colour themes:** Auto, which follows your system's light or dark setting, or one of nine themes (Light, Dark, Midnight, Ocean, Forest, Sunset, Rose, Nord and Solarized), from the palette button in the header. A test checks every theme's contrast.
 - **Ask about me:** a small chatbot that answers from this site's own content. It runs entirely in the browser (MiniSearch); there is no AI service behind it.
+- **Feedback:** a button on every page. A note becomes a public GitHub issue in this repo, sent through a small Cloudflare Worker (`worker/index.ts`) with a Turnstile check, and is triaged weekly. Setup: `docs/feedback-setup.md`.
 
 ## Stack
 

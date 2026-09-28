@@ -1,14 +1,21 @@
 // Cloudflare Workers settings, read by `npx wrangler deploy` after Cloudflare's build.
-// The site is plain files from `astro build`, so the Worker only serves dist/: no server code and no Astro adapter.
-// Without this file, the deploy sets the project up by itself and adds the adapter, whose build fails on resvg.
+// The site is plain files from `astro build`, served from dist/ with no Astro adapter (the adapter's build fails on
+// resvg). One small script, worker/index.ts, answers /api/feedback; every other address is served straight from dist/.
 {
   // Must match the Worker's name in the Cloudflare dashboard, or the deploy is refused.
   "name": "shashank662-portfolio",
   "compatibility_date": "2026-09-27",
+  "main": "worker/index.ts",
   "assets": {
     // /summary serves summary.html by default, matching the site's links.
     "directory": "./dist",
     // An unknown address gets 404.html, with a 404 status.
-    "not_found_handling": "404-page"
-  }
+    "not_found_handling": "404-page",
+    "binding": "ASSETS",
+    // Only the feedback address runs the script; pages and files skip it.
+    "run_worker_first": ["/api/*"]
+  },
+  // Five feedback messages a minute per visitor address. The Turnstile check stops bots; this stops a flood.
+  "ratelimits": [{ "name": "FEEDBACK_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }]
+  // Secrets, set in the Cloudflare dashboard (never here): GITHUB_TOKEN and TURNSTILE_SECRET. See docs/feedback-setup.md.
 }

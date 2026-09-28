@@ -1,0 +1,112 @@
+---
+// The feedback button and form (spec §9b). A note becomes a public GitHub issue, sent through the Cloudflare Worker,
+// or, until that is set up or if it fails, through GitHub's own new-issue page.
+import { feedbackConfig } from '../data/feedback';
+import { FEEDBACK_TYPES, MESSAGE_MAX } from '../lib/feedback';
+
+const live = Boolean(feedbackConfig.endpoint && feedbackConfig.turnstileSiteKey);
+---
+<button type="button" class="pill mono" data-feedback-open aria-expanded="false" aria-controls="feedback-panel">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path d="M2.5 3h11v7.5H7L4 13v-2.5H2.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+  </svg>
+  Feedback
+</button>
+
+<section
+  class="panel" id="feedback-panel" role="dialog" aria-modal="false" aria-labelledby="feedback-title" hidden data-feedback-panel
+  data-endpoint={feedbackConfig.endpoint} data-sitekey={feedbackConfig.turnstileSiteKey}
+>
+  <header class="head">
+    <h2 id="feedback-title">Feedback on this site</h2>
+    <button type="button" class="close" data-feedback-close aria-label="Close">×</button>
+  </header>
+  <form class="body" novalidate data-feedback-form>
+    <p class="intro">Spotted a bug, or something that could read better? Tell me.</p>
+    <fieldset>
+      <legend class="label">About</legend>
+      <div class="types">
+        {Object.entries(FEEDBACK_TYPES).map(([value, name], i) => (
+          <label class="type"><input type="radio" name="type" value={value} checked={i === 0} /><span>{name}</span></label>
+        ))}
+      </div>
+    </fieldset>
+    <label class="visually-hidden" for="feedback-message">Your feedback</label>
+    <textarea id="feedback-message" name="message" rows="4" maxlength={MESSAGE_MAX} required placeholder="What should change?" data-feedback-message></textarea>
+    <p class="meta mono" data-feedback-details></p>
+    <p class="note">This becomes a public issue on the site's GitHub repo. Please don't include personal details.</p>
+    <div data-feedback-turnstile></div>
+    <p class="error" role="alert" data-feedback-error></p>
+    <div class="row">
+      <span class="meta mono" data-feedback-count>0 / {MESSAGE_MAX}</span>
+      <button type="submit" class="send" data-feedback-send>{live ? 'Send' : 'Continue on GitHub'}</button>
+    </div>
+  </form>
+  <div class="done" hidden data-feedback-done tabindex="-1">
+    <p class="thanks" data-feedback-thanks>Thanks, it's logged.</p>
+    <p class="intro" data-feedback-next>Shashank reviews every note. You can follow what happens to it here:</p>
+    <a data-feedback-link target="_blank" rel="noopener">The issue on GitHub ↗</a>
+  </div>
+</section>
+
+<script>
+  import '../scripts/feedback';
+</script>
+
+<style>
+  /* Bottom right, beside "Ask about me"; bottom left on a phone, so the two never overlap. */
+  .pill {
+    position: fixed; right: 158px; bottom: 16px; z-index: 80;
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-size: 12px;
+    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45); transition: border-color 0.25s;
+  }
+  .pill:hover { border-color: var(--accent); }
+  .pill[hidden], .panel[hidden], .done[hidden] { display: none; }
+  /* It needs JavaScript to do anything. */
+  :global(html:not(.js)) .pill { display: none; }
+
+  .panel {
+    position: fixed; right: 16px; bottom: 16px; z-index: 90;
+    display: flex; flex-direction: column; width: 380px; max-height: min(640px, calc(100vh - 32px)); overflow-y: auto;
+    border: 1px solid var(--line); border-radius: 14px; background: var(--bg); color: var(--ink);
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.5);
+  }
+  .head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  h2 { font-size: 15px; font-weight: 600; }
+  .close { width: 30px; height: 30px; border-radius: 8px; font-size: 20px; line-height: 1; color: var(--muted); }
+  .close:hover { background: var(--line2); color: var(--ink); }
+
+  .body, .done { display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 16px; }
+  .intro { font-size: 14px; line-height: 1.5; color: var(--muted); }
+  fieldset { border: 0; padding: 0; margin: 0; }
+  .types { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .type input { position: absolute; opacity: 0; pointer-events: none; }
+  .type span {
+    display: inline-block; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 12.5px;
+    cursor: pointer; transition: border-color 0.2s, color 0.2s;
+  }
+  .type input:checked + span { border-color: var(--accent); color: var(--accent); }
+  .type input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  textarea {
+    min-height: 96px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; resize: vertical;
+    background: transparent; color: var(--ink); font: inherit; font-size: 14px; line-height: 1.5;
+  }
+  textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .meta { font-size: 11.5px; line-height: 1.6; color: var(--muted); }
+  .note { padding: 9px 11px; border-radius: 8px; background: var(--line2); font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+  .error { font-size: 13px; color: var(--warn); }
+  .error:empty { display: none; }
+  .error :global(a) { color: var(--accent); text-decoration: underline; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .send { padding: 10px 18px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 14px; font-weight: 600; }
+  .send:disabled { opacity: 0.6; }
+  .thanks { font-size: 17px; font-weight: 600; }
+  .done a { color: var(--accent); text-decoration: underline; font-size: 14px; }
+  .done:focus { outline: none; }
+
+  @media (max-width: 760px) {
+    .pill { right: auto; left: 16px; }
+    .panel { left: 0; right: 0; bottom: 0; width: auto; max-height: 85vh; border-radius: 16px 16px 0 0; }
+  }
+</style>
