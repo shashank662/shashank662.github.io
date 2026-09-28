@@ -67,8 +67,11 @@ describe('POST /api/feedback', () => {
 
   it('only takes feedback from the site itself', async () => {
     const calls = outside();
+    const logged = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const res = await handleFeedback(post(good, 'https://elsewhere.example'), env());
     expect(res.status).toBe(403);
+    // The browser can't read the refusal, so the log says which origin it came from.
+    expect(logged).toHaveBeenCalledWith('feedback refused from origin', 'https://elsewhere.example');
     expect(res.headers.get('Access-Control-Allow-Origin')).toBeNull();
     expect(calls).toHaveLength(0);
   });
@@ -90,6 +93,18 @@ describe('POST /api/feedback', () => {
     const res = await handleFeedback(post(good), env());
     expect(res.status).toBe(502);
     expect(JSON.stringify(await res.json())).not.toContain('gh-secret');
+  });
+
+  it('turns a crash into a reply the site can read, and logs the real error', async () => {
+    vi.stubGlobal('fetch', async () => {
+      throw new Error('boom');
+    });
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await worker.fetch(post(good), env());
+    expect(res.status).toBe(500);
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe(SITE);
+    expect(await res.json()).toEqual({ error: "Couldn't save it just now." });
+    expect(String(logged.mock.calls[0])).toContain('boom');
   });
 
   it('answers the browser preflight for the site', async () => {
