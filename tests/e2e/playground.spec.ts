@@ -54,10 +54,10 @@ test('visitors can send their own triggers', async ({ page }) => {
   await expect(page.locator('[data-logs]')).toContainText('you sent 5 triggers');
 });
 
-test('the model is described in words', async ({ page }) => {
+test('the simulation is described in words, and says its numbers are illustrative', async ({ page }) => {
   await page.goto('/#play');
-  await expect(page.getByRole('img', { name: /Live model of the auto-retry framework/ })).toBeVisible();
-  await expect(page.getByText(/My Engati auto-retry framework, running live/)).toBeVisible();
+  await expect(page.getByRole('img', { name: /Interactive simulation of the auto-retry framework/ })).toBeVisible();
+  await expect(page.getByText(/An interactive simulation of my Engati auto-retry framework/)).toBeVisible();
 });
 
 test('with reduced motion it waits behind a Play button', async ({ page }) => {
