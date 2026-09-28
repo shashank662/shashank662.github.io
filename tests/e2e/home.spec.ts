@@ -259,3 +259,20 @@ test('the name reads "Shashank H R" in full, on one line and inside the screen',
   expect(h.left - k.right).toBeGreaterThan(8);
   expect(r.left - h.right).toBeGreaterThan(8);
 });
+
+test('the first screen invites people short on time to the 60-second summary', async ({ page }) => {
+  await page.goto('/');
+  const invite = page.locator('[data-hero]').getByRole('link', { name: 'Short on time? Read the 60-second summary' });
+  await expect(invite).toBeVisible();
+  await expect(invite).toHaveAttribute('href', '/summary');
+  // In the first screen, clear of the fixed header, with no scrolling.
+  const box = await invite.boundingBox();
+  const header = await page.locator('[data-header]').boundingBox();
+  const viewport = page.viewportSize();
+  expect(box && header && viewport).toBeTruthy();
+  if (!box || !header || !viewport) return;
+  expect(box.y).toBeGreaterThanOrEqual(header.y + header.height);
+  expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+  // Big enough to tap on a phone.
+  expect(box.height).toBeGreaterThanOrEqual(24);
+});
