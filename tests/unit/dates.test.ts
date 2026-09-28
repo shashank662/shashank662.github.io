@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   formatDuration,
+  formatRange,
   monthsBetween,
   parseYearMonth,
   spanPosition,
@@ -79,5 +80,19 @@ describe('toAttr and parseYearMonth', () => {
     expect(parseYearMonth('')).toBeNull();
     expect(parseYearMonth('2024-7')).toBeNull();
     expect(parseYearMonth('now')).toBeNull();
+  });
+});
+
+describe('formatRange', () => {
+  it('names the month and year at each end', () => {
+    expect(formatRange([2020, 8], [2024, 7])).toBe('Aug 2020 – Jul 2024');
+  });
+
+  it('says the year once when both ends share it', () => {
+    expect(formatRange([2024, 1], [2024, 6])).toBe('Jan – Jun 2024');
+  });
+
+  it('runs to "now" while still going', () => {
+    expect(formatRange([2024, 7], null)).toBe('Jul 2024 – now');
   });
 });
