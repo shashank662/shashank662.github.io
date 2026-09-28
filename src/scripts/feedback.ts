@@ -123,12 +123,15 @@ if (pill && panel && form && message && done) {
     }
     send.disabled = true;
     try {
+      // The browser's own words for a failed request ("Load failed", "Failed to fetch") mean nothing to a visitor.
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...feedback, token }),
+      }).catch(() => {
+        throw new Error("Couldn't reach the feedback service.");
       });
-      const data = (await res.json()) as { url?: string; error?: string };
+      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
       if (!res.ok || !data.url) throw new Error(data.error ?? 'failed');
       finish(data.url);
     } catch (reason) {

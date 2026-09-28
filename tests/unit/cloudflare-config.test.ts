@@ -7,6 +7,7 @@ interface WranglerConfig {
   main?: string;
   assets: { directory: string; not_found_handling?: string; binding?: string; run_worker_first?: string[] };
   ratelimits?: { name: string; simple: { limit: number; period: number } }[];
+  observability?: { enabled: boolean };
 }
 
 // The file's comments are whole lines, so dropping those lines leaves plain JSON.
@@ -29,6 +30,10 @@ describe('the Cloudflare Worker config', () => {
 
   it('limits how much feedback one visitor can send', () => {
     expect(config.ratelimits).toEqual([expect.objectContaining({ name: 'FEEDBACK_LIMIT', simple: { limit: 5, period: 60 } })]);
+  });
+
+  it('keeps the Worker logs, so a failed feedback note can be traced', () => {
+    expect(config.observability).toEqual({ enabled: true });
   });
 
   it("answers an unknown address with the site's own 404 page", () => {

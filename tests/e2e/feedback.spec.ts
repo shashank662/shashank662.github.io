@@ -134,3 +134,33 @@ test.describe('without JavaScript', () => {
     await expect(pill(page)).toBeHidden();
   });
 });
+
+test("if the Worker can't be reached, the form says so in plain words and offers GitHub", async ({ page }) => {
+  await withSettings(page, ENDPOINT, 'test-key');
+  await page.route('https://challenges.cloudflare.com/**', (route) =>
+    route.fulfill({
+      contentType: 'text/javascript',
+      body: 'window.turnstile = { render: (el, o) => { setTimeout(() => o.callback("person-token")); return "w1"; }, reset() {} };',
+    }),
+  );
+  await page.route(ENDPOINT, (route) => route.abort('failed'));
+  await page.goto('/');
+  await pill(page).click();
+  await panel(page).getByRole('textbox').fill('The form will not send.');
+  await expect.poll(() => page.evaluate(() => Boolean(window.turnstile))).toBe(true);
+  await panel(page).getByRole('button', { name: 'Send' }).click();
+
+  const alert = panel(page).getByRole('alert');
+  await expect(alert).toContainText("Couldn't reach the feedback service.");
+  await expect(alert.getByRole('link', { name: 'Send it on GitHub instead' })).toBeVisible();
+});
+
+test('the type buttons keep the site cursor, ringed like other controls', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Phones have no pointer.');
+  await page.goto('/');
+  await pill(page).click();
+  const idea = panel(page).locator('.type span', { hasText: 'Idea' });
+  await expect(idea).toHaveCSS('cursor', 'none');
+  await idea.hover();
+  await expect(page.locator('[data-cursor-dot]')).toHaveClass(/\bring\b/);
+});

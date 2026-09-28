@@ -39,7 +39,11 @@ async function isPerson(token: unknown, secret: string, ip: string): Promise<boo
 export async function handleFeedback(request: Request, env: Env): Promise<Response> {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(request) });
   if (request.method !== 'POST') return reply(request, 405, { error: 'Send feedback with POST.' });
-  if (!cors(request)['Access-Control-Allow-Origin']) return reply(request, 403, { error: 'Feedback is only taken from the site.' });
+  if (!cors(request)['Access-Control-Allow-Origin']) {
+    // The browser can't read this refusal, so the Worker logs say which origin it came from.
+    console.warn('feedback refused from origin', request.headers.get('Origin'));
+    return reply(request, 403, { error: 'Feedback is only taken from the site.' });
+  }
   if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET) return reply(request, 503, { error: 'Feedback is not set up yet.' });
 
   const ip = request.headers.get('CF-Connecting-IP') ?? '';
@@ -76,7 +80,16 @@ export async function handleFeedback(request: Request, env: Env): Promise<Respon
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    if (new URL(request.url).pathname === '/api/feedback') return handleFeedback(request, env);
+    if (new URL(request.url).pathname === '/api/feedback') {
+      // A crash would otherwise reach the browser as Cloudflare's bare error page, with no CORS headers, which the site
+      // can only report as "Load failed". Log the real error (Worker logs) and answer in a form the site can read.
+      try {
+        return await handleFeedback(request, env);
+      } catch (error) {
+        console.error('feedback failed', error);
+        return reply(request, 500, { error: "Couldn't save it just now." });
+      }
+    }
     return env.ASSETS.fetch(request);
   },
 };

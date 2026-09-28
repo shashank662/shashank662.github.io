@@ -15,6 +15,8 @@
     // Only the feedback address runs the script; pages and files skip it.
     "run_worker_first": ["/api/*"]
   },
+  // Keeps the script's logs (Cloudflare dashboard → the Worker → Logs), so a failed feedback note can be traced.
+  "observability": { "enabled": true },
   // Five feedback messages a minute per visitor address. The Turnstile check stops bots; this stops a flood.
   "ratelimits": [{ "name": "FEEDBACK_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }]
   // Secrets, set in the Cloudflare dashboard (never here): GITHUB_TOKEN and TURNSTILE_SECRET. See docs/feedback-setup.md.
