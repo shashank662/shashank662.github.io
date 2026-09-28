@@ -29,7 +29,10 @@ function outside({ person = true, github = 201 } = {}) {
   return calls;
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 describe('POST /api/feedback', () => {
   it('checks the visitor with Turnstile, opens the issue, and returns its link', async () => {
@@ -107,9 +110,17 @@ describe('POST /api/feedback', () => {
     expect(isSiteOrigin(self, self)).toBe(true);
   });
 
-  it('says so when the secrets are not set up yet', async () => {
+  it('says so when the secrets are not set up yet, and logs which names are missing, never a value', async () => {
     outside();
-    expect((await handleFeedback(post(good), env({ GITHUB_TOKEN: undefined }))).status).toBe(503);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await handleFeedback(post(good), env({ GITHUB_TOKEN: undefined }));
+    expect(res.status).toBe(503);
+    expect(logged).toHaveBeenCalledWith('feedback secrets missing:', 'GITHUB_TOKEN');
+
+    logged.mockClear();
+    await handleFeedback(post(good), env({ GITHUB_TOKEN: '', TURNSTILE_SECRET: undefined }));
+    expect(logged).toHaveBeenCalledWith('feedback secrets missing:', 'GITHUB_TOKEN, TURNSTILE_SECRET');
+    expect(JSON.stringify(logged.mock.calls)).not.toContain('ts-secret');
   });
 
   it('slows down a visitor sending too much', async () => {
