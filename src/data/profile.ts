@@ -74,7 +74,8 @@ export interface Profile {
   status: string;
   metaDescription: string;
   links: { email: string; linkedin: string; github: string; resume: string };
-  hero: { label: string; intro: string; lede: string; badge: string; typedLines: string[] };
+  /** `quick` invites people short on time to the 60-second view, in the first screen. */
+  hero: { label: string; intro: string; quick: string; lede: string; badge: string; typedLines: string[] };
   sections: { n: string; label: string; href: string }[];
   strips: { skills: string[]; highlights: string[] };
   about: { paragraph: string; facts: Fact[] };
@@ -117,6 +118,7 @@ export const profile: Profile = {
     label: 'Portfolio · 2026 edition',
     intro:
       'Backend engineer at Engati, Bangalore. 2+ years full-time (after a 6-month internship) building Java & Spring Boot services for a high-volume B2B messaging platform.',
+    quick: 'Short on time? Read the 60-second summary',
     lede: 'I build *reliable backends* for high‑volume messaging.',
     badge: 'Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺',
     typedLines: [
