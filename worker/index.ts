@@ -58,7 +58,12 @@ export async function handleFeedback(request: Request, env: Env): Promise<Respon
     console.warn('feedback refused from origin', request.headers.get('Origin'));
     return reply(request, 403, { error: 'Feedback is only taken from the site.' });
   }
-  if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET) return reply(request, 503, { error: 'Feedback is not set up yet.' });
+  if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET) {
+    // Names only, never values: the Worker logs say which secret to add (Settings → Variables and Secrets).
+    const missing = (['GITHUB_TOKEN', 'TURNSTILE_SECRET'] as const).filter((name) => !env[name]);
+    console.error('feedback secrets missing:', missing.join(', '));
+    return reply(request, 503, { error: 'Feedback is not set up yet.' });
+  }
 
   const ip = request.headers.get('CF-Connecting-IP') ?? '';
   if (env.FEEDBACK_LIMIT && !(await env.FEEDBACK_LIMIT.limit({ key: ip || 'unknown' })).success) {
