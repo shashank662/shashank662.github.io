@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import worker, { handleFeedback, type Env } from '../../worker/index';
+import worker, { handleFeedback, isSiteOrigin, type Env } from '../../worker/index';
 
 const SITE = 'https://shashank662.github.io';
 const good = { type: 'idea', message: 'A dark mode for the résumé?', page: '/', screen: 'laptop', theme: 'dark', token: 'ok-token' };
@@ -74,6 +74,37 @@ describe('POST /api/feedback', () => {
     expect(logged).toHaveBeenCalledWith('feedback refused from origin', 'https://elsewhere.example');
     expect(res.headers.get('Access-Control-Allow-Origin')).toBeNull();
     expect(calls).toHaveLength(0);
+  });
+
+  it('takes feedback from the site on its own domain and any subdomain of it', async () => {
+    for (const origin of ['https://shashankhr.in', 'https://www.shashankhr.in', 'https://blog.shashankhr.in']) {
+      outside();
+      const res = await handleFeedback(post(good, origin), env());
+      expect(res.status).toBe(201);
+      expect(res.headers.get('Access-Control-Allow-Origin')).toBe(origin);
+      const preflight = await handleFeedback(
+        new Request('https://portfolio.example.workers.dev/api/feedback', { method: 'OPTIONS', headers: { Origin: origin } }),
+        env(),
+      );
+      expect(preflight.headers.get('Access-Control-Allow-Origin')).toBe(origin);
+    }
+  });
+
+  it('refuses look-alikes of the domain, plain http, and other ports', () => {
+    const self = 'https://portfolio.example.workers.dev';
+    for (const origin of [
+      'https://evilshashankhr.in',
+      'https://shashankhr.in.evil.example',
+      'http://shashankhr.in',
+      'https://shashankhr.in:8443',
+      'https://shashankhr.in/',
+      'null',
+      '',
+    ]) {
+      expect(isSiteOrigin(origin, self), origin).toBe(false);
+    }
+    expect(isSiteOrigin('https://shashank662.github.io', self)).toBe(true);
+    expect(isSiteOrigin(self, self)).toBe(true);
   });
 
   it('says so when the secrets are not set up yet', async () => {

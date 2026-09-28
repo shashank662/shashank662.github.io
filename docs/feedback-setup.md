@@ -16,7 +16,9 @@ Everything below is done by the owner in Cloudflare and GitHub. No secret ever g
 ## 2. A Turnstile widget (Cloudflare's free check that a person is sending)
 
 1. Cloudflare dashboard → **Turnstile** → Add widget.
-2. Name: `portfolio-feedback`. Hostnames: `shashank662.github.io` and your Worker's `workers.dev` hostname.
+2. Name: `portfolio-feedback`. Hostnames: `shashankhr.in` (this covers its subdomains, such as `www.shashankhr.in`),
+   `shashank662.github.io`, and your Worker's `workers.dev` hostname. The Worker takes feedback from the same sites:
+   `shashankhr.in` and any subdomain of it over https, GitHub Pages, and its own address (`worker/index.ts`).
 3. Widget mode: **Managed**.
 4. Copy the **site key** (public) and the **secret key** (private).
 

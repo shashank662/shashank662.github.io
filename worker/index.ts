@@ -12,13 +12,27 @@ export interface Env {
   FEEDBACK_LIMIT?: { limit: (options: { key: string }) => Promise<{ success: boolean }> };
 }
 
-/** The pages allowed to send feedback: the site on GitHub Pages, and this Worker's own copy of it. */
-const SITE = 'https://shashank662.github.io';
+/** The owner's domain: the site may be served from it or any of its subdomains. */
+const DOMAIN = 'shashankhr.in';
+
+/**
+ * The pages allowed to send feedback: shashankhr.in and its subdomains over https, the site on GitHub Pages, and this
+ * Worker's own copy. The hostname is compared whole or after a dot, so a look-alike such as evilshashankhr.in is refused.
+ */
+export function isSiteOrigin(origin: string, self: string): boolean {
+  if (origin === self || origin === 'https://shashank662.github.io') return true;
+  try {
+    const url = new URL(origin);
+    const host = url.hostname;
+    return url.protocol === 'https:' && url.port === '' && url.origin === origin && (host === DOMAIN || host.endsWith(`.${DOMAIN}`));
+  } catch {
+    return false;
+  }
+}
 
 function cors(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') ?? '';
-  const self = new URL(request.url).origin;
-  if (origin !== SITE && origin !== self) return {};
+  if (!isSiteOrigin(origin, new URL(request.url).origin)) return {};
   return { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type', Vary: 'Origin' };
 }
 
