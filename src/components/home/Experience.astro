@@ -1,131 +1,140 @@
 ---
+// Experience: a slim timeline of the degree and the two roles, then each role newest first, always open, with what
+// was built in it linking to the case studies.
 import SectionHead from './SectionHead.astro';
-import { profile, type CareerSpan } from '../../data/profile';
-import { formatDuration, monthsBetween, spanPosition, toAttr, yearTicks } from '../../lib/dates';
+import { profile, type CareerProject, type CareerSpan } from '../../data/profile';
+import { formatDuration, formatRange, monthsBetween, spanPosition, toAttr, yearTicks } from '../../lib/dates';
 import { emphasize } from '../../lib/text';
 
 const { career } = profile;
+const dated = career.spans.filter((s): s is CareerSpan => !s.within);
+const projects = career.spans.filter((s): s is CareerProject => Boolean(s.within));
+const newestFirst = [...dated].sort((a, b) => b.start[0] * 12 + b.start[1] - (a.start[0] * 12 + a.start[1]));
 const ticks = yearTicks(career.axisStart);
-const colour = { muted: 'var(--muted)', ink: 'var(--ink)', accent: 'var(--accent)' } as const;
-/** A project is drawn across the role it was built in; everything else across its own dates. */
-const timingOf = (span: (typeof career.spans)[number]): CareerSpan => {
-  if (!span.within) return span;
-  const role = career.spans.find((s): s is CareerSpan => s.id === span.within);
-  if (!role) throw new Error(`profile.career has no span with id "${span.within}"`);
-  return role;
-};
 ---
 <section class="section wrap" id="exp">
-  <SectionHead n="02" label="Experience" meta={`GET /career · ${career.spans.length} spans · 200 OK`} />
+  <SectionHead n="02" label="Experience" />
   <h2 class="h2" set:html={emphasize(career.title)} />
   <p class="sub">{career.sub}</p>
 
-  <div class="trace" data-trace data-in-view data-axis={toAttr(career.axisStart)}>
-    <div class="axis mono" aria-hidden="true">
-      <span>span</span>
-      <div class="ticks" data-ticks>
-        {ticks.map((t) => <span data-year style={`left:${(t.left * 100).toFixed(3)}%`}>{t.year}</span>)}
-        <span class="now" data-now style="left:100%">now</span>
-      </div>
-      <span class="r">took</span>
-    </div>
-    <ol>
-      {career.spans.map((span, i) => {
-        const timing = timingOf(span);
-        const pos = spanPosition(timing.start, timing.end, career.axisStart);
-        const end = timing.end ? toAttr(timing.end) : '';
+  <div class="timeline" data-career data-in-view data-axis={toAttr(career.axisStart)} aria-hidden="true">
+    <div class="track">
+      {dated.map((span, i) => {
+        const pos = spanPosition(span.start, span.end, career.axisStart);
         return (
-          <li class={`lvl${span.level}`} style={`--i:${i};--c:${colour[span.tone]}`}>
-            <button type="button" class="head" data-row-toggle aria-controls={`span-${i}`}>
-              <span class="lbl"><span class="name">{span.name}</span><small class="mono">{span.tag}</small></span>
-              <span class="track" aria-hidden="true">
-                <span class="bar" data-bar data-start={toAttr(timing.start)} data-end={end} style={`--l:${pos.left};--w:${pos.width}`}></span>
-              </span>
-              {span.within ? (
-                <span class="dur" aria-hidden="true"></span>
-              ) : (
-                <span class="dur mono" data-duration data-start={toAttr(span.start)} data-end={end}>
-                  {formatDuration(monthsBetween(span.start, span.end))}
-                </span>
-              )}
-            </button>
-            <div class="more" id={`span-${i}`}><p>{span.detail}</p></div>
-          </li>
+          <span
+            class={`bar ${span.tone}`}
+            data-bar
+            data-start={toAttr(span.start)}
+            data-end={span.end ? toAttr(span.end) : ''}
+            style={`--l:${pos.left};--w:${pos.width};--i:${i}`}
+          ></span>
         );
       })}
-    </ol>
+    </div>
+    <div class="ticks mono" data-ticks>
+      {ticks.map((t) => <span data-year style={`left:${(t.left * 100).toFixed(3)}%`}>{t.year}</span>)}
+      <span class="now" data-now style="left:100%">now</span>
+    </div>
+    <ul class="key mono">
+      {dated.map((span) => <li><i class={span.tone}></i>{span.short}</li>)}
+    </ul>
   </div>
+
+  <ol class="roles">
+    {newestFirst.map((span) => {
+      const built = projects.filter((p) => p.within === span.id);
+      return (
+        <li class="role">
+          <div class="when">
+            <h3>{span.name}</h3>
+            <p class="mono">
+              {formatRange(span.start, span.end)} ·{' '}
+              <span data-duration data-start={toAttr(span.start)} data-end={span.end ? toAttr(span.end) : ''}>
+                {formatDuration(monthsBetween(span.start, span.end))}
+              </span>
+            </p>
+          </div>
+          <div class="what">
+            <p class="detail">{span.detail}</p>
+            {built.length > 0 && (
+              <>
+                <p class="label built">What I built</p>
+                <ul class="projects">
+                  {built.map((p) => (
+                    <li>
+                      <a href={p.href}><span class="pname">{p.name}<span class="arrow" aria-hidden="true">→</span></span><span class="note mono">{p.note}</span></a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {span.awards?.map((award) => <p class="award"><span aria-hidden="true">✺ </span>{award}</p>)}
+          </div>
+        </li>
+      );
+    })}
+  </ol>
 </section>
 
 <script>
   import '../../scripts/durations';
   import '../../scripts/in-view';
-  import '../../scripts/trace';
+  import '../../scripts/career';
 </script>
 
 <style>
-  .trace { margin-top: 44px; border-top: 1.5px solid var(--ink); }
-  .axis, .head {
-    display: grid; grid-template-columns: minmax(170px, 300px) 1fr 70px; gap: 22px; align-items: center;
-  }
-  .axis { padding: 10px 0; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); }
-  .r, .dur { text-align: right; }
-  .ticks { position: relative; height: 14px; }
-  /* :global, because trace.ts rebuilds the year labels and new elements don't carry Astro's scope attribute. */
-  .ticks :global(span) { position: absolute; top: 0; transform: translateX(-50%); }
-  .ticks :global(.now) { transform: translateX(-100%); color: var(--accent); }
-
-  li { border-bottom: 1px solid var(--line); }
-  .head { width: 100%; padding: 15px 0; text-align: left; }
-  .lbl { display: flex; align-items: baseline; gap: 10px; min-width: 0; font-size: 16px; transition: color 0.25s; }
-  .name { white-space: nowrap; }
-  .lbl small { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lvl0 .name { font-family: var(--font-mono); font-size: 13px; }
-  .lvl2 .lbl, .lvl2 .more { padding-left: 20px; }
-  li:global(.open) .lbl { color: var(--accent); }
-
-  .track { position: relative; display: block; height: 12px; background: var(--line2); }
+  /* The timeline: one track, the degree and the roles as bars across it, years under it and a key. */
+  .timeline { margin-top: 40px; }
+  .track { position: relative; height: 14px; background: var(--line2); }
   .bar {
     position: absolute; top: 0; bottom: 0; left: calc(var(--l) * 100%); width: max(calc(var(--w) * 100%), 6px);
-    background: var(--c); transform-origin: left;
-    transition: transform 1.3s var(--ease-out) calc(var(--i) * 110ms);
+    transform-origin: left; transition: transform 1.3s var(--ease-out) calc(var(--i) * 140ms);
   }
-  /* A project has no dates of its own: a dotted line across the role it was built in. */
-  .lvl2 .bar { top: 5px; bottom: 5px; background: repeating-linear-gradient(90deg, var(--c) 0 4px, transparent 4px 8px); opacity: 0.8; }
-  :global(.js) .trace .bar { transform: scaleX(0); }
-  :global(.js) .trace:global(.in) .bar { transform: scaleX(1); }
-  .dur { font-size: 12px; color: var(--muted); }
+  .ink { background: var(--ink); }
+  .accent-soft { background: color-mix(in srgb, var(--accent) 45%, var(--bg)); }
+  .accent { background: var(--accent); }
+  :global(.js) .timeline .bar { transform: scaleX(0); }
+  :global(.js) .timeline:global(.in) .bar { transform: scaleX(1); }
+  .ticks { position: relative; height: 16px; margin-top: 8px; font-size: 11px; color: var(--muted); }
+  /* :global, because career.ts rebuilds the year labels and new elements don't carry Astro's scope attribute. */
+  .ticks :global(span) { position: absolute; top: 0; transform: translateX(-50%); }
+  .ticks :global(.now) { transform: translateX(-100%); color: var(--accent); }
+  .key { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 14px; font-size: 12px; color: var(--muted); }
+  .key li { display: flex; align-items: center; gap: 8px; }
+  .key i { width: 12px; height: 12px; }
 
-  /* The row animates from 0fr to 1fr, so a detail opens to its full height however long it is.
-     Details are only collapsed when JavaScript runs (and are then hidden from screen readers too,
-     matching aria-expanded); without it they are simply all open. */
-  .more {
-    display: grid; grid-template-rows: 1fr; padding-bottom: 14px;
-    font-size: 15px; line-height: 1.6; color: var(--muted);
-    transition: grid-template-rows 0.5s var(--ease-out), padding 0.5s, visibility 0s 0.5s;
+  /* Each role: its name and dates on the left, what it was and what it built on the right. */
+  .roles { margin-top: 48px; border-top: 1.5px solid var(--ink); }
+  .role {
+    display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 16px 48px;
+    padding: 32px 0; border-bottom: 1px solid var(--line);
   }
-  .more > p { min-height: 0; overflow: hidden; }
-  :global(.js) .more { grid-template-rows: 0fr; padding-bottom: 0; visibility: hidden; }
-  :global(.js) li:global(.open) .more {
-    grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s;
+  h3 { font-size: clamp(20px, 1.8vw, 26px); font-weight: 600; line-height: 1.2; }
+  .when p { margin-top: 8px; font-size: 13px; color: var(--muted); }
+  .detail { font-size: 17px; line-height: 1.6; }
+  .built { margin-top: 22px; }
+  .projects { margin-top: 10px; border-top: 1px solid var(--line); }
+  .projects li { border-bottom: 1px solid var(--line); }
+  .projects a {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 24px;
+    padding: 12px 0; min-height: 44px;
   }
-  /* Hover opens rows for a mouse only: after a tap, a touch screen keeps :hover and the row could not close. */
-  @media (hover: hover) {
-    li:hover .lbl { color: var(--accent); }
-    :global(.js) li:hover .more {
-      grid-template-rows: 1fr; padding-bottom: 14px; visibility: visible; transition-delay: 0s;
-    }
-  }
+  .pname { font-size: 17px; font-weight: 600; transition: color 0.25s; }
+  .arrow { display: inline-block; margin-left: 6px; color: var(--accent); transition: transform 0.25s var(--ease-out); }
+  .note { font-size: 13px; color: var(--muted); }
+  .projects a:hover .pname { color: var(--accent); }
+  .projects a:hover .arrow { transform: translateX(4px); }
+  .award { margin-top: 18px; font-size: 15px; color: var(--muted); }
+  .award span { color: var(--accent); }
 
   @media (max-width: 760px) {
-    .axis, .head { grid-template-columns: 130px 1fr 52px; gap: 12px; }
+    .role { grid-template-columns: 1fr; padding: 26px 0; }
+    .detail, .pname { font-size: 16px; }
     /* Too narrow for every year: keep 2021, 2023, 2025 … and "now". */
     .ticks :global(span:nth-child(even):not(.now)) { display: none; }
-    .lbl { font-size: 14px; }
-    .lbl small { display: none; }
-    .name { white-space: normal; line-height: 1.25; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .bar, .more { transition: none; }
+    .bar, .arrow { transition: none; }
   }
 </style>
