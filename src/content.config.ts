@@ -19,6 +19,8 @@ const work = defineCollection({
     diagram: z.enum(DIAGRAM_IDS),
     steps: z.array(text).min(1),
     decisions: z.array(z.object({ title: text, body: text })).length(3),
+    /** The hardest tradeoff made, and why: shown before Results when there is one. */
+    tradeoff: z.object({ title: text, body: text }).optional(),
     /** Each supports **strong** text. */
     results: z.array(text).min(1),
     quote: text.optional(),
