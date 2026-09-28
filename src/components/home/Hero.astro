@@ -19,6 +19,19 @@ const { hero } = profile;
     </ol>
   </div>
 
+  {/* The best evidence first: three flagship results, each a link to its proof, and the two ways to go deeper. */}
+  <div class="proof">
+    <ul class="wins" aria-label="Flagship results">
+      {hero.proof.map((p) => (
+        <li><a href={p.href}><b class="display">{p.metric}</b><span>{p.text}</span><i aria-hidden="true">→</i></a></li>
+      ))}
+    </ul>
+    <div class="ctas">
+      <a class="cta primary" href="#work">View work</a>
+      <a class="cta" href={profile.links.resume} target="_blank" rel="noopener">Résumé</a>
+    </div>
+  </div>
+
   <h1 class="name display" aria-label={profile.name}>
     {words.map((word) => (
       <span class="word">{word.map(({ c, i }) => <span class="ch" aria-hidden="true"><span style={`--i:${i}`}>{c}</span></span>)}</span>
@@ -67,6 +80,28 @@ const { hero } = profile;
   .index a { display: flex; gap: 16px; transition: color 0.25s; }
   .index span { color: var(--muted); }
   .index a:hover { color: var(--accent); }
+
+  /* Proof under the intro: three flagship results as links, then the two ways in. It fills the space that used to sit
+     empty above the name, so visitors meet the evidence before they scroll. */
+  .proof { display: flex; flex-wrap: wrap; align-items: stretch; gap: 16px 28px; margin-top: 32px; }
+  .wins { display: grid; grid-template-columns: repeat(3, minmax(0, 260px)); gap: 12px; }
+  .wins a {
+    position: relative; display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 14px 16px 16px;
+    border: 1px solid var(--line); border-radius: 12px; transition: border-color 0.25s;
+  }
+  .wins a:hover { border-color: var(--accent); }
+  .wins b { font-size: clamp(24px, 2.2vw, 32px); line-height: 1; color: var(--accent); }
+  .wins span { font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+  .wins i { position: absolute; top: 14px; right: 14px; font-style: normal; color: var(--muted); transition: transform 0.25s var(--ease-out), color 0.25s; }
+  .wins a:hover i { transform: translateX(3px); color: var(--accent); }
+  .ctas { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+  .cta {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 22px;
+    border: 1px solid var(--ink); border-radius: 999px; font-size: 15px; font-weight: 600; white-space: nowrap;
+    transition: background 0.25s, color 0.25s;
+  }
+  .cta.primary { background: var(--ink); color: var(--bg); }
+  .cta:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
   .name {
     margin-top: auto; padding-top: 40px;
@@ -129,8 +164,18 @@ const { hero } = profile;
     .typed { margin-left: 0; }
   }
 
+  @media (max-width: 1100px) {
+    .wins { grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+    .ctas { flex-direction: row; }
+  }
+
   @media (max-width: 760px) {
     .index { display: none; }
+    .proof { margin-top: 24px; }
+    .wins { grid-template-columns: 1fr; gap: 8px; }
+    .wins a { flex-direction: row; align-items: baseline; gap: 12px; padding: 12px 36px 12px 14px; }
+    .wins b { flex: none; font-size: 22px; }
+    .ctas .cta { flex: 1; }
     .row2 { grid-template-columns: 1fr; }
     .lede-wrap { text-align: left; justify-self: start; }
     /* On a phone the line starts at the left already, and the longest one wraps once. */
