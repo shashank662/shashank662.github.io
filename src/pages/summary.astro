@@ -102,7 +102,7 @@ const printed = (href: string) => href.replace(/^(mailto:|https?:\/\/(www\.)?)/,
     @page { size: A4; margin: 16mm; }
     :global(html), :global(body) { background: #fff; color: #000; }
     :global(body::after), :global([data-header]), :global(footer), :global([data-progress]),
-    :global([data-cursor-dot]), :global([data-ask-open]), :global([data-ask-panel]), :global(.skip-link) {
+    :global([data-cursor-dot]), :global([data-ask-open]), :global([data-ask-panel]), :global([data-feedback-open]), :global([data-feedback-panel]), :global(.skip-link) {
       display: none !important;
     }
     .summary { max-width: none; padding: 0; }
