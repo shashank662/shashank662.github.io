@@ -1,7 +1,17 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 
-const pill = (page: Page) => page.getByRole('button', { name: 'Feedback' });
+const pill = (page: Page) => page.getByRole('button', { name: 'Feedback', exact: true });
+
+/** Opens the feedback form the way a visitor would: the Feedback button, or on a phone, through the Ask panel. */
+async function openForm(page: Page): Promise<void> {
+  if (await pill(page).isVisible()) {
+    await pill(page).click();
+    return;
+  }
+  await page.getByRole('button', { name: 'Ask about me' }).click();
+  await page.getByRole('dialog', { name: 'Ask about Shashank' }).getByRole('button', { name: /leave feedback/i }).click();
+}
 const panel = (page: Page) => page.getByRole('dialog', { name: 'Feedback on this site' });
 const ENDPOINT = 'https://feedback.test/api/feedback';
 
@@ -41,7 +51,28 @@ async function asIfSetUp(page: Page, reply: { status: number; body: Record<strin
   return sent;
 }
 
-test('the Feedback button sits at the bottom, clear of "Ask about me", on every page', async ({ page }) => {
+test('on a phone there is one floating button: feedback is reached through the Ask panel', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Phones only.');
+  await page.goto('/');
+  await expect(pill(page)).toBeHidden();
+  await openForm(page);
+  await expect(panel(page)).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Ask about Shashank' })).toBeHidden();
+  await page.keyboard.press('Escape');
+  await expect(panel(page)).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Ask about me' })).toBeFocused();
+});
+
+test('on a laptop the Feedback button is a small, quiet icon beside "Ask about me"', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Laptops only.');
+  await page.goto('/');
+  const box = (await pill(page).boundingBox())!;
+  expect(box.width).toBeLessThanOrEqual(44);
+  await expect(pill(page)).toHaveAttribute('title', 'Feedback');
+});
+
+test('the Feedback button sits at the bottom, clear of "Ask about me", on every page', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'On a phone the button lives in the Ask panel.');
   for (const path of ['/', '/work/auto-retry-framework']) {
     await page.goto(path);
     await expect(pill(page)).toBeVisible();
@@ -57,7 +88,7 @@ test('the Feedback button sits at the bottom, clear of "Ask about me", on every 
 
 test('the form asks what it is about, says it becomes public, and closes with Escape', async ({ page }) => {
   await page.goto('/');
-  await pill(page).click();
+  await openForm(page);
   await expect(panel(page)).toBeVisible();
   await expect(panel(page).getByRole('radio')).toHaveCount(3);
   await expect(panel(page).getByRole('radio', { name: "Something's broken" })).toBeChecked();
@@ -67,7 +98,9 @@ test('the form asks what it is about, says it becomes public, and closes with Es
 
   await page.keyboard.press('Escape');
   await expect(panel(page)).toBeHidden();
-  await expect(pill(page)).toBeFocused();
+  // Focus goes back to whichever button opened the form: Feedback, or on a phone, Ask about me.
+  const focused = await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? document.activeElement?.textContent?.trim());
+  expect(['Feedback', 'Ask about me']).toContain(focused);
 });
 
 test('the site sends to the Worker, with its Turnstile key', async ({ page }) => {
@@ -80,7 +113,7 @@ test('the site sends to the Worker, with its Turnstile key', async ({ page }) =>
 test('without the Worker set up, Send opens a filled-in GitHub issue', async ({ page, context }) => {
   await withSettings(page, '', '');
   await page.goto('/');
-  await pill(page).click();
+  await openForm(page);
   const send = panel(page).getByRole('button', { name: 'Continue on GitHub' });
   await send.click();
   await expect(panel(page).getByRole('alert')).toHaveText('Write a few words first.');
@@ -100,7 +133,7 @@ test('without the Worker set up, Send opens a filled-in GitHub issue', async ({ 
 test('once set up, a note goes to the Worker with the Turnstile token, and the visitor gets the issue link', async ({ page }) => {
   const sent = await asIfSetUp(page, { status: 201, body: { number: 12, url: 'https://github.com/shashank662/shashank662.github.io/issues/12' } });
   await page.goto('/');
-  await pill(page).click();
+  await openForm(page);
   await panel(page).getByRole('textbox').fill('Love the playground.');
   await panel(page).getByRole('radio', { name: 'Idea' }).check({ force: true });
   await expect.poll(() => page.evaluate(() => Boolean(window.turnstile))).toBe(true);
@@ -115,7 +148,7 @@ test('once set up, a note goes to the Worker with the Turnstile token, and the v
 test('if the Worker turns a note away, the form says why and offers GitHub instead', async ({ page }) => {
   await asIfSetUp(page, { status: 403, body: { error: "Couldn't confirm you're a person. Try again." } });
   await page.goto('/');
-  await pill(page).click();
+  await openForm(page);
   await panel(page).getByRole('textbox').fill('The menu overlaps on my tablet.');
   await expect.poll(() => page.evaluate(() => Boolean(window.turnstile))).toBe(true);
   await panel(page).getByRole('button', { name: 'Send' }).click();
@@ -145,7 +178,7 @@ test("if the Worker can't be reached, the form says so in plain words and offers
   );
   await page.route(ENDPOINT, (route) => route.abort('failed'));
   await page.goto('/');
-  await pill(page).click();
+  await openForm(page);
   await panel(page).getByRole('textbox').fill('The form will not send.');
   await expect.poll(() => page.evaluate(() => Boolean(window.turnstile))).toBe(true);
   await panel(page).getByRole('button', { name: 'Send' }).click();
@@ -158,7 +191,7 @@ test("if the Worker can't be reached, the form says so in plain words and offers
 test('the type buttons keep the site cursor, ringed like other controls', async ({ page, isMobile }) => {
   test.skip(isMobile, 'Phones have no pointer.');
   await page.goto('/');
-  await pill(page).click();
+  await openForm(page);
   const idea = panel(page).locator('.type span', { hasText: 'Idea' });
   await expect(idea).toHaveCSS('cursor', 'none');
   await idea.hover();
