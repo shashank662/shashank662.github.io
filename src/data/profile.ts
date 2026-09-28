@@ -24,19 +24,32 @@ export interface CareerSpan extends Span {
   short: string;
   /** Its colour in the timeline. */
   tone: 'ink' | 'accent-soft' | 'accent';
+  /** One short line for the Experience section. */
+  line: string;
+  /** The fuller account, for the chatbot. */
   detail: string;
   awards?: string[];
   within?: never;
 }
 
-/** Something built in a role: it links to its case study, with the number that sums it up. */
+/** Something built in a role: it links to its case study, with the number that sums it up and what it measures. */
 export interface CareerProject {
   name: string;
   /** The role it was built in. */
   within: 'internship' | 'full-time';
   href: string;
-  note: string;
+  figure: string;
+  caption: string;
   id?: never;
+}
+
+/** Work on this site that shows a skill in use. */
+export type Proof = 'retry' | 'rcs' | 'ai' | 'cart' | 'mongo-incident' | 'leak-incident' | 'sandbox';
+
+/** One row of the Stack section: a group from the résumé, and its skills with the work on this site that used them. */
+export interface SkillGroup {
+  group: string;
+  skills: { name: string; usedIn?: Proof[] }[];
 }
 
 export interface Incident {
@@ -76,7 +89,16 @@ export interface Profile {
   metaDescription: string;
   links: { email: string; linkedin: string; github: string; resume: string };
   /** `quick` invites people short on time to the 60-second view, in the first screen. */
-  hero: { label: string; intro: string; quick: string; lede: string; badge: string; typedLines: string[] };
+  hero: {
+    label: string;
+    intro: string;
+    quick: string;
+    /** Flagship results shown straight under the intro, each linking to its proof. */
+    proof: { metric: string; text: string; href: string }[];
+    lede: string;
+    badge: string;
+    typedLines: string[];
+  };
   sections: { n: string; label: string; href: string }[];
   strips: { skills: string[]; highlights: string[] };
   about: { paragraph: string; facts: Fact[] };
@@ -85,6 +107,8 @@ export interface Profile {
   education: { degree: string; school: string; cgpa: string };
   /** The 60-second view: a one-line description and the top wins, each with its number. */
   summary: { description: string; wins: { metric: string; text: string; href: string }[] };
+  /** The Stack section: the résumé's skills, grouped as on the résumé. */
+  stack: { title: string; sub: string; proofs: Record<Proof, { label: string; href: string }>; groups: SkillGroup[] };
   career: { axisStart: YearMonth; title: string; sub: string; spans: (CareerSpan | CareerProject)[] };
   incidents: { title: string; sub: string; items: Incident[] };
   work: { title: string; brief: WorkRow & { title: string; more: string } };
@@ -120,22 +144,28 @@ export const profile: Profile = {
     intro:
       'Backend engineer at Engati, Bangalore. 2+ years full-time (after a 6-month internship) building Java & Spring Boot services for a high-volume B2B messaging platform.',
     quick: 'Short on time? Read the 60-second summary',
+    proof: [
+      { metric: '45%', text: 'of failed deliveries recovered on the first retry', href: '/work/auto-retry-framework' },
+      { metric: '~8M / day', text: 'billing events, each counted once, even on a re-run', href: '/work/rcs-billing-pipeline' },
+      { metric: '30–60 min', text: 'daily review time per developer, down from ~2 h', href: '/work/ai-code-reviewer' },
+    ],
     lede: 'I build *reliable backends* for high‑volume messaging.',
     badge: 'Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺',
     typedLines: [
       '~2M api triggers a day · 50k–100k retries',
       'java · spring boot · kafka · redis · mongodb',
-      'failure rate: 35% → 12%',
+      '45% of failed deliveries saved on 1st retry',
       'open to sde-2 roles · 2026',
     ],
   },
   sections: [
     { n: '01', label: 'About', href: '#about' },
-    { n: '02', label: 'Experience', href: '#exp' },
-    { n: '03', label: 'Work', href: '#work' },
-    { n: '04', label: 'Incidents', href: '#incidents' },
-    { n: '05', label: 'Playground', href: '#play' },
-    { n: '06', label: 'Contact', href: '#contact' },
+    { n: '02', label: 'Stack', href: '#stack' },
+    { n: '03', label: 'Experience', href: '#exp' },
+    { n: '04', label: 'Work', href: '#work' },
+    { n: '05', label: 'Incidents', href: '#incidents' },
+    { n: '06', label: 'Playground', href: '#play' },
+    { n: '07', label: 'Contact', href: '#contact' },
   ],
   strips: {
     skills: ['Java', 'Spring Boot', 'Apache Kafka', 'RabbitMQ', 'Redis', 'MongoDB', 'Spark', 'AWS S3', 'Microservices'],
@@ -148,7 +178,6 @@ export const profile: Profile = {
       { key: 'based_in', value: 'Bangalore, IN' },
       { key: 'engati', value: 'SDE · Jul 2024 → now', span: FULL_TIME },
       { key: '', value: 'intern · Jan → Jun 2024', span: INTERNSHIP },
-      { key: 'stack', value: 'Java · Spring Boot · Kafka' },
       { key: 'education', value: 'B.E. ISE · CGPA 9.47' },
       { key: 'awards', value: AWARDS[0] },
       { key: 'status', value: '● open to SDE-2 roles', tone: 'ok' },
@@ -161,10 +190,63 @@ export const profile: Profile = {
     description:
       'Shashank H R in 60 seconds: backend engineer at Engati in Bangalore, his top wins with numbers, stack, education and résumé.',
     wins: [
-      { metric: '35% → 12%', text: 'failure rate on ~2M API triggers a day', href: '/work/auto-retry-framework' },
-      { metric: '2 h → 30 min', text: 'code review for ~20 developers, with a company award', href: '/work/ai-code-reviewer' },
+      { metric: '45%', text: 'of failed deliveries recovered on the first retry, across ~2M API triggers a day', href: '/work/auto-retry-framework' },
+      { metric: '2 h → 30–60 min', text: 'review time per developer per day for ~20 developers, with a company award', href: '/work/ai-code-reviewer' },
       { metric: '−60%', text: 'production MongoDB memory usage', href: '/#incidents' },
       { metric: '1–2 sprints', text: 'to ship a full-stack abandoned-cart flow as an intern', href: '/work/abandoned-cart-recovery' },
+    ],
+  },
+  stack: {
+    title: 'Stack',
+    sub: 'The tools I work with, grouped as on my résumé. Pick one to see where I used it.',
+    proofs: {
+      retry: { label: 'Auto-retry framework', href: '/work/auto-retry-framework' },
+      rcs: { label: 'RCS billing pipeline', href: '/work/rcs-billing-pipeline' },
+      ai: { label: 'AI code reviewer', href: '/work/ai-code-reviewer' },
+      cart: { label: 'Abandoned-cart recovery', href: '/work/abandoned-cart-recovery' },
+      'mongo-incident': { label: 'Incident: cluster running out of memory', href: '/#incidents' },
+      'leak-incident': { label: 'Incident: a service leaking memory', href: '/#incidents' },
+      sandbox: { label: 'Prod sandbox', href: '/#work' },
+    },
+    // The groups and names are the résumé's own. usedIn lists only work shown on this site.
+    groups: [
+      { group: 'Languages', skills: [{ name: 'Java', usedIn: ['retry', 'cart'] }, { name: 'Python', usedIn: ['leak-incident'] }, { name: 'SQL' }] },
+      {
+        group: 'Backend',
+        skills: [
+          { name: 'Spring Boot', usedIn: ['retry', 'ai', 'cart'] },
+          { name: 'REST APIs', usedIn: ['retry'] },
+          { name: 'Microservices Architecture', usedIn: ['retry', 'cart'] },
+        ],
+      },
+      {
+        group: 'Messaging & Caching',
+        skills: [{ name: 'Apache Kafka', usedIn: ['rcs', 'cart'] }, { name: 'RabbitMQ', usedIn: ['retry'] }, { name: 'Redis', usedIn: ['retry'] }],
+      },
+      {
+        group: 'Data Engineering',
+        skills: [{ name: 'Apache Spark', usedIn: ['rcs'] }, { name: 'Apache Iceberg' }, { name: 'Maxwell' }, { name: 'Change Data Capture (CDC)' }],
+      },
+      {
+        group: 'Databases & Search',
+        skills: [{ name: 'MongoDB', usedIn: ['retry', 'mongo-incident'] }, { name: 'MySQL' }, { name: 'Elasticsearch' }],
+      },
+      {
+        group: 'Cloud & Infrastructure',
+        skills: [
+          { name: 'AWS S3', usedIn: ['rcs'] },
+          { name: 'Docker' },
+          { name: 'Nginx', usedIn: ['sandbox'] },
+          { name: 'Jenkins' },
+          { name: 'Git' },
+          { name: 'CI/CD' },
+        ],
+      },
+      {
+        group: 'AI & LLM',
+        skills: [{ name: 'LLM-based Applications', usedIn: ['ai'] }, { name: 'AI Agents', usedIn: ['ai'] }, { name: 'Runtime Python Tool Calls' }],
+      },
+      { group: 'Frontend', skills: [{ name: 'React' }] },
     ],
   },
   career: {
@@ -172,13 +254,13 @@ export const profile: Profile = {
     title: 'Experience',
     sub: 'Two roles at Engati, and the degree before them. Each project links to its case study.',
     spans: [
-      { id: 'education', name: EDUCATION.degree, short: 'B.E.', tone: 'ink', ...STUDIES, detail: `${EDUCATION.school}. Graduated with a ${EDUCATION.cgpa} CGPA.` },
-      { id: 'internship', name: 'Engati · SDE intern', short: 'Intern', tone: 'accent-soft', ...INTERNSHIP, detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
-      { name: 'Abandoned-cart recovery', within: 'internship', href: '/work/abandoned-cart-recovery', note: '1–2 sprints, end to end' },
-      { id: 'full-time', name: 'Engati · Software Engineer', short: 'Software Engineer', tone: 'accent', ...FULL_TIME, detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform.', awards: [AWARDS[0]] },
-      { name: 'Auto-retry framework', within: 'full-time', href: '/work/auto-retry-framework', note: '35% → 12% failures' },
-      { name: 'RCS billing pipeline', within: 'full-time', href: '/work/rcs-billing-pipeline', note: 'Kafka · S3 · Spark' },
-      { name: 'AI code reviewer', within: 'full-time', href: '/work/ai-code-reviewer', note: '2 h → 30 min per review' },
+      { id: 'education', name: EDUCATION.degree, short: 'B.E.', tone: 'ink', ...STUDIES, line: `JSS STU, Mysuru · CGPA ${EDUCATION.cgpa}`, detail: `${EDUCATION.school}. Graduated with a ${EDUCATION.cgpa} CGPA.` },
+      { id: 'internship', name: 'Engati · SDE intern', short: 'Intern', tone: 'accent-soft', ...INTERNSHIP, line: 'Shipped a full-stack abandoned-cart flow in 1–2 sprints.', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
+      { name: 'Abandoned-cart recovery', within: 'internship', href: '/work/abandoned-cart-recovery', figure: '1–2 sprints', caption: 'from design to production' },
+      { id: 'full-time', name: 'Engati · Software Engineer', short: 'Software Engineer', tone: 'accent', ...FULL_TIME, line: 'Java & Spring Boot microservices for a high-volume messaging platform.', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform.', awards: [AWARDS[0]] },
+      { name: 'Auto-retry framework', within: 'full-time', href: '/work/auto-retry-framework', figure: '45%', caption: 'failed deliveries recovered on the first retry' },
+      { name: 'RCS billing pipeline', within: 'full-time', href: '/work/rcs-billing-pipeline', figure: '~8M', caption: 'billing events a day' },
+      { name: 'AI code reviewer', within: 'full-time', href: '/work/ai-code-reviewer', figure: '2 h → 30–60 min', caption: 'review time per developer per day' },
     ],
   },
   incidents: {
@@ -224,14 +306,14 @@ export const profile: Profile = {
       cardTag: 'Platform',
       cardMetric: '40–50',
       cardLabel: 'people testing safely · zero production impact',
-      more: 'A production-isolated sandbox built with Nginx rerouting. 40–50 people across engineering, FDE and support test there safely, with zero impact on production.',
+      more: 'A production-isolated sandbox built with Nginx rerouting. 40–50 people across engineering, FDE and support test there safely, with zero impact on production. I wrote its configuration, database and backend; the DevOps team scripted the Nginx routing.',
     },
   },
   playground: {
-    title: 'The retry flow, live',
-    sub: 'My Engati auto-retry framework, running live. Triggers flow out to Meta; failures come back as webhooks, through the analytics pipeline, to trigger-mvc. Retryable ones wait in RabbitMQ with back-off, then go out again with their original payload, fetched from MongoDB by trackerId. Switch the framework off, or have Meta send a burst of error webhooks, and watch the failure rate.',
+    title: 'The retry flow, simulated',
+    sub: 'An interactive simulation of my Engati auto-retry framework; its numbers are illustrative, not production data. Triggers flow out to Meta; failures come back as webhooks, through the analytics pipeline, to trigger-mvc. Retryable ones wait in RabbitMQ with back-off, then go out again with their original payload, fetched from MongoDB by trackerId. Switch the framework off, or have Meta send a burst of error webhooks, and watch the failure rate.',
     canvasLabel:
-      'Live model of the auto-retry framework. Triggers travel from the integrations through the API gateway, trigger-mvc and the messaging pipeline to Meta; messaging keeps each trackerId in Redis. Failed deliveries come back through the webhook receiver and the analytics pipeline to trigger-mvc. Retryable ones wait in RabbitMQ, then trigger-mvc fetches the original payload from MongoDB and sends them again.',
+      'Interactive simulation of the auto-retry framework, with illustrative numbers. Triggers travel from the integrations through the API gateway, trigger-mvc and the messaging pipeline to Meta; messaging keeps each trackerId in Redis. Failed deliveries come back through the webhook receiver and the analytics pipeline to trigger-mvc. Retryable ones wait in RabbitMQ, then trigger-mvc fetches the original payload from MongoDB and sends them again.',
   },
   contact: {
     prompt: 'Got a role in mind?',
