@@ -60,48 +60,37 @@ test('the typed line grows from a prompt that stays put, so typing never slides 
   expect(new Set(prompts).size).toBe(1);
 });
 
-test('the career trace dates the degree and roles, not the projects, and opens rows on click', async ({ page }) => {
+test('Experience lists the roles newest first, open, with their dates and what each built', async ({ page }) => {
   await page.goto('/#exp');
-  await expect(page.getByText('GET /career · 8 spans · 200 OK')).toBeVisible();
+  const exp = page.locator('#exp');
+  // Nothing that reads like leftover debug output.
+  await expect(exp.getByText(/GET \/career|200 OK|root span/)).toHaveCount(0);
 
-  // The root span, the degree and the two roles show how long they took; the projects built in them carry no dates.
-  const durations = page.locator('#exp [data-duration]');
-  await expect(durations).toHaveCount(4);
+  await expect(exp.getByRole('heading', { level: 3 })).toHaveText([
+    'Engati · Software Engineer',
+    'Engati · SDE intern',
+    'B.E., Information Science',
+  ]);
+  await expect(exp.getByText('Jul 2024 – now')).toBeVisible();
+  await expect(exp.getByText('Jan – Jun 2024')).toBeVisible();
+  await expect(exp.getByText('Aug 2020 – Jul 2024')).toBeVisible();
+  const durations = exp.locator('.roles [data-duration]');
+  await expect(durations).toHaveCount(3);
   for (const text of await durations.allTextContents()) expect(text.trim()).toMatch(DURATION);
-  await expect(page.locator('#exp li.lvl2')).toHaveCount(4);
-  await expect(page.locator('#exp li.lvl2 [data-duration]')).toHaveCount(0);
 
-  const first = page.locator('#exp [data-row-toggle]').first();
-  await expect(first).toHaveAttribute('aria-expanded', 'false');
-  await first.click();
-  await expect(first).toHaveAttribute('aria-expanded', 'true');
-});
-
-test('a trace row hides its detail until opened, shows all of it, and closes again', async ({ page, isMobile }) => {
-  await page.goto('/#exp');
-  // The auto-retry row has one of the longest details.
-  const row = page.locator('#exp [data-row-toggle]').nth(5);
-  const detail = page.locator('#span-5');
-  const press = () => (isMobile ? row.tap() : row.click());
-  // How far the text runs past the bottom of its box; above 0 means the last line is cut off.
-  const overflow = () =>
-    detail.evaluate((el) => {
-      const text = document.createRange();
-      text.selectNodeContents(el);
-      return text.getBoundingClientRect().bottom - el.getBoundingClientRect().bottom;
-    });
-
-  await expect(detail).toBeHidden();
-  await press();
-  await expect(row).toHaveAttribute('aria-expanded', 'true');
-  await expect(detail).toBeVisible();
-  await expect.poll(overflow).toBeLessThanOrEqual(0.5);
-
-  await press();
-  // A mouse resting on a row opens it on purpose, so move it away; a finger leaves nothing behind.
-  if (!isMobile) await page.mouse.move(0, 0);
-  await expect(row).toHaveAttribute('aria-expanded', 'false');
-  await expect(detail).toBeHidden();
+  // Every project links to its case study, with its number showing, no hover or tap needed.
+  const links = exp.locator('.projects a');
+  await expect(links).toHaveCount(4);
+  expect(await links.evaluateAll((all) => all.map((a) => a.getAttribute('href')))).toEqual([
+    '/work/auto-retry-framework',
+    '/work/rcs-billing-pipeline',
+    '/work/ai-code-reviewer',
+    '/work/abandoned-cart-recovery',
+  ]);
+  await expect(exp.getByText('35% → 12% failures')).toBeVisible();
+  await expect(exp.getByText(/Employee of the Month ×2/)).toBeVisible();
+  // A timeline key names each bar.
+  await expect(exp.locator('.key li')).toHaveText(['B.E.', 'Intern', 'Software Engineer']);
 });
 
 test('the timeline follows the visitor’s date, and no year label runs into "now"', async ({ page }) => {
@@ -184,9 +173,10 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('#incidents .bar i').first()).toHaveCSS('transform', 'none');
   });
 
-  test('the career trace details are open', async ({ page }) => {
+  test('the roles and their projects all show', async ({ page }) => {
     await page.goto('/#exp');
-    await expect(page.locator('#span-5')).toBeVisible();
+    await expect(page.locator('#exp .projects a')).toHaveCount(4);
+    await expect(page.locator('#exp .projects a').first()).toBeVisible();
   });
 });
 
@@ -299,4 +289,35 @@ test.describe('on a tablet held upright', () => {
     expect(Math.abs(lede.x - name.x)).toBeLessThan(12);
     expect(Math.abs(typed.x - name.x)).toBeLessThan(12);
   });
+});
+
+test('the header links to the résumé and LinkedIn, as text on wide screens and icons on a phone', async ({ page, isMobile }) => {
+  await page.goto('/');
+  const header = page.locator('[data-header]');
+  const resume = header.getByRole('link', { name: 'Résumé' });
+  const linkedin = header.getByRole('link', { name: 'LinkedIn' });
+  await expect(resume).toHaveAttribute('href', '/resume.pdf');
+  await expect(linkedin).toHaveAttribute('href', /^https:\/\/www\.linkedin\.com\/in\//);
+  for (const link of [resume, linkedin]) {
+    await expect(link).toBeVisible();
+    await expect(link.locator('svg')).toBeVisible({ visible: isMobile });
+  }
+  // The header still fits on one line, inside the screen.
+  const width = page.viewportSize()?.width ?? 0;
+  const boxes = await header.locator('nav > *').evaluateAll((items) =>
+    items.map((el) => el.getBoundingClientRect()).filter((box) => box.width > 0).map((box) => box.toJSON()),
+  );
+  expect(Math.max(...boxes.map((b) => b.right))).toBeLessThanOrEqual(width);
+  const middles = boxes.map((b) => b.top + b.height / 2);
+  expect(Math.max(...middles) - Math.min(...middles)).toBeLessThanOrEqual(2);
+});
+
+test('the favicon is the S outline, drawn without depending on any installed font', async ({ page, request }) => {
+  await page.goto('/');
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/favicon.svg');
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute('href', '/apple-touch-icon.png');
+  const svg = await (await request.get('/favicon.svg')).text();
+  expect(svg).not.toContain('<text');
+  expect(svg).toContain('<path');
+  expect((await request.get('/apple-touch-icon.png')).headers()['content-type']).toBe('image/png');
 });
