@@ -12,6 +12,7 @@ const { hero } = profile;
     <div>
       <p class="label">{hero.label}</p>
       <p class="intro">{hero.intro}</p>
+      <a class="quick" href="/summary">{hero.quick}<span class="arrow" aria-hidden="true"> →</span></a>
     </div>
     <ol class="index mono" aria-label="Sections">
       {profile.sections.map((s) => <li><a href={s.href}><span>{s.n}</span>{s.label}</a></li>)}
@@ -53,6 +54,14 @@ const { hero } = profile;
   }
   .meta { display: flex; justify-content: space-between; gap: 32px; }
   .intro { max-width: 350px; margin-top: 12px; font-size: 15px; line-height: 1.55; color: var(--muted); }
+  /* The 60-second view, offered where everyone looks first: a bold accent link, easy to tap. */
+  .quick {
+    display: inline-flex; align-items: center; min-height: 44px; margin-top: 10px;
+    font-size: 16px; font-weight: 600; color: var(--accent);
+    text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px;
+  }
+  .quick .arrow { display: inline-block; margin-left: 4px; transition: transform 0.25s var(--ease-out); }
+  .quick:hover .arrow { transform: translateX(4px); }
   .index { font-size: 12px; line-height: 2.1; }
   .index a { display: flex; gap: 16px; transition: color 0.25s; }
   .index span { color: var(--muted); }
