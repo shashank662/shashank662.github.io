@@ -321,3 +321,22 @@ test('the favicon is the S outline, drawn without depending on any installed fon
   expect(svg).toContain('<path');
   expect((await request.get('/apple-touch-icon.png')).headers()['content-type']).toBe('image/png');
 });
+
+test('the About words light up as they reach the middle of the screen, not before', async ({ page }) => {
+  await page.goto('/');
+  const paragraph = page.locator('[data-word-reveal]');
+  /** Scrolls so the paragraph's top sits at `share` of the screen height, then reads the first word's light. */
+  const litAt = async (share: number) =>
+    paragraph.evaluate(async (el, s) => {
+      const top = el.getBoundingClientRect().top + scrollY;
+      scrollTo({ top: top - innerHeight * s, behavior: 'instant' });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return Number((el.querySelector('.w') as HTMLElement).style.getPropertyValue('--lit') || 0);
+    }, share);
+
+  // In the lower part of the screen the words wait, still dim.
+  expect(await litAt(0.8)).toBe(0);
+  expect(await litAt(0.65)).toBe(0);
+  // Once the paragraph reaches the middle, its first words light up.
+  expect(await litAt(0.45)).toBeGreaterThan(0.5);
+});
