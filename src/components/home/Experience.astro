@@ -13,7 +13,7 @@ const newestFirst = [...dated].sort((a, b) => b.start[0] * 12 + b.start[1] - (a.
 const ticks = yearTicks(career.axisStart);
 ---
 <section class="section wrap" id="exp">
-  <SectionHead n="02" label="Experience" />
+  <SectionHead n="03" label="Experience" />
   <h2 class="h2" set:html={emphasize(career.title)} />
   <p class="sub">{career.sub}</p>
 
@@ -56,14 +56,17 @@ const ticks = yearTicks(career.axisStart);
             </p>
           </div>
           <div class="what">
-            <p class="detail">{span.detail}</p>
+            <p class="detail">{span.line}</p>
             {built.length > 0 && (
               <>
                 <p class="label built">What I built</p>
                 <ul class="projects">
                   {built.map((p) => (
                     <li>
-                      <a href={p.href}><span class="pname">{p.name}<span class="arrow" aria-hidden="true">→</span></span><span class="note mono">{p.note}</span></a>
+                      <a href={p.href}>
+                        <span class="pname">{p.name}<span class="arrow" aria-hidden="true">→</span></span>
+                        <span class="stat"><span class="figure">{p.figure}</span><span class="caption mono">{p.caption}</span></span>
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -117,12 +120,15 @@ const ticks = yearTicks(career.axisStart);
   .projects { margin-top: 10px; border-top: 1px solid var(--line); }
   .projects li { border-bottom: 1px solid var(--line); }
   .projects a {
-    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 24px;
-    padding: 12px 0; min-height: 44px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 24px;
+    padding: 14px 0; min-height: 44px;
   }
   .pname { font-size: 17px; font-weight: 600; transition: color 0.25s; }
   .arrow { display: inline-block; margin-left: 6px; color: var(--accent); transition: transform 0.25s var(--ease-out); }
-  .note { font-size: 13px; color: var(--muted); }
+  /* The number that sums up each project, big, with what it measures under it. */
+  .stat { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+  .figure { font-size: clamp(22px, 2.2vw, 30px); font-weight: 600; line-height: 1.1; color: var(--accent); white-space: nowrap; }
+  .caption { margin-top: 2px; font-size: 12px; color: var(--muted); }
   .projects a:hover .pname { color: var(--accent); }
   .projects a:hover .arrow { transform: translateX(4px); }
   .award { margin-top: 18px; font-size: 15px; color: var(--muted); }
@@ -131,6 +137,7 @@ const ticks = yearTicks(career.axisStart);
   @media (max-width: 760px) {
     .role { grid-template-columns: 1fr; padding: 26px 0; }
     .detail, .pname { font-size: 16px; }
+    .stat { align-items: flex-start; text-align: left; }
     /* Too narrow for every year: keep 2021, 2023, 2025 … and "now". */
     .ticks :global(span:nth-child(even):not(.now)) { display: none; }
   }
