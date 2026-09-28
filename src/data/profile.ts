@@ -15,26 +15,27 @@ export interface Fact {
   tone?: 'ok';
 }
 
-interface CareerRow {
+/** A dated entry in Experience: the degree or a role. */
+export interface CareerSpan extends Span {
+  /** Lets other parts of the site (the chatbot, the 60-second view) find this entry. */
+  id: 'education' | 'internship' | 'full-time';
   name: string;
-  tag: string;
-  tone: 'muted' | 'ink' | 'accent';
+  /** Its name in the timeline's key, e.g. "Intern". */
+  short: string;
+  /** Its colour in the timeline. */
+  tone: 'ink' | 'accent-soft' | 'accent';
   detail: string;
-}
-
-/** A dated span on the career trace: the whole career, the degree or a role. */
-export interface CareerSpan extends Span, CareerRow {
-  /** Lets other parts of the site (the chatbot) find this span. */
-  id?: 'education' | 'internship' | 'full-time';
-  level: 0 | 1;
+  awards?: string[];
   within?: never;
 }
 
-/** Something built inside a role. It has no dates of its own, so it is drawn across that role's time. */
-export interface CareerProject extends CareerRow {
-  level: 2;
+/** Something built in a role: it links to its case study, with the number that sums it up. */
+export interface CareerProject {
+  name: string;
   /** The role it was built in. */
   within: 'internship' | 'full-time';
+  href: string;
+  note: string;
   id?: never;
 }
 
@@ -169,16 +170,15 @@ export const profile: Profile = {
   career: {
     axisStart: [2020, 7],
     title: 'Experience',
-    sub: 'Read it like a request trace: my degree, internship, full-time role and the systems I built are spans on one timeline. Hover a row to open it.',
+    sub: 'Two roles at Engati, and the degree before them. Each project links to its case study.',
     spans: [
-      { name: 'GET /career', tag: 'root span', level: 0, start: [2020, 8], end: null, tone: 'muted', detail: 'Everything so far. Still running, status 200.' },
-      { id: 'education', name: EDUCATION.degree, tag: 'JSS STU, Mysuru', level: 1, ...STUDIES, tone: 'ink', detail: `${EDUCATION.school}. Graduated with a ${EDUCATION.cgpa} CGPA.` },
-      { id: 'internship', name: 'Engati · SDE intern', tag: '6 months', level: 1, ...INTERNSHIP, tone: 'accent', detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
-      { name: 'Abandoned-cart recovery', tag: 'shopify · duckdb · kafka', level: 2, within: 'internship', tone: 'accent', detail: 'Shopify popup → @Async shopper lookups (our DB → Shopify GraphQL → DuckDB) → Kafka → branded short link → message. Designed and tested end to end.' },
-      { id: 'full-time', name: 'Engati · Software Engineer', tag: 'full-time', level: 1, ...FULL_TIME, tone: 'accent', detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform. Employee of the Month twice (“Always at 110%”).' },
-      { name: 'Auto-retry framework', tag: 'java · redis · rabbitmq', level: 2, within: 'full-time', tone: 'accent', detail: 'Failed Meta deliveries come back as webhooks; retryable ones are re-sent via RabbitMQ with back-off, keyed by a trackerId. ~2M triggers and 50K–100K retries a day. Failure rate 35% → 12%.' },
-      { name: 'RCS billing pipeline', tag: 'kafka · s3 · spark', level: 2, within: 'full-time', tone: 'accent', detail: 'Webhooks → Kafka → S3, aggregated by idempotent, replay-safe Spark jobs for accurate customer billing.' },
-      { name: 'AI code reviewer', tag: 'spring boot · llm', level: 2, within: 'full-time', tone: 'accent', detail: 'Reviews GitLab MRs with an LLM from a Slack trigger. ~20 developers, ~2 h → ~30 min per review, company award.' },
+      { id: 'education', name: EDUCATION.degree, short: 'B.E.', tone: 'ink', ...STUDIES, detail: `${EDUCATION.school}. Graduated with a ${EDUCATION.cgpa} CGPA.` },
+      { id: 'internship', name: 'Engati · SDE intern', short: 'Intern', tone: 'accent-soft', ...INTERNSHIP, detail: 'Shipped a full-stack abandoned-cart recovery flow in one to two sprints, and hardened order validation and identity checks with senior engineers.' },
+      { name: 'Abandoned-cart recovery', within: 'internship', href: '/work/abandoned-cart-recovery', note: '1–2 sprints, end to end' },
+      { id: 'full-time', name: 'Engati · Software Engineer', short: 'Software Engineer', tone: 'accent', ...FULL_TIME, detail: 'Java & Spring Boot microservices for a high-volume B2B SaaS messaging platform.', awards: [AWARDS[0]] },
+      { name: 'Auto-retry framework', within: 'full-time', href: '/work/auto-retry-framework', note: '35% → 12% failures' },
+      { name: 'RCS billing pipeline', within: 'full-time', href: '/work/rcs-billing-pipeline', note: 'Kafka · S3 · Spark' },
+      { name: 'AI code reviewer', within: 'full-time', href: '/work/ai-code-reviewer', note: '2 h → 30 min per review' },
     ],
   },
   incidents: {
