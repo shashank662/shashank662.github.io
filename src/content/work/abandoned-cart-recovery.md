@@ -4,7 +4,7 @@ kicker: "Engati · Internship · full stack"
 title: "Abandoned-cart recovery"
 lede: "High-intent shoppers who leave a Shopify store get a personal nudge to come back: a branded link, and a discount if the store offers one. I designed and shipped it end to end as an intern, in *one to two sprints*."
 meta:
-  - { label: "Role", value: "Built it end to end (intern)" }
+  - { label: "Role", value: "Designed & built it (intern)" }
   - { label: "Stack", value: "Shopify Liquid · Spring Boot @Async · Shopify GraphQL · DuckDB · Kafka" }
   - { label: "Timeline", value: "1–2 sprints" }
   - { label: "Status", value: "shipped", tone: "ok" }
@@ -48,3 +48,5 @@ ask:
 ---
 
 A store can only win back an abandoned cart if it can reach the shopper. Shopify doesn’t share a customer’s details across stores, so someone new to one store is often unknown there, even if they have ordered elsewhere.
+
+As an intern, I designed and built it from scratch; rollout was with the DevOps team.
