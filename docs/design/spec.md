@@ -27,7 +27,7 @@ A personal portfolio for a backend engineer (Java / Spring Boot, ~2 years full-t
 The approved direction mixes two explored concepts:
 
 - **Kinetic editorial** (concept C): huge condensed type, a serif italic for accents, magazine-style section labels like `(03) Selected work`, generous whitespace, thin rules.
-- **Live system** (concept A): technical touches — a live status line, the career drawn as a request trace, incident write-ups, and a playground that simulates the real retry framework.
+- **Live system** (concept A): technical touches — a live status line, the career on a slim timeline, incident write-ups, and a playground that simulates the real retry framework.
 
 Motion is calm and purposeful. Hover effects are subtle (a soft row tint and a small card next to the cursor); there are no large cursor blobs or effects that cover content.
 
@@ -65,7 +65,7 @@ Adobe's Source family: a serif for headings and big numbers, a sans for text, a 
 |---|---|
 | Source Serif 4 (variable: weight and optical size) | the hero name, section titles (semibold), case study, work and incident titles, big numbers (bold); normal case. Big sizes get its display design automatically |
 | Source Sans 3 (300–600) | ledes (light), body text and UI |
-| Source Code Pro | technical labels, logs, diagram text, the career trace |
+| Source Code Pro | technical labels, logs, diagram text, the career timeline's dates |
 | Instrument Serif italic | only the two crossing bands on the home page, in normal case: the one slanted text on the site (the owner's pick, from the site's first design) |
 
 Emphasis is never italic: accent words are semibold in the accent colour. The crossing bands are the one exception.
@@ -93,6 +93,8 @@ Emphasis is never italic: accent words are semibold in the accent colour. The cr
 
 Every page shares the same header, footer, and "Ask about me" button (section 9).
 
+The favicon is the landing screen's mark: the S of Source Serif 4 Bold as an outline (never text, so it looks the same whatever fonts are installed), light on the dark `#141414` screen with the blue outline printed slightly off. `apple-touch-icon.png` is the same mark at 180px, filled edge to edge, for phone home screens.
+
 ## 5. Home page
 
 **Landing screen.** A first visit opens on a short animation, then the home page.
@@ -117,7 +119,7 @@ Sections, in order:
 1. **Header** (fixed)
    - Left: "Shashank H R · Backend Engineer".
    - Centre: live status (`● all systems operational`) and India time (`HH:MM:SS IST`); hidden below 1000px.
-   - Right: `Work`, `Playground`, `Contact` (hidden below 760px), an accent pill `60-sec view` linking to `/summary`, and the colour theme picker: a pill with a palette icon and the current choice ("Auto", "Forest"…). It opens a native popover under it, "Colour theme", with Auto and the nine themes as radio buttons, each drawn as a small page in its own colours; the choice is ticked. Arrow keys move through the themes and choose as they go, Escape closes and returns focus to the button, and clicking outside closes it. Hidden without JavaScript, which it needs.
+   - Right: `Work`, `Playground`, `Contact` (hidden below 760px), `Résumé` (`/resume.pdf`) and `LinkedIn`, both opening in a new tab (text links; below 760px, a document icon and the LinkedIn logo, the text kept for screen readers), an accent pill `60-sec view` linking to `/summary`, and the colour theme picker: a pill with a palette icon and the current choice ("Auto", "Forest"…). It opens a native popover under it, "Colour theme", with Auto and the nine themes as radio buttons, each drawn as a small page in its own colours; the choice is ticked. Arrow keys move through the themes and choose as they go, Escape closes and returns focus to the button, and clicking outside closes it. Hidden without JavaScript, which it needs.
    - After 30px of scroll the header gets a blurred `--bg` background and a hairline. A 2px accent bar across the top shows scroll progress.
 2. **Hero**
    - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph and, under it, a bold accent link "Short on time? Read the 60-second summary →" to `/summary`, so the quick view is seen in the first screen (the header pill alone was easy to miss); on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
@@ -127,10 +129,9 @@ Sections, in order:
 3. **Skill strips.** Two slightly rotated marquee bands: one lists skills (Java, Spring Boot, Apache Kafka, RabbitMQ, Redis, MongoDB, Spark, AWS S3, Microservices), the other highlights (Open to SDE-2 roles, Employee of the Month ×2, MongoDB certified, CGPA 9.47, Bangalore). They drift at a base speed; scroll speed adds a boost and scroll direction sets the drift direction.
 4. **(01) About.** A mono facts list (`based_in`, `engati` SDE and intern lines with computed durations, `stack`, `education`, `awards`, `status`) beside a large paragraph whose words fade from 14% to full opacity as it scrolls through the viewport. Phrases marked in the data render in serif italic accent.
 5. **(02) Experience — "Experience"**
-   - Section label shows `GET /career · <N> spans · 200 OK`, where N is counted from the data.
-   - A trace table: a year axis from 2021 to the current year plus "now"; one row per span with a label, a small tag, a bar positioned by start and end month, and the duration.
-   - Nesting: projects sit under their role (level 2), and the root span is shown in mono.
-   - Bars grow in the first time the table enters the viewport. Hovering (or tapping) a row expands a one-line detail.
+   - Replaced the request-trace table on 2026-09-28: its "GET /career · root span" row and "200 OK" label read like leftover debug output to visitors.
+   - A slim timeline: one track with the degree (ink), the internship (soft accent) and the full-time role (accent) as bars placed by start and end month, years under it plus "now", and a key. Bars grow in the first time it enters the viewport.
+   - Then each role, newest first and always open: its name, its dates and length (`Jul 2024 – now · 2y 2m`, `Jan – Jun 2024 · 6m`), a one-line summary, "What I built" as links to the case studies with each one's key number, and any award. The degree is the last entry. Names and dates sit left of the details on wide screens and stack on a phone.
 6. **(03) Selected work.** Five rows: the four case studies (links) and "Prod sandbox" (a brief).
    - Columns: number, title, one-line description, stack, key metric with a small caption.
    - Hover: a soft `--line2` tint; the title shifts 10px right and turns accent; a 230px card follows the cursor, offset down and right (flipping left near the right edge), showing tag, "Case study ↗" or "Click to expand", a big accent metric and a short label.
@@ -333,7 +334,7 @@ Content is separated from layout so it can be edited without touching components
 - **`astro check`:** types and content schemas, on every build.
 - **Vitest unit tests:**
   - `dates.ts` formatting, including month boundaries and `null` end dates
-  - trace bar position maths
+  - timeline bar position maths
   - `retrySim.ts` with a seeded random source: long-run failure near 12% ± 3 with retries ON, near 35% ± 3 with retries OFF; no retries when OFF; at most 3 attempts; back-off waits of 1.5 s and 3 s
   - the chatbot matcher against a table of at least 40 real phrasings, including typos and shorthand ("how many yrs of exp", "notice period?", "tell me abt the retry thing"), each mapped to its expected answer, plus at least 10 off-topic questions ("what's the weather", "write me a poem") that must get the fallback
 - **Playwright browser tests** (Chromium, desktop and a 390px mobile viewport):
