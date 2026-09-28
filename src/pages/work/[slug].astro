@@ -79,8 +79,15 @@ if (spec.steps.length !== data.steps.length) {
       </div>
     </section>
 
+    {data.tradeoff && (
+      <section class="sec wrap">
+        <h2 class="label">(04) The hardest tradeoff</h2>
+        <div class="tradeoff"><h3 class="display">{data.tradeoff.title}</h3><p>{data.tradeoff.body}</p></div>
+      </section>
+    )}
+
     <section class="sec wrap">
-      <h2 class="label">(04) Results</h2>
+      <h2 class="label">({data.tradeoff ? '05' : '04'}) Results</h2>
       <div>
         <ul class="results">{data.results.map((result) => <li><span set:html={emphasize(result)} /></li>)}</ul>
         {data.quote && <blockquote class="quote">{data.quote}</blockquote>}
@@ -146,6 +153,11 @@ if (spec.steps.length !== data.steps.length) {
   .decisions div:last-child { border-right: 0; }
   .decisions h3 { font-size: 24px; line-height: 1.05; }
   .decisions p { margin-top: 10px; font-size: 15px; line-height: 1.6; color: var(--muted); }
+
+  /* The hardest tradeoff: one statement, with an accent rule, so it reads as the decision that cost something. */
+  .tradeoff { max-width: 760px; padding: 4px 0 4px 22px; border-left: 3px solid var(--accent); }
+  .tradeoff h3 { font-size: clamp(24px, 2.4vw, 32px); line-height: 1.1; }
+  .tradeoff p { margin-top: 12px; font-size: 17px; line-height: 1.65; color: var(--muted); }
 
   .results { display: grid; gap: 14px; }
   .results li { display: grid; grid-template-columns: 28px 1fr; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.5; }
