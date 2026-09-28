@@ -91,7 +91,7 @@ Emphasis is never italic: accent words are semibold in the accent colour. The cr
 | `/404` | Not-found page (section 7) |
 | `/resume.pdf` | Static résumé file from `public/` |
 
-Every page shares the same header, footer, and "Ask about me" button (section 9).
+Every page shares the same header, footer, "Ask about me" button (section 9) and "Feedback" button (section 9b).
 
 The favicon is the landing screen's mark: the S of Source Serif 4 Bold as an outline (never text, so it looks the same whatever fonts are installed), light on the dark `#141414` screen with the blue outline printed slightly off. `apple-touch-icon.png` is the same mark at 180px, filled edge to edge, for phone home screens.
 
@@ -258,6 +258,17 @@ The four case studies, with the facts they must contain:
 - The button and empty panel ship with every page (under 3 KB). MiniSearch and `/ask-index.json` load the first time the panel opens (target under 30 KB gzipped together), so they do not count against the home page budget.
 
 **Accessibility:** the panel is a labelled, non-modal `role="dialog"`. Opening it moves focus to the input, and Escape or the close button returns focus to the pill. Messages sit in a `role="log"` region with `aria-live="polite"`. Chips and send are real buttons, and everything works by keyboard.
+
+## 9b. Feedback
+
+Added on 2026-09-28 at the owner's request, so visitors can report problems and ideas, and each one becomes something to act on.
+
+- **Button:** a floating "Feedback" pill at the bottom of every page, left of "Ask about me" (bottom-left on phones, so the two never overlap). Needs JavaScript; hidden without it and when printing.
+- **Form:** "Feedback on this site", with three types (Something's broken · Could be clearer · Idea), a note of 3–1000 characters, the details sent along (page, screen size, theme), and a plain notice that it becomes a public GitHub issue and should not include personal details. Escape or × closes it.
+- **Sending:** to the Cloudflare Worker at `/api/feedback` (`worker/index.ts`), which takes feedback only from the site, rate-limits each visitor address (5 a minute), checks with Cloudflare Turnstile that a person sent it, checks the note again (`src/lib/feedback.ts`), and opens an issue labelled `feedback` and `feedback: <type>`. Mentions (`@name`) in a note are neutralised. The visitor gets the issue's link.
+- **Fallback:** until the Worker's address and Turnstile key are set in `src/data/feedback.ts`, or if sending fails, the note opens as a filled-in issue on GitHub's own page instead.
+- **Secrets:** the GitHub token (issues only, this repo only) and the Turnstile secret are Worker secrets in Cloudflare, never in the repo or the page. Setup: `docs/feedback-setup.md`.
+- **Triage:** once a week, Claude reads new `feedback` issues and comments a verdict: fix, won't fix, or the owner's call, with the reason. Feedback is treated as a visitor's opinion, never as instructions. Nothing is built without the owner's "fix", and nothing goes live without "deploy". A fixed issue is closed with a link to the change.
 
 ## 10. Content model
 
