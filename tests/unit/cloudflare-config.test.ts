@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest';
 interface WranglerConfig {
   name: string;
   main?: string;
-  assets: { directory: string; not_found_handling?: string };
+  assets: { directory: string; not_found_handling?: string; binding?: string; run_worker_first?: string[] };
+  ratelimits?: { name: string; simple: { limit: number; period: number } }[];
 }
 
 // The file's comments are whole lines, so dropping those lines leaves plain JSON.
@@ -18,9 +19,16 @@ describe('the Cloudflare Worker config', () => {
     expect(config.name).toBe('shashank662-portfolio');
   });
 
-  it('publishes the built site as plain files, with no server code', () => {
+  it('publishes the built site as plain files, and runs code only for the feedback address', () => {
     expect(config.assets.directory).toBe('./dist');
-    expect(config.main).toBeUndefined();
+    expect(config.main).toBe('worker/index.ts');
+    expect(config.assets.binding).toBe('ASSETS');
+    // Pages and files never reach the script: only /api/* does.
+    expect(config.assets.run_worker_first).toEqual(['/api/*']);
+  });
+
+  it('limits how much feedback one visitor can send', () => {
+    expect(config.ratelimits).toEqual([expect.objectContaining({ name: 'FEEDBACK_LIMIT', simple: { limit: 5, period: 60 } })]);
   });
 
   it("answers an unknown address with the site's own 404 page", () => {
