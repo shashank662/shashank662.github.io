@@ -1,0 +1,84 @@
+---
+// The Stack section (spec §5): the résumé's skills, one row per group. Each skill is a button; choosing one (hover,
+// focus or tap) says where on this site it was used, with links. Without JavaScript the chips are plain labels.
+import SectionHead from './SectionHead.astro';
+import { profile } from '../../data/profile';
+
+const { stack } = profile;
+const count = stack.groups.reduce((n, g) => n + g.skills.length, 0);
+---
+<section class="section wrap" id="stack">
+  <SectionHead n="02" label="Stack" meta={`${stack.groups.length} groups · ${count} skills`} />
+  <h2 class="h2">{stack.title}</h2>
+  <p class="sub">{stack.sub}</p>
+
+  <div class="rows" data-stack>
+    {stack.groups.map((g) => (
+      <div class="row">
+        <h3 class="group label">{g.group}</h3>
+        <ul class="chips">
+          {g.skills.map((skill) => (
+            <li>
+              <button type="button" class:list={['chip', { 'has-work': skill.usedIn }]} aria-pressed="false" data-skill={skill.name}>
+                {skill.name}
+              </button>
+              <template data-used>
+                {skill.usedIn ? (
+                  <>
+                    <span class="label">Used in</span>
+                    {skill.usedIn.map((id) => <a href={stack.proofs[id].href}>{stack.proofs[id].label}</a>)}
+                  </>
+                ) : (
+                  <span class="label">On my résumé</span>
+                )}
+              </template>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+    <p class="used" aria-live="polite" data-stack-used>
+      <span class="hint">Pick a skill to see where I used it. <i aria-hidden="true">●</i> marks those with work on this site.</span>
+    </p>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/stack';
+</script>
+
+<style>
+  .rows { margin-top: 40px; border-top: 1.5px solid var(--ink); }
+  .row {
+    display: grid; grid-template-columns: minmax(180px, 240px) 1fr; gap: 12px 32px; align-items: center;
+    padding: 18px 0; border-bottom: 1px solid var(--line);
+  }
+  .group { color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 7px 14px;
+    border: 1px solid var(--line); border-radius: 999px; font-size: 15px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  /* A dot marks the skills that have work on this site to show. */
+  .chip.has-work::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .chip:hover, .chip[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed='true'] { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  :global(html:not(.js)) .chip { pointer-events: none; }
+  template { display: none; }
+
+  .used {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; min-height: 56px; padding: 18px 0;
+    font-size: 15px;
+  }
+  .used :global(.label) { color: var(--muted); }
+  .used :global(a) { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .hint { color: var(--muted); }
+  .hint i { font-style: normal; font-size: 9px; color: var(--accent); vertical-align: 2px; }
+  :global(html:not(.js)) .used { display: none; }
+
+  @media (max-width: 760px) {
+    .row { grid-template-columns: 1fr; gap: 10px; padding: 16px 0; }
+    .chip { font-size: 14px; }
+  }
+</style>

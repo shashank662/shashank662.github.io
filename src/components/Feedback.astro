@@ -6,11 +6,11 @@ import { FEEDBACK_TYPES, MESSAGE_MAX } from '../lib/feedback';
 
 const live = Boolean(feedbackConfig.endpoint && feedbackConfig.turnstileSiteKey);
 ---
-<button type="button" class="pill mono" data-feedback-open aria-expanded="false" aria-controls="feedback-panel">
-  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+{/* A small, quiet icon beside "Ask about me" on wide screens. On a phone it is hidden, and the Ask panel links here. */}
+<button type="button" class="pill" data-feedback-open aria-expanded="false" aria-controls="feedback-panel" aria-label="Feedback" title="Feedback">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <path d="M2.5 3h11v7.5H7L4 13v-2.5H2.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
   </svg>
-  Feedback
 </button>
 
 <section
@@ -54,14 +54,14 @@ const live = Boolean(feedbackConfig.endpoint && feedbackConfig.turnstileSiteKey)
 </script>
 
 <style>
-  /* Bottom right, beside "Ask about me"; bottom left on a phone, so the two never overlap. */
+  /* A round icon button just left of "Ask about me": present, but quieter than it. */
   .pill {
-    position: fixed; right: 158px; bottom: 16px; z-index: 80;
-    display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 999px;
-    border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-size: 12px;
-    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45); transition: border-color 0.25s;
+    position: fixed; right: 162px; bottom: 16px; z-index: 80;
+    display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--line); background: var(--bg); color: var(--muted);
+    transition: border-color 0.25s, color 0.25s;
   }
-  .pill:hover { border-color: var(--accent); }
+  .pill:hover { border-color: var(--accent); color: var(--ink); }
   .pill[hidden], .panel[hidden], .done[hidden] { display: none; }
   /* It needs JavaScript to do anything. */
   :global(html:not(.js)) .pill { display: none; }
@@ -106,7 +106,8 @@ const live = Boolean(feedbackConfig.endpoint && feedbackConfig.turnstileSiteKey)
   .done:focus { outline: none; }
 
   @media (max-width: 760px) {
-    .pill { right: auto; left: 16px; }
+    /* One floating button on a phone: feedback is reached from the Ask panel. */
+    .pill { display: none; }
     .panel { left: 0; right: 0; bottom: 0; width: auto; max-height: 85vh; border-radius: 16px 16px 0 0; }
   }
 </style>

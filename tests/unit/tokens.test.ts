@@ -42,6 +42,12 @@ describe.each(THEMES)('the $name theme', ({ id }) => {
     expect(contrast(t['--on-accent'], t['--accent'])).toBeGreaterThanOrEqual(4.5);
   });
 
+  // Small grey labels were faint, especially on dark backgrounds: muted text gets more than the minimum.
+  it('keeps muted text clearly readable: 7:1 on dark themes, 5.5:1 on light ones', () => {
+    const dark = luminance(channels(t['--bg'])) < 0.2;
+    expect(contrast(t['--muted'], t['--bg'])).toBeGreaterThanOrEqual(dark ? 7 : 5.5);
+  });
+
   it('keeps the crossing bands readable', () => {
     expect(contrast(t['--strip1-fg'], t['--strip1-bg'])).toBeGreaterThanOrEqual(4.5);
     expect(contrast(t['--strip2-fg'], t['--accent'])).toBeGreaterThanOrEqual(4.5);

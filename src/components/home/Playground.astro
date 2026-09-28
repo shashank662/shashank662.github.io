@@ -6,7 +6,7 @@ import { emphasize } from '../../lib/text';
 const { playground } = profile;
 ---
 <section class="section wrap" id="play" data-playground>
-  <SectionHead n="05" label="Playground" status />
+  <SectionHead n="06" label="Playground" meta="interactive simulation · illustrative numbers" />
   <h2 class="h2" set:html={emphasize(playground.title)} />
   <p class="sub">{playground.sub}</p>
   <div class="grid" data-model>
@@ -15,11 +15,11 @@ const { playground } = profile;
       <button type="button" class="send mono" data-send>↳ send 5 of your own triggers</button>
       <button type="button" class="play" data-play hidden>▶ Play the simulation</button>
       <p class="nojs">
-        The live model needs JavaScript. <a class="u" href="/work/auto-retry-framework">Read how the framework works →</a>
+        The simulation needs JavaScript. <a class="u" href="/work/auto-retry-framework">Read how the framework works →</a>
       </p>
     </div>
     <div class="panel">
-      <div class="metric"><span class="label">failure rate · live</span><b class="display good" data-metric="fail">12.0%</b></div>
+      <div class="metric"><span class="label">failure rate · simulated</span><b class="display good" data-metric="fail">12.0%</b></div>
       <div class="metric"><span class="label">in retry queue</span><b class="display" data-metric="queue">0</b></div>
       <div class="metric"><span class="label">saved by retries</span><b class="display" data-metric="saved">0</b></div>
       <button type="button" class="toggle" role="switch" aria-checked="true" data-retry-switch>

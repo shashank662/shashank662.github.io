@@ -66,7 +66,10 @@ if (pill && panel && form && message && done) {
     document.head.append(script);
   };
 
+  /** Where focus goes back to on close: the Feedback button, or on a phone, the "Ask about me" button. */
+  let opener: HTMLElement = pill;
   const open = () => {
+    opener = pill.offsetParent ? pill : (document.querySelector<HTMLElement>('[data-ask-open]') ?? pill);
     panel.hidden = false;
     pill.hidden = true;
     pill.setAttribute('aria-expanded', 'true');
@@ -78,7 +81,7 @@ if (pill && panel && form && message && done) {
     panel.hidden = true;
     pill.hidden = false;
     pill.setAttribute('aria-expanded', 'false');
-    pill.focus();
+    opener.focus();
   };
   /** Sent, or, on GitHub's page, not sent until the visitor presses Submit there: the screen says which. */
   const finish = (url: string, onGitHubPage = false) => {
@@ -100,6 +103,13 @@ if (pill && panel && form && message && done) {
   };
 
   pill.addEventListener('click', open);
+  // The Ask panel's "Send feedback" link: close that panel, then open this one.
+  document.querySelectorAll<HTMLElement>('[data-feedback-from-ask]').forEach((link) => {
+    link.addEventListener('click', () => {
+      document.querySelector<HTMLButtonElement>('[data-ask-close]')?.click();
+      open();
+    });
+  });
   pick<HTMLButtonElement>('[data-feedback-close]').addEventListener('click', close);
   panel.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') close();

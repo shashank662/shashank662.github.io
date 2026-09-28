@@ -37,7 +37,7 @@ Nine colour themes, all first-class: Light and Dark (the table below), plus Midn
 
 - The themes are listed in `src/lib/theme.ts`; their colours live in `src/styles/tokens.css`, as `[data-theme='…']` rules that work on any element, so the picker's swatches draw themselves in their own colours.
 - Colours stay six-digit hex, because the playground's canvas reads them.
-- `tests/unit/tokens.test.ts` reads every theme from the stylesheet and checks: text, muted text, accent text and text on the accent at 4.5:1 or more; the crossing bands at 4.5:1; the About words at 3:1 before they light up, at the theme's own faintest opacity (`--word-dim`, `--word-dim-hl`: 0.47 and 0.69, or 0.52 and 0.73 for Solarized, whose text is less dark); and a dark landing screen with light letters (`--intro-dark`, `--intro-light`, `--intro-line`; Light and Dark keep `#141414`, `#F1EDE4` and `#5A78FF`).
+- `tests/unit/tokens.test.ts` reads every theme from the stylesheet and checks: text, accent text and text on the accent at 4.5:1 or more; the crossing bands at 4.5:1; muted text at 7:1 on dark themes and 5.5:1 on light ones (small grey labels were faint, so it gets more than the 4.5:1 minimum); the About words at 3:1 before they light up, at the theme's own faintest opacity (`--word-dim`, `--word-dim-hl`: 0.47 and 0.69, or 0.52 and 0.73 for Solarized, whose text is less dark); and a dark landing screen with light letters (`--intro-dark`, `--intro-light`, `--intro-line`; Light and Dark keep `#141414`, `#F1EDE4` and `#5A78FF`).
 - The status colours and the grain follow the scheme, light or dark.
 
 | Token | Light | Dark | Used for |
@@ -122,24 +122,29 @@ Sections, in order:
    - Right: `Work`, `Playground`, `Contact` (hidden below 760px), `Résumé` (`/resume.pdf`) and `LinkedIn`, both opening in a new tab (text links; below 760px, a document icon and the LinkedIn logo, the text kept for screen readers), an accent pill `60-sec view` linking to `/summary`, and the colour theme picker: a pill with a palette icon and the current choice ("Auto", "Forest"…). It opens a native popover under it, "Colour theme", with Auto and the nine themes as radio buttons, each drawn as a small page in its own colours; the choice is ticked. Arrow keys move through the themes and choose as they go, Escape closes and returns focus to the button, and clicking outside closes it. Hidden without JavaScript, which it needs.
    - After 30px of scroll the header gets a blurred `--bg` background and a hairline. A 2px accent bar across the top shows scroll progress.
 2. **Hero**
-   - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph and, under it, a bold accent link "Short on time? Read the 60-second summary →" to `/summary`, so the quick view is seen in the first screen (the header pill alone was easy to miss); on the right, a mono index `01 About … 06 Contact` linking to sections (hidden below 760px).
+   - Top row: the label "Portfolio · 2026 edition" with a short intro paragraph and, under it, a bold accent link "Short on time? Read the 60-second summary →" to `/summary`, so the quick view is seen in the first screen (the header pill alone was easy to miss); on the right, a mono index `01 About … 07 Contact` linking to sections (hidden below 760px).
+   - Under it, the proof row (added 2026-09-28 from a portfolio review: "bring your best evidence higher"): three flagship results as linked cards (`45%` of failed deliveries recovered on the first retry, `~8M / day` billing events counted once, `30–60 min` daily review time per developer, down from ~2 h), with "View work" (`#work`) and "Résumé" buttons. Three columns and stacked buttons on a laptop, a single column on a phone.
    - The full name "Shashank H R" in Source Serif 4 Bold, under 60% of a laptop screen wide (10.5vw, up to 165px), on one line. Letters slide up one after another on load. On mouse devices each letter leans up (up to 22px, `scaleY` up to 1.14) when the cursor is within 300px, and turns accent at once when very close: only the slide-up waits its turn.
    - Second row: a rotating circular badge ("Open to SDE-2 roles ✺ Bangalore ✺ 2026 ✺", accent core with "↓" linking to About) and the light lede "I build *reliable backends* for high-volume messaging."
    - A mono line types and erases four lines in turn, prompt `~/shashank $`. It types rightward from a prompt that stays put, in a block as wide as the longest line (right-aligned under the lede on wider screens).
 3. **Skill strips.** Two slightly rotated marquee bands: one lists skills (Java, Spring Boot, Apache Kafka, RabbitMQ, Redis, MongoDB, Spark, AWS S3, Microservices), the other highlights (Open to SDE-2 roles, Employee of the Month ×2, MongoDB certified, CGPA 9.47, Bangalore). They drift at a base speed; scroll speed adds a boost and scroll direction sets the drift direction.
-4. **(01) About.** A mono facts list (`based_in`, `engati` SDE and intern lines with computed durations, `stack`, `education`, `awards`, `status`) beside a large paragraph whose words light up to full opacity as they pass the middle of the screen: the lit edge starts when the paragraph's top reaches 60% of the screen height and ends when its bottom passes 40% (`src/lib/reveal.ts`). Phrases marked in the data render in serif italic accent.
-5. **(02) Experience — "Experience"**
+4. **(01) About.** A mono facts list (`based_in`, `engati` SDE and intern lines with computed durations, `education`, `awards`, `status`) beside a large paragraph whose words light up to full opacity as they pass the middle of the screen: the lit edge starts when the paragraph's top reaches 60% of the screen height and ends when its bottom passes 40% (`src/lib/reveal.ts`). Phrases marked in the data render in serif italic accent.
+5. **(02) Stack — "Stack"** Added on 2026-09-28 from feedback issue #10 ("too text-heavy; show skills as rows with a heading").
+   - The résumé's skills, grouped as on the résumé (Languages, Backend, Messaging & Caching, Data Engineering, Databases & Search, Cloud & Infrastructure, AI & LLM, Frontend): one row per group, its name on the left and its skills as chips on the right (stacked on a phone).
+   - Each chip is a button. Hovering, focusing or tapping one shows, under the rows, where on this site it was used, as links to the case studies, the incidents or the prod sandbox; a skill with no work on the site says "On my résumé". A dot marks the chips that have work to show. Links name only work on this site, never side projects.
+   - Without JavaScript the chips are plain labels.
+6. **(03) Experience — "Experience"**
    - Replaced the request-trace table on 2026-09-28: its "GET /career · root span" row and "200 OK" label read like leftover debug output to visitors.
    - A slim timeline: one track with the degree (ink), the internship (soft accent) and the full-time role (accent) as bars placed by start and end month, years under it plus "now", and a key. Bars grow in the first time it enters the viewport.
-   - Then each role, newest first and always open: its name, its dates and length (`Jul 2024 – now · 2y 2m`, `Jan – Jun 2024 · 6m`), a one-line summary, "What I built" as links to the case studies with each one's key number, and any award. The degree is the last entry. Names and dates sit left of the details on wide screens and stack on a phone.
-6. **(03) Selected work.** Five rows: the four case studies (links) and "Prod sandbox" (a brief).
+   - Then each role, newest first and always open: its name, its dates and length (`Jul 2024 – now · 2y 2m`, `Jan – Jun 2024 · 6m`), one short line, "What I built" as links to the case studies, each led by its key number in large accent type with what it measures under it (`35% → 12%` failure rate, `~8M` billing events a day, `2 h → 30 min` per code review, `1–2 sprints` from design to production), and any award. The degree is the last entry. Names and dates sit left of the details on wide screens and stack on a phone.
+7. **(04) Selected work.** Five rows: the four case studies (links) and "Prod sandbox" (a brief).
    - Columns: number, title, one-line description, stack, key metric with a small caption.
    - Hover: a soft `--line2` tint; the title shifts 10px right and turns accent; a 230px card follows the cursor, offset down and right (flipping left near the right edge), showing tag, "Case study ↗" or "Click to expand", a big accent metric and a short label.
    - No card on touch devices. The sandbox row expands its text in place (button semantics, `aria-expanded`).
-7. **(04) Incidents — "Production incidents"** Two postmortem cards (INC-01 MongoDB M20 memory, INC-02 FastAPI memory leak), each with Impact, Cause and Fix, a big accent delta, and before/after bars that grow in on first view.
-8. **(05) Playground — "The retry flow, live"** The retry-flow simulation (section 8).
-9. **(06) Contact.** A giant "Let's talk →" (mailto link) and links: Email, LinkedIn, GitHub, Résumé (PDF).
-10. **Footer** (mono): "© <year> Shashank H R · built with Astro", real page-load time (from the Navigation Timing API), a session uptime counter, and the same live status as the header.
+8. **(05) Incidents — "Production incidents"** The section label reads "2 write-ups from production", not a live count, so it doesn't look like a current incident dashboard. Two postmortem cards (INC-01 MongoDB M20 memory, INC-02 FastAPI memory leak), each with Impact, Cause and Fix, a big accent delta, and before/after bars that grow in on first view.
+9. **(06) Playground — "The retry flow, simulated"** The retry-flow simulation (section 8). Its label reads "interactive simulation · illustrative numbers", its text says the numbers are illustrative, not production data, and the failure-rate readout is "failure rate · simulated".
+10. **(07) Contact.** A giant "Let's talk →" (mailto link) and links: Email, LinkedIn, GitHub, Résumé (PDF).
+11. **Footer** (mono): "© <year> Shashank H R · built with Astro", real page-load time (from the Navigation Timing API), a session uptime counter, and the same live status as the header.
 
 ## 6. Case study pages
 
@@ -151,7 +156,8 @@ One template renders all four from content files (section 10). Layout, top to bo
 4. **(01) The problem:** one to three paragraphs.
 5. **(02) How it works:** an SVG diagram with numbered accent dots, then a matching numbered list of steps.
 6. **(03) Key decisions:** three cards, each a heading and one short paragraph.
-7. **(04) Results:** a list; an optional pull quote in serif italic; an optional call-to-action link (case study 01 links to `/#play`).
+7. **(04) The hardest tradeoff** (optional): one decision that cost something, and why, set off with an accent rule. When a case study has one, Results becomes (05).
+8. **(04 or 05) Results:** a list; an optional pull quote in serif italic; an optional call-to-action link (case study 01 links to `/#play`, as "the interactive simulation").
 8. **Next case study:** a big link to the next case, wrapping from 04 back to 01.
 
 Below 860px the meta and stats become two columns, sections stack, and the diagram scrolls sideways (it keeps a 720px minimum width).
@@ -263,7 +269,7 @@ The four case studies, with the facts they must contain:
 
 Added on 2026-09-28 at the owner's request, so visitors can report problems and ideas, and each one becomes something to act on.
 
-- **Button:** a floating "Feedback" pill at the bottom of every page, left of "Ask about me" (bottom-left on phones, so the two never overlap). Needs JavaScript; hidden without it and when printing.
+- **Button:** on wide screens, a small round icon button (accessible name and tooltip "Feedback") just left of "Ask about me", quieter than it. On a phone it is hidden, so only one button floats; the Ask panel ends with "Something off on this site? Leave feedback →", which closes that panel and opens the form. Needs JavaScript; hidden without it and when printing.
 - **Form:** "Feedback on this site", with three types (Something's broken · Could be clearer · Idea), a note of 3–1000 characters, the details sent along (page, screen size, theme), and a plain notice that it becomes a public GitHub issue and should not include personal details. Escape or × closes it.
 - **Sending:** to the Cloudflare Worker at `/api/feedback` (`worker/index.ts`), which takes feedback only from the site, rate-limits each visitor address (5 a minute), checks with Cloudflare Turnstile that a person sent it, checks the note again (`src/lib/feedback.ts`), and opens an issue labelled `feedback` and `feedback: <type>`. Mentions (`@name`) in a note are neutralised. The visitor gets the issue's link.
 - **Fallback:** until the Worker's address and Turnstile key are set in `src/data/feedback.ts`, or if sending fails, the note opens as a filled-in issue on GitHub's own page instead.

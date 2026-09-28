@@ -14,7 +14,7 @@ test('every home section renders and scrolling through raises no errors', async 
     await page.locator(`#${id}`).scrollIntoViewIfNeeded();
     await expect(page.locator(`#${id}`)).toBeVisible();
   }
-  for (const name of ['Experience', 'Selected work', 'Production incidents', 'The retry flow, live']) {
+  for (const name of ['Experience', 'Selected work', 'Production incidents', 'The retry flow, simulated']) {
     await expect(page.getByRole('heading', { level: 2, name, exact: true })).toBeVisible();
   }
   expect(errors).toEqual([]);
@@ -87,7 +87,15 @@ test('Experience lists the roles newest first, open, with their dates and what e
     '/work/ai-code-reviewer',
     '/work/abandoned-cart-recovery',
   ]);
-  await expect(exp.getByText('35% → 12% failures')).toBeVisible();
+  // Each project leads with its number, big, and what it measures; each role has one short line.
+  await expect(exp.locator('.figure')).toHaveText(['45%', '~8M', '2 h → 30–60 min', '1–2 sprints']);
+  await expect(exp.locator('.caption')).toHaveText([
+    'failed deliveries recovered on the first retry',
+    'billing events a day',
+    'review time per developer per day',
+    'from design to production',
+  ]);
+  await expect(exp.getByText(/hardened order validation/)).toHaveCount(0);
   await expect(exp.getByText(/Employee of the Month ×2/)).toBeVisible();
   // A timeline key names each bar.
   await expect(exp.locator('.key li')).toHaveText(['B.E.', 'Intern', 'Software Engineer']);
@@ -282,7 +290,8 @@ test.describe('on a tablet held upright', () => {
     await expect(page.locator('[data-hero]')).toHaveClass(/\bgo\b/);
     await page.waitForTimeout(1800);
     const box = (selector: string) => page.locator(`[data-hero] ${selector}`).boundingBox();
-    const [quick, name, lede, typed] = await Promise.all(['.quick', 'h1.name', '.lede', '.typed'].map(box));
+    // The proof row is the last thing above the name.
+    const [quick, name, lede, typed] = await Promise.all(['.proof', 'h1.name', '.lede', '.typed'].map(box));
     expect(quick && name && lede && typed).toBeTruthy();
     if (!quick || !name || !lede || !typed) return;
     expect(name.y - (quick.y + quick.height)).toBeLessThan(1024 * 0.2);
@@ -339,4 +348,92 @@ test('the About words light up as they reach the middle of the screen, not befor
   expect(await litAt(0.65)).toBe(0);
   // Once the paragraph reaches the middle, its first words light up.
   expect(await litAt(0.45)).toBeGreaterThan(0.5);
+});
+
+const RESUME_SKILLS = {
+  Languages: ['Java', 'Python', 'SQL'],
+  Backend: ['Spring Boot', 'REST APIs', 'Microservices Architecture'],
+  'Messaging & Caching': ['Apache Kafka', 'RabbitMQ', 'Redis'],
+  'Data Engineering': ['Apache Spark', 'Apache Iceberg', 'Maxwell', 'Change Data Capture (CDC)'],
+  'Databases & Search': ['MongoDB', 'MySQL', 'Elasticsearch'],
+  'Cloud & Infrastructure': ['AWS S3', 'Docker', 'Nginx', 'Jenkins', 'Git', 'CI/CD'],
+  'AI & LLM': ['LLM-based Applications', 'AI Agents', 'Runtime Python Tool Calls'],
+  Frontend: ['React'],
+};
+
+test("Stack comes after About and shows the résumé's skills, one row per group", async ({ page }) => {
+  await page.goto('/#stack');
+  const stack = page.locator('#stack');
+  await expect(stack.getByRole('heading', { level: 2, name: 'Stack' })).toBeVisible();
+  const order = await page.locator('main > section[id]').evaluateAll((all) => all.map((s) => s.id));
+  expect(order.indexOf('stack')).toBe(order.indexOf('about') + 1);
+  await expect(stack.getByRole('heading', { level: 3 })).toHaveText(Object.keys(RESUME_SKILLS));
+  for (const [group, skills] of Object.entries(RESUME_SKILLS)) {
+    const row = stack.locator('.row', { has: page.getByRole('heading', { level: 3, name: group, exact: true }) });
+    await expect(row.getByRole('button')).toHaveText(skills);
+  }
+});
+
+test('choosing a skill says where on the site it was used, or that it is on the résumé', async ({ page }) => {
+  await page.goto('/#stack');
+  const stack = page.locator('#stack');
+  const used = stack.locator('[data-stack-used]');
+  const kafka = stack.getByRole('button', { name: 'Apache Kafka' });
+  await kafka.click();
+  await expect(kafka).toHaveAttribute('aria-pressed', 'true');
+  await expect(used).toContainText('Apache Kafka');
+  await expect(used.getByRole('link')).toHaveText(['RCS billing pipeline', 'Abandoned-cart recovery']);
+  await expect(used.getByRole('link').first()).toHaveAttribute('href', '/work/rcs-billing-pipeline');
+
+  const react = stack.getByRole('button', { name: 'React' });
+  await react.click();
+  await expect(kafka).toHaveAttribute('aria-pressed', 'false');
+  await expect(used).toContainText('On my résumé');
+  await expect(used.getByRole('link')).toHaveCount(0);
+});
+
+test('the sections are numbered in page order, with Stack as 02', async ({ page }) => {
+  await page.goto('/');
+  // Each section's own number: the first "(NN)" label inside it.
+  const numbers = await page.locator('main > section[id]').evaluateAll((sections) =>
+    sections
+      .map((section) => [...section.querySelectorAll('.label')].map((l) => l.textContent?.trim().match(/^\((\d\d)\)/)?.[1]).find(Boolean))
+      .filter(Boolean),
+  );
+  expect(numbers).toEqual(['01', '02', '03', '04', '05', '06', '07']);
+  await expect(page.locator('#stack .sec-head')).toContainText('(02) Stack');
+});
+
+test('the page names no side projects and shows no phone number', async ({ page }) => {
+  await page.goto('/');
+  const text = await page.locator('body').innerText();
+  expect(text).not.toMatch(/ZoomCart|Real-Time Data Integration Pipeline/i);
+  expect(text).not.toMatch(/9035265512|\+91/);
+});
+
+test('the first screen leads with three flagship results and clear ways to view work and the résumé', async ({ page }) => {
+  await page.goto('/');
+  const wins = page.locator('[data-hero]').getByRole('list', { name: 'Flagship results' }).getByRole('link');
+  await expect(wins).toHaveCount(3);
+  expect(await wins.evaluateAll((all) => all.map((a) => a.getAttribute('href')))).toEqual([
+    '/work/auto-retry-framework',
+    '/work/rcs-billing-pipeline',
+    '/work/ai-code-reviewer',
+  ]);
+  await expect(page.locator('[data-hero]').getByRole('link', { name: 'View work' })).toHaveAttribute('href', '#work');
+  await expect(page.locator('[data-hero]').getByRole('link', { name: 'Résumé' })).toHaveAttribute('href', '/resume.pdf');
+  // On a laptop, all of it is in the first screen, clear of the fixed header.
+  const viewport = page.viewportSize()!;
+  if (viewport.width > 1000) {
+    const box = (await page.locator('[data-hero] .proof').boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+  }
+});
+
+test('the playground says it is a simulation, and incidents read as write-ups, not a live dashboard', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#play .sec-head')).toContainText('interactive simulation · illustrative numbers');
+  await expect(page.locator('#play')).toContainText(/illustrative, not production data/);
+  await expect(page.locator('#incidents .sec-head')).toContainText('2 write-ups from production');
+  await expect(page.locator('body')).not.toContainText(/running live|0 open/);
 });
