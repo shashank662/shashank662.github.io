@@ -276,3 +276,27 @@ test('the first screen invites people short on time to the 60-second summary', a
   // Big enough to tap on a phone.
   expect(box.height).toBeGreaterThanOrEqual(24);
 });
+
+test('the 60-second summary link is set bigger than the intro around it', async ({ page }) => {
+  await page.goto('/');
+  const size = (selector: string) =>
+    page.locator(`[data-hero] ${selector}`).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  expect(await size('.quick')).toBeGreaterThanOrEqual((await size('.intro')) * 1.3);
+});
+
+test.describe('on a tablet held upright', () => {
+  test.use({ viewport: { width: 768, height: 1024 } });
+
+  test('the name follows the intro with no big empty gap, and the lines under it start at the left', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-hero]')).toHaveClass(/\bgo\b/);
+    await page.waitForTimeout(1800);
+    const box = (selector: string) => page.locator(`[data-hero] ${selector}`).boundingBox();
+    const [quick, name, lede, typed] = await Promise.all(['.quick', 'h1.name', '.lede', '.typed'].map(box));
+    expect(quick && name && lede && typed).toBeTruthy();
+    if (!quick || !name || !lede || !typed) return;
+    expect(name.y - (quick.y + quick.height)).toBeLessThan(1024 * 0.2);
+    expect(Math.abs(lede.x - name.x)).toBeLessThan(12);
+    expect(Math.abs(typed.x - name.x)).toBeLessThan(12);
+  });
+});
