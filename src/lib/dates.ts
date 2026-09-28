@@ -24,6 +24,16 @@ export function formatDuration(months: number): string {
   return rest === 0 ? `${years}y` : `${years}y ${rest}m`;
 }
 
+const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "Aug 2020 – Jul 2024", "Jan – Jun 2024" (one year, said once), or "Jul 2024 – now" while still going. */
+export function formatRange(start: YearMonth, end: YearMonth | null): string {
+  const at = ([year, month]: YearMonth) => `${SHORT_MONTHS[month - 1]} ${year}`;
+  if (!end) return `${at(start)} – now`;
+  if (start[0] === end[0]) return `${SHORT_MONTHS[start[1] - 1]} – ${at(end)}`;
+  return `${at(start)} – ${at(end)}`;
+}
+
 /** Where a span sits on a timeline running from `axisStart` to today, as fractions of the timeline's width. */
 export function spanPosition(
   start: YearMonth,
