@@ -115,6 +115,46 @@ test('a small card follows the mouse over a work row', async ({ page, isMobile }
   await expect(card).not.toHaveClass(/\bon\b/);
 });
 
+test('each work row shows its result right under the title, as a large number with readable words', async ({ page }) => {
+  await page.goto('/#work');
+  const rows = page.locator('#work .row');
+  await expect(rows).toHaveCount(5);
+  for (const row of await rows.all()) {
+    // Measured together, so a page still scrolling to #work can't skew one against the other.
+    const [title, box] = await row.evaluate((el) =>
+      ['.t', '.res b'].map((sel) => el.querySelector(sel)!.getBoundingClientRect().toJSON()),
+    );
+    const number = row.locator('.res b');
+    expect(box.y).toBeGreaterThanOrEqual(title.y + title.height - 2);
+    expect(Math.abs(box.x - title.x)).toBeLessThan(4);
+    expect(parseFloat(await number.evaluate((el) => getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(22);
+    // The words beside it are in the body font, at a readable size.
+    const words = row.locator('.res span');
+    expect(parseFloat(await words.evaluate((el) => getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
+    expect(await words.evaluate((el) => getComputedStyle(el).fontFamily)).not.toMatch(/Code|mono/i);
+  }
+});
+
+test('on a phone a work row stacks title, result, then the way into the case study', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Phones only.');
+  await page.goto('/#work');
+  const row = page.locator('#work a[href="/work/auto-retry-framework"]');
+  const [title, result, go] = await row.evaluate((el) =>
+    ['.t', '.res', '.go'].map((sel) => el.querySelector(sel)!.getBoundingClientRect().top),
+  );
+  expect(title).toBeLessThan(result);
+  expect(result).toBeLessThan(go);
+  await expect(row.locator('.go')).toHaveText(/Case study/);
+});
+
+test('a narrow window gets no hover card, even with a mouse', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Phones have no mouse.');
+  await page.setViewportSize({ width: 800, height: 900 });
+  await page.goto('/#work');
+  await page.locator('#work a[href="/work/ai-code-reviewer"]').hover();
+  await expect(page.locator('[data-work-card]')).not.toHaveClass(/\bon\b/);
+});
+
 test('touch screens get no hover card', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'only for touch screens');
   await page.goto('/#work');
