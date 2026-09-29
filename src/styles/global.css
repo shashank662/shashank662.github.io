@@ -8,6 +8,10 @@
   padding: 0;
 }
 
+/* Secondary text that people read (descriptions, captions, intros): a step down from the ink, clearly brighter than
+   --muted, which is kept for small metadata. Mixed from each theme's own colours, so every theme gets one. */
+:root { --ink-2: color-mix(in srgb, var(--ink) 80%, var(--bg)); }
+
 html {
   background: var(--bg);
   scroll-behavior: smooth;
@@ -71,7 +75,7 @@ em { font-style: normal; font-weight: 600; color: var(--accent); }
 
 /* ---------- section titles ---------- */
 .h2 { margin-top: 30px; font-family: var(--font-display); font-size: clamp(40px, 6vw, 96px); font-weight: 600; line-height: 1; letter-spacing: -0.025em; }
-.sub { max-width: 640px; margin-top: 22px; font-size: 17px; line-height: 1.6; color: var(--muted); }
+.sub { max-width: 640px; margin-top: 22px; font-size: 17px; line-height: 1.6; color: var(--ink-2); }
 .section { padding-top: 9vw; padding-bottom: 5vw; }
 /* Jump links land below the fixed header instead of under it. */
 [id] { scroll-margin-top: 72px; }
@@ -109,8 +113,10 @@ html.fine.theme-wipe { cursor: auto; }
 
 /* ---------- live status pill ---------- */
 .status { display: inline-flex; align-items: center; gap: 8px; color: var(--ok); transition: color 0.3s; }
-.status i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: ping 1.8s infinite; }
+.status i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+/* The dot is still while all is well, and pulses only when something needs attention. */
 .status[data-state='degraded'] { color: var(--warn); }
+.status[data-state='degraded'] i { animation: ping 1.8s infinite; }
 @keyframes ping {
   0% { box-shadow: 0 0 0 0 currentColor; }
   100% { box-shadow: 0 0 0 8px transparent; }
@@ -137,5 +143,5 @@ html.theme-wipe::view-transition-new(root) { z-index: 2; }
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .status i { animation: none; }
+  .status[data-state='degraded'] i { animation: none; }
 }
