@@ -275,42 +275,70 @@ test('the first screen invites people short on time to the 60-second summary', a
   expect(box.height).toBeGreaterThanOrEqual(24);
 });
 
-test('the 60-second summary link is set bigger than the intro around it', async ({ page }) => {
+// One main action: View work is the only solid button. The summary is a quiet text link, and the header's
+// 60-sec view an outline, so neither outweighs the work itself.
+test('View work is the one main action; the summary is a quiet link', async ({ page }) => {
   await page.goto('/');
-  const size = (selector: string) =>
-    page.locator(`[data-hero] ${selector}`).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-  expect(await size('.quick')).toBeGreaterThanOrEqual((await size('.intro')) * 1.3);
+  const hero = page.locator('[data-hero]');
+  const style = (selector: string, prop: string) =>
+    page.locator(selector).first().evaluate((el, p) => getComputedStyle(el).getPropertyValue(p), prop);
+  const accent = await page.evaluate(() => getComputedStyle(document.body).getPropertyValue('--accent').trim());
+  const toHex = (rgb: string) => '#' + (rgb.match(/\d+/g) ?? []).slice(0, 3).map((n) => Number(n).toString(16).padStart(2, '0')).join('');
+
+  expect(await style('[data-hero] .quick', 'font-size')).toBe(await style('[data-hero] .intro', 'font-size'));
+  expect(toHex(await style('[data-hero] .quick', 'color'))).not.toBe(accent);
+  // View work is filled; Résumé is not.
+  expect(await style('[data-hero] .cta.primary', 'background-color')).not.toBe('rgba(0, 0, 0, 0)');
+  expect(await hero.getByRole('link', { name: 'Résumé' }).evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+  // The header's 60-sec view, where it shows, is not a filled accent button.
+  const summary = page.locator('[data-header] nav').getByRole('link', { name: '60-sec view' });
+  if (await summary.isVisible()) {
+    expect(await summary.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+  }
+});
+
+test('on a phone the hero reads like a case study: name, what I build, intro, the two ways in, then the results', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Phones only.');
+  await page.goto('/');
+  await expect(page.locator('[data-hero]')).toHaveClass(/\bgo\b/);
+  const order = await page.locator('[data-hero]').evaluate((hero) =>
+    ['h1.name', '.lede', '.intro', '.ctas', '.wins'].map((sel) => hero.querySelector(sel)!.getBoundingClientRect().top),
+  );
+  expect(order).toEqual([...order].sort((a, b) => a - b));
+  // The name is in the first screen, clear of the header.
+  const header = (await page.locator('[data-header]').boundingBox())!;
+  expect(order[0]).toBeGreaterThanOrEqual(header.y + header.height);
+  expect(order[1]).toBeLessThan(page.viewportSize()!.height / 2);
 });
 
 test.describe('on a tablet held upright', () => {
   test.use({ viewport: { width: 768, height: 1024 } });
 
-  test('the name follows the intro with no big empty gap, and the lines under it start at the left', async ({ page }) => {
+  test('the name leads, as on a phone, and the lines under it start at the left', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('[data-hero]')).toHaveClass(/\bgo\b/);
     await page.waitForTimeout(1800);
     const box = (selector: string) => page.locator(`[data-hero] ${selector}`).boundingBox();
-    // The proof row is the last thing above the name.
-    const [quick, name, lede, typed] = await Promise.all(['.proof', 'h1.name', '.lede', '.typed'].map(box));
-    expect(quick && name && lede && typed).toBeTruthy();
-    if (!quick || !name || !lede || !typed) return;
-    expect(name.y - (quick.y + quick.height)).toBeLessThan(1024 * 0.2);
+    const [name, lede, typed, intro] = await Promise.all(['h1.name', '.lede', '.typed', '.intro'].map(box));
+    expect(name && lede && typed && intro).toBeTruthy();
+    if (!name || !lede || !typed || !intro) return;
+    expect(name.y).toBeLessThan(intro.y);
     expect(Math.abs(lede.x - name.x)).toBeLessThan(12);
     expect(Math.abs(typed.x - name.x)).toBeLessThan(12);
   });
 });
 
-test('the header links to the résumé and LinkedIn, as text on wide screens and icons on a phone', async ({ page, isMobile }) => {
+test('the header links to the résumé and LinkedIn on wide screens; on a phone they are in the menu', async ({ page, isMobile }) => {
   await page.goto('/');
   const header = page.locator('[data-header]');
-  const resume = header.getByRole('link', { name: 'Résumé' });
-  const linkedin = header.getByRole('link', { name: 'LinkedIn' });
+  const place = isMobile ? header.locator('[data-menu]') : header.locator('nav');
+  if (isMobile) await header.getByRole('button', { name: 'Menu' }).click();
+  const resume = place.getByRole('link', { name: 'Résumé' });
+  const linkedin = place.getByRole('link', { name: 'LinkedIn' });
   await expect(resume).toHaveAttribute('href', '/resume.pdf');
   await expect(linkedin).toHaveAttribute('href', /^https:\/\/www\.linkedin\.com\/in\//);
-  for (const link of [resume, linkedin]) {
-    await expect(link).toBeVisible();
-    await expect(link.locator('svg')).toBeVisible({ visible: isMobile });
-  }
+  await expect(resume).toBeVisible();
+  await expect(linkedin).toBeVisible();
   // The header still fits on one line, inside the screen.
   const width = page.viewportSize()?.width ?? 0;
   const boxes = await header.locator('nav > *').evaluateAll((items) =>
@@ -319,6 +347,45 @@ test('the header links to the résumé and LinkedIn, as text on wide screens and
   expect(Math.max(...boxes.map((b) => b.right))).toBeLessThanOrEqual(width);
   const middles = boxes.map((b) => b.top + b.height / 2);
   expect(Math.max(...middles) - Math.min(...middles)).toBeLessThanOrEqual(2);
+});
+
+test('on a phone the header is the name, the theme and one Menu with Work, About and Contact', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Phones only.');
+  await page.goto('/');
+  const header = page.locator('[data-header]');
+  const menu = header.getByRole('button', { name: 'Menu' });
+  const visibleLinks = await header.locator('nav a').evaluateAll((all) => all.filter((a) => a.getBoundingClientRect().width > 0).length);
+  expect(visibleLinks).toBe(0);
+  await expect(menu).toHaveAttribute('aria-expanded', 'false');
+
+  await menu.click();
+  await expect(menu).toHaveAttribute('aria-expanded', 'true');
+  const drawer = header.locator('[data-menu]');
+  for (const [name, href] of [['Work', '/#work'], ['About', '/#about'], ['Contact', '/#contact'], ['60-sec view', '/summary']]) {
+    await expect(drawer.getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+  }
+  await page.keyboard.press('Escape');
+  await expect(drawer).toBeHidden();
+  await expect(menu).toBeFocused();
+
+  // A link closes the menu and goes to its section.
+  await menu.click();
+  await drawer.getByRole('link', { name: 'Work', exact: true }).click();
+  await expect(drawer).toBeHidden();
+  await expect(page).toHaveURL(/#work$/);
+});
+
+test('fewer things move at once: no header clock, a still status dot, a still badge, and a typed line that stops', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  await expect(page.locator('[data-header] [data-clock]')).toHaveCount(0);
+  await expect(page.locator('[data-header] .status i')).toHaveCSS('animation-name', 'none');
+  await expect(page.locator('[data-hero] .badge svg')).toHaveCSS('animation-name', 'none');
+  // The typed line types each line once and rests on the last, with no caret left blinking.
+  const lines: string[] = JSON.parse((await page.locator('[data-typed]').getAttribute('data-lines')) ?? '[]');
+  await expect(page.locator('[data-typed]')).toHaveText(lines[lines.length - 1], { timeout: 30_000 });
+  await expect(page.locator('[data-hero] .typed')).toHaveClass(/\bdone\b/);
+  await expect(page.locator('[data-hero] .caret')).toBeHidden();
 });
 
 test('the favicon is the S outline, drawn without depending on any installed font', async ({ page, request }) => {
