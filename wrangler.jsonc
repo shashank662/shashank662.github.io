@@ -4,6 +4,7 @@
 {
   // Must match the Worker's name in the Cloudflare dashboard, or the deploy is refused.
   "name": "shashank662-portfolio",
+  "previews": {},
   "compatibility_date": "2026-09-27",
   "main": "worker/index.ts",
   "assets": {
