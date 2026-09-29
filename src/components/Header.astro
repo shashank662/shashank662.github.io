@@ -5,7 +5,7 @@ import { profile } from '../data/profile';
 ---
 <header class="hd" data-header>
   <a class="who" href="/"><b>{profile.name}</b><span>{profile.role}</span></a>
-  <div class="mid"><Status /><span aria-hidden="true">·</span><span class="mono clock" data-clock>--:--:-- IST</span></div>
+  <div class="mid"><Status /></div>
   <nav aria-label="Main">
     <a class="u link" href="/#work">Work</a>
     <a class="u link" href="/#play">Playground</a>
@@ -25,10 +25,30 @@ import { profile } from '../data/profile';
       </svg>
       <span>LinkedIn</span>
     </a>
-    <a class="pill accent" href="/summary">60-sec view</a>
+    <a class="pill summary" href="/summary">60-sec view</a>
     <ThemePicker />
+    {/* On a phone the links above fold into one menu (once JavaScript runs; without it they stay as they are). */}
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-menu" data-menu-button>
+      <span class="bars" aria-hidden="true"><i></i><i></i></span>Menu
+    </button>
   </nav>
+  <div class="drawer" id="site-menu" data-menu hidden>
+    <ul class="sections">
+      <li><a href="/#work">Work</a></li>
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+    <ul class="more">
+      <li><a href="/summary">60-sec view</a></li>
+      <li><a href={profile.links.resume} target="_blank" rel="noopener">Résumé <span aria-hidden="true">↗</span></a></li>
+      <li><a href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a></li>
+    </ul>
+  </div>
 </header>
+
+<script>
+  import '../scripts/menu';
+</script>
 
 <style>
   .hd {
@@ -48,7 +68,6 @@ import { profile } from '../data/profile';
   .who b { font-weight: 600; }
   .who span { color: var(--muted); margin-left: 8px; }
   .mid { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
-  .clock { font-variant-numeric: tabular-nums; }
   nav { justify-self: end; display: flex; align-items: center; gap: 20px; }
 
   @media (max-width: 1000px) {
@@ -57,6 +76,10 @@ import { profile } from '../data/profile';
   }
   .ext { display: flex; align-items: center; }
   .ext svg { display: none; }
+  /* The 60-second view is an outline, not a filled accent button, so it doesn't outrank View work in the hero. */
+  .summary { border-color: var(--line); }
+  .summary:hover { border-color: var(--accent); color: var(--accent); }
+  .menu-btn, .drawer { display: none; }
 
   @media (max-width: 760px) {
     .link, .who span { display: none; }
@@ -66,5 +89,27 @@ import { profile } from '../data/profile';
     .ext span {
       position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
     }
+
+    /* With JavaScript, the phone header is the name, the theme and one Menu button. */
+    :global(.js) .ext, :global(.js) .summary { display: none; }
+    :global(.js) .menu-btn {
+      display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px;
+      border: 1px solid var(--line); border-radius: 999px; font-size: 13px; font-weight: 600;
+    }
+    .bars { display: grid; gap: 4px; width: 14px; }
+    .bars i { display: block; height: 1.5px; background: currentColor; transition: transform 0.3s var(--ease-out); }
+    .menu-btn[aria-expanded='true'] .bars i:first-child { transform: translateY(2.75px) rotate(45deg); }
+    .menu-btn[aria-expanded='true'] .bars i:last-child { transform: translateY(-2.75px) rotate(-45deg); }
+
+    :global(.js) .drawer:not([hidden]) {
+      display: block; position: absolute; top: calc(100% + 6px); left: var(--gutter); right: var(--gutter);
+      padding: 8px 20px 14px; border: 1px solid var(--line); border-radius: 16px;
+      background: var(--bg); box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.45);
+    }
+    .drawer a { display: flex; align-items: center; min-height: 48px; }
+    .sections a { font-family: var(--font-display); font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+    .sections li + li { border-top: 1px solid var(--line); }
+    .more { display: flex; flex-wrap: wrap; gap: 0 22px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+    .more a { font-size: 15px; font-weight: 500; color: var(--ink-2); }
   }
 </style>
