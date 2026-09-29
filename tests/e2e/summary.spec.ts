@@ -14,7 +14,10 @@ test('the 60-second view has everything a recruiter needs', async ({ page }) => 
 
 test('the header links to it from every page', async ({ page }) => {
   await page.goto('/work/rcs-billing-pipeline');
-  await page.getByRole('link', { name: '60-sec view' }).click();
+  // On a phone it sits in the menu.
+  const menu = page.getByRole('button', { name: 'Menu' });
+  if (await menu.isVisible()) await menu.click();
+  await page.locator('[data-header]').getByRole('link', { name: '60-sec view' }).filter({ visible: true }).click();
   await expect(page).toHaveURL(/\/summary$/);
 });
 
