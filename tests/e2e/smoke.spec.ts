@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures';
 
-test('home shows the hero and the live clock without errors', async ({ page }) => {
+test('home shows the hero and the live status without errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (msg) => {
     if (msg.type() === 'error') errors.push(msg.text());
@@ -9,7 +9,7 @@ test('home shows the hero and the live clock without errors', async ({ page }) =
 
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1, name: 'Shashank' })).toBeVisible();
-  await expect(page.locator('[data-clock]').first()).toHaveText(/\d\d:\d\d:\d\d IST/);
+  await expect(page.locator('[data-status-text]').first()).toHaveText('all systems operational');
   expect(errors).toEqual([]);
 });
 
