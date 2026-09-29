@@ -108,7 +108,10 @@ if (button && menu) {
     if ((event as ToggleEvent).newState !== 'open') return;
     const rect = button.getBoundingClientRect();
     menu.style.top = `${rect.bottom + 8}px`;
-    menu.style.right = `${Math.max(8, innerWidth - rect.right)}px`;
+    // Lined up with the button's right edge, but never past the left edge of a narrow screen (on a phone the button
+    // sits beside the Menu button, not at the corner).
+    const width = Math.min(460, innerWidth - 16);
+    menu.style.right = `${Math.max(8, Math.min(innerWidth - rect.right, innerWidth - width - 8))}px`;
   });
   menu.addEventListener('toggle', (event) => {
     if ((event as ToggleEvent).newState === 'open') menu.querySelector<HTMLElement>('[aria-checked="true"]')?.focus();
