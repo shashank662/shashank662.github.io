@@ -23,10 +23,12 @@ const glide = (slug: string) => `view-transition-name: work-${slug}; view-transi
         data-card-label={data.row.cardLabel}
       >
         <span class="n mono">{caseNumber(data.order)}</span>
-        <span class="t display" style={glide(id)}>{data.title}</span>
-        <span class="d">{data.row.description}</span>
-        <span class="s mono">{data.row.stack}</span>
-        <span class="st mono">{data.row.metric}<small>{data.row.metricCaption}</small></span>
+        <span class="main">
+          <span class="t display" style={glide(id)}>{data.title}</span>
+          <span class="res"><b class="display">{data.row.metric}</b><span>{data.row.metricCaption}</span></span>
+        </span>
+        <span class="about"><span class="d">{data.row.description}</span><span class="s">{data.row.stack}</span></span>
+        <span class="go"><span class="go-text">Case study</span><i aria-hidden="true">→</i></span>
       </a>
     ))}
     <button
@@ -40,10 +42,12 @@ const glide = (slug: string) => `view-transition-name: work-${slug}; view-transi
       data-card-label={brief.cardLabel}
     >
       <span class="n mono">{caseNumber(cases.length + 1)}</span>
-      <span class="t display">{brief.title}</span>
-      <span class="d">{brief.description}</span>
-      <span class="s mono">{brief.stack}</span>
-      <span class="st mono">{brief.metric}<small>{brief.metricCaption}</small></span>
+      <span class="main">
+        <span class="t display">{brief.title}</span>
+        <span class="res"><b class="display">{brief.metric}</b><span>{brief.metricCaption}</span></span>
+      </span>
+      <span class="about"><span class="d">{brief.description}</span><span class="s">{brief.stack}</span></span>
+      <span class="go"><span class="go-text">Details</span><i aria-hidden="true">+</i></span>
     </button>
     <div class="more" id="brief-more"><div><p>{brief.more}</p></div></div>
   </div>
@@ -64,22 +68,31 @@ const glide = (slug: string) => `view-transition-name: work-${slug}; view-transi
 
 <style>
   .rows { margin-top: 40px; border-top: 1px solid var(--line); }
+  /* Each row: the title with its result right under it, then what it is and what it's built with, then the way in. */
   .row {
-    position: relative; display: grid; grid-template-columns: 56px 1.3fr 1.4fr 1fr 110px; gap: 20px; align-items: center;
-    width: 100%; padding: 28px 14px; border-bottom: 1px solid var(--line); text-align: left;
+    position: relative; display: grid; grid-template-columns: 56px 1.25fr 1.5fr 40px; gap: 20px; align-items: center;
+    width: 100%; padding: 30px 14px; border-bottom: 1px solid var(--line); text-align: left;
     transition: background 0.35s;
   }
-  .n { font-size: 13px; color: var(--muted); }
+  .n { align-self: start; padding-top: 0.9em; font-size: 13px; color: var(--muted); }
+  .main, .about { display: flex; flex-direction: column; }
   .t { font-size: clamp(26px, 3.2vw, 50px); line-height: 1; transition: transform 0.5s var(--ease-out), color 0.3s; }
-  .d { font-size: 15px; line-height: 1.5; color: color-mix(in srgb, var(--ink) 82%, var(--bg)); }
-  .s { font-size: 12px; line-height: 1.5; color: var(--muted); }
-  .st { font-size: 13px; font-weight: 500; text-align: right; color: var(--accent); }
-  .st small { display: block; margin-top: 3px; font-size: 10.5px; font-weight: 400; color: var(--muted); }
+  .res { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 14px; }
+  .res b { font-size: clamp(24px, 2.1vw, 32px); line-height: 1; color: var(--accent); white-space: nowrap; }
+  .res span { font-size: 15px; line-height: 1.4; color: var(--ink-2); }
+  .d { font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+  .s { margin-top: 10px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  .go { justify-self: end; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+  .go i { font-style: normal; font-size: 20px; transition: transform 0.35s var(--ease-out), color 0.3s; }
+  .go-text { display: none; }
+  .brief[aria-expanded='true'] .go i { transform: rotate(45deg); }
 
   /* Hover is for a mouse only (a tap would leave it stuck); keyboard focus gets the same look. */
   @media (hover: hover) {
     .row:hover { background: var(--line2); }
     .row:hover .t { transform: translateX(10px); color: var(--accent); }
+    .row:hover .go i { color: var(--accent); }
+    a.row:hover .go i { transform: translateX(4px); }
   }
   .row:focus-visible { background: var(--line2); }
   .row:focus-visible .t, .brief[aria-expanded='true'] .t { color: var(--accent); }
@@ -114,10 +127,17 @@ const glide = (slug: string) => `view-transition-name: work-${slug}; view-transi
   .card-metric { margin-top: 10px; font-size: 36px; line-height: 1; color: var(--accent); }
   .card-label { margin-top: 5px; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
 
+  /* A phone: title, then result, then the way in, stacked. The hover card is for wide screens with a mouse only. */
   @media (max-width: 860px) {
-    .row { grid-template-columns: 40px 1fr auto; }
-    .d, .s { display: none; }
-    .more p { padding-left: 14px; }
+    .row { grid-template-columns: 32px 1fr; gap: 0 12px; padding: 26px 4px; }
+    .n { padding-top: 0.5em; }
+    .about { display: none; }
+    .res { margin-top: 12px; }
+    .go { grid-column: 2; justify-self: start; margin-top: 14px; color: var(--ink); font-weight: 600; }
+    .go i { font-size: 16px; }
+    .go-text { display: inline; }
+    .more p { padding-left: 48px; }
+    .float { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .t, .more, .card { transition: none; }
