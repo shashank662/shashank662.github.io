@@ -53,9 +53,10 @@ describe.each(THEMES)('the $name theme', ({ id }) => {
     expect(contrast(t['--strip2-fg'], t['--accent'])).toBeGreaterThanOrEqual(4.5);
   });
 
-  it('keeps the About words at 3:1 before they light up, at the theme\'s own faintest opacity', () => {
-    expect(contrast(blend(t['--ink'], t['--bg'], Number(t['--word-dim'])), t['--bg'])).toBeGreaterThanOrEqual(3);
-    expect(contrast(blend(t['--accent'], t['--bg'], Number(t['--word-dim-hl'])), t['--bg'])).toBeGreaterThanOrEqual(3);
+  // The About paragraph stays comfortably readable all through its reveal, not just legible.
+  it('keeps the About words readable before they light up: 4.5:1 for the text, 4:1 for the accent words', () => {
+    expect(contrast(blend(t['--ink'], t['--bg'], Number(t['--word-dim'])), t['--bg'])).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(blend(t['--accent'], t['--bg'], Number(t['--word-dim-hl'])), t['--bg'])).toBeGreaterThanOrEqual(4);
   });
 
   it('opens on a dark landing screen with light letters', () => {
