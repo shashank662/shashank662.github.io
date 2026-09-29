@@ -43,18 +43,19 @@ if (hero) {
     });
   }
 
-  // The mono line under the lede types and erases each line in turn.
+  // The mono line under the lede types and erases each line in turn, once through, then rests on the last line.
   const typed = hero.querySelector<HTMLElement>('[data-typed]');
   const lines: string[] = JSON.parse(typed?.dataset.lines ?? '[]');
   if (typed && lines.length > 0) {
     if (reduce) {
-      typed.textContent = lines[0];
+      typed.textContent = lines[lines.length - 1];
+      typed.closest('.typed')?.classList.add('done');
     } else {
       let line = 0;
       let chars = 0;
       let erasing = false;
       let next = performance.now() + 1200;
-      onFrame((now) => {
+      const stop = onFrame((now) => {
         if (now < next) return;
         const text = lines[line];
         if (!erasing) {
@@ -62,6 +63,11 @@ if (hero) {
           typed.textContent = text.slice(0, chars);
           next = now + 30 + Math.random() * 35;
           if (chars >= text.length) {
+            if (line === lines.length - 1) {
+              typed.closest('.typed')?.classList.add('done');
+              stop();
+              return;
+            }
             erasing = true;
             next = now + 2000;
           }
@@ -71,7 +77,7 @@ if (hero) {
           next = now + 16;
           if (chars <= 0) {
             erasing = false;
-            line = (line + 1) % lines.length;
+            line += 1;
             next = now + 350;
           }
         }
