@@ -1,7 +1,9 @@
 import { finePointer, onFrame, prefersReducedMotion } from './motion';
 
-// A small card that follows the mouse over the work rows and shows each project's headline number.
+// A small card that follows the mouse over the work rows and shows each project's headline number. Only on a wide
+// screen with a mouse: on a narrow one it would cover the rows next to it (the CSS hides it there too).
 const float = document.querySelector<HTMLElement>('[data-work-card]');
+const wide = matchMedia('(min-width: 861px)');
 
 if (float && finePointer()) {
   const ease = prefersReducedMotion() ? 1 : 0.2;
@@ -30,7 +32,7 @@ if (float && finePointer()) {
 
   document.querySelectorAll<HTMLElement>('[data-card-metric]').forEach((row) => {
     row.addEventListener('pointerenter', (event) => {
-      if (event.pointerType !== 'mouse') return;
+      if (event.pointerType !== 'mouse' || !wide.matches) return;
       write('tag', row.dataset.cardTag);
       write('go', row.dataset.cardGo);
       write('metric', row.dataset.cardMetric);
