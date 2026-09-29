@@ -1,4 +1,4 @@
-import { formatIST, formatUptime } from '../lib/clock';
+import { formatUptime } from '../lib/clock';
 
 const header = document.querySelector<HTMLElement>('[data-header]');
 const progress = document.querySelector<HTMLElement>('[data-progress]');
@@ -13,10 +13,6 @@ onScroll();
 
 const started = performance.now();
 function everySecond(): void {
-  const now = formatIST(new Date());
-  document.querySelectorAll('[data-clock]').forEach((el) => {
-    el.textContent = now;
-  });
   const up = formatUptime((performance.now() - started) / 1000);
   document.querySelectorAll('[data-uptime]').forEach((el) => {
     el.textContent = up;
