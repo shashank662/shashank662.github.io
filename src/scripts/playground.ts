@@ -18,6 +18,7 @@ function start(root: HTMLElement): void {
     if (!el) throw new Error(`Playground markup is missing ${selector}`);
     return el;
   };
+  const hint = $<HTMLElement>('[data-play-hint]');
   const model = $<HTMLElement>('[data-model]');
   const stage = $<HTMLElement>('[data-stage]');
   const canvas = $<HTMLCanvasElement>('[data-canvas]');
@@ -69,6 +70,7 @@ function start(root: HTMLElement): void {
         log('INFO', `tr_${event.id} queued · retry in ${event.wait.toFixed(1)}s (attempt ${event.attempt})`, 1.4);
       } else if (event.type === 'error-webhooks-over') {
         setSiteStatus('ok');
+        hint.textContent = 'Failures are back to normal. Watch the queue drain.';
         burstButton.disabled = false;
         log('OK', 'failure webhooks back to normal · retry queue draining');
       }
@@ -109,6 +111,7 @@ function start(root: HTMLElement): void {
     play();
     sim.setRetry(!sim.retryOn);
     framework.setAttribute('aria-checked', String(sim.retryOn));
+    hint.textContent = sim.retryOn ? 'Retries are on. Temporary failures get another chance.' : 'Retries are off. Failed deliveries will be lost.';
     frameworkLabel.textContent = sim.retryOn ? 'ON' : 'OFF';
     if (sim.retryOn) log('OK', 'retry framework ON · retryable failures get re-sent');
     else log('WARN', 'retry framework OFF · failed deliveries are lost');
@@ -118,6 +121,7 @@ function start(root: HTMLElement): void {
     play();
     if (!sim.startErrorWebhooks()) return;
     burstButton.disabled = true;
+    hint.textContent = 'A burst of failures. Retryable messages wait, then try again.';
     setSiteStatus('degraded', 'error webhooks · retrying');
     log('WARN', 'meta sending failure webhooks for most deliveries (simulated)');
   });
@@ -125,6 +129,7 @@ function start(root: HTMLElement): void {
   const send = () => {
     play();
     sim.send(5);
+    hint.textContent = 'Five messages sent. Follow their path through the system.';
     log('YOU', 'you sent 5 triggers through the integrations');
   };
   sendButton.addEventListener('click', send);

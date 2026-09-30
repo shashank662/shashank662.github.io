@@ -6,19 +6,14 @@ import { emphasize } from '../../lib/text';
 const { incidents } = profile;
 ---
 <section class="section wrap" id="incidents">
-  <SectionHead n="05" label="Incidents" meta={`${incidents.items.length} write-ups from production`} />
+  <SectionHead n="03" label="Incidents" meta={`${incidents.items.length} write-ups from production`} />
   <h2 class="h2" set:html={emphasize(incidents.title)} />
-  <p class="sub">{incidents.sub}</p>
+  <p class="sub">Two problems traced to their source. The measured change, at a glance.</p>
   <div class="grid">
     {incidents.items.map((inc) => (
-      <article class="inc" data-in-view>
+      <article class="inc">
         <p class="top mono"><span>{inc.id} · {inc.context}</span><span class="ok">● resolved</span></p>
         <h3 class="display">{inc.title}</h3>
-        <dl>
-          <dt class="mono">Impact</dt><dd>{inc.impact}</dd>
-          <dt class="mono">Cause</dt><dd>{inc.cause}</dd>
-          <dt class="mono">Fix</dt><dd>{inc.fix}</dd>
-        </dl>
         <div class="res">
           <p class="delta display">{inc.delta}<small class="mono">{inc.deltaLabel}</small></p>
           <div class="bars mono" aria-hidden="true">
@@ -27,6 +22,7 @@ const { incidents } = profile;
           </div>
           <p class="visually-hidden">Before: {inc.before.label}. After: {inc.after.label}.</p>
         </div>
+        <details><summary>Cause & fix</summary><p><strong>Cause.</strong> {inc.cause}</p><p><strong>Fix.</strong> {inc.fix}</p></details>
       </article>
     ))}
   </div>
@@ -37,6 +33,9 @@ const { incidents } = profile;
 </script>
 
 <style>
+  summary { padding: 14px 0; min-height: 44px; cursor: pointer; font-size: 14px; }
+  details { margin-top: 18px; border-top: 1px solid var(--line); }
+  details p { font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; margin-top: 44px; border-top: 1.5px solid var(--ink); }
   .inc { padding: 28px 30px 32px 0; border-bottom: 1px solid var(--line); }
   .inc + .inc { padding-left: 30px; padding-right: 0; border-left: 1px solid var(--line); }
@@ -45,20 +44,20 @@ const { incidents } = profile;
   h3 { font-size: clamp(26px, 2.8vw, 40px); line-height: 1.02; margin: 16px 0 20px; }
   dl { display: grid; grid-template-columns: 78px 1fr; gap: 9px 16px; font-size: 15px; line-height: 1.5; }
   dt { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; padding-top: 4px; }
-  .res { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-top: 26px; }
+  .res { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; margin-top: 26px; }
   .delta { font-size: clamp(44px, 5.4vw, 80px); line-height: 0.9; color: var(--accent); }
   .delta small { display: block; margin-top: 8px; font-size: 11px; letter-spacing: 0.02em; color: var(--muted); text-transform: none; }
-  .bars { flex: 1; max-width: 260px; font-size: 11px; color: var(--muted); }
+  .bars { flex: 1; min-width: 240px; max-width: 260px; font-size: 11px; color: var(--muted); }
   .bar-row { display: grid; grid-template-columns: 48px 1fr 56px; gap: 10px; align-items: center; margin-top: 8px; }
   .bar-row span:last-child { text-align: right; color: var(--ink); }
-  .bar { position: relative; display: block; height: 10px; background: var(--line2); }
+  .bar { position: relative; display: block; height: 28px; background: var(--line2); }
   .bar i {
     position: absolute; top: 0; bottom: 0; left: 0; width: calc(var(--w) * 100%);
     background: var(--ink); transform-origin: left; transition: transform 1.3s var(--ease-out) 0.2s;
   }
   .bar.after i { background: var(--accent); transition-delay: 0.55s; }
-  :global(.js) .inc .bar i { transform: scaleX(0); }
-  :global(.js) .inc:global(.in) .bar i { transform: scaleX(1); }
+
+
 
   @media (max-width: 860px) {
     .grid { grid-template-columns: 1fr; }

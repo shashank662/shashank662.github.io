@@ -27,7 +27,7 @@ test('the numbers keep moving while the controls are on screen, even with the ca
 
 test('a burst of error webhooks turns every live status amber for about five seconds', async ({ page }) => {
   await page.goto('/#play');
-  const burst = page.getByRole('button', { name: /Simulate error webhooks/ });
+  const burst = page.getByRole('button', { name: /Cause a failure/ });
   await burst.click();
   await expect(burst).toBeDisabled();
   for (const pill of await page.locator('[data-status]').all()) {
@@ -50,13 +50,14 @@ test('a burst of error webhooks started before the model is on screen still ends
 
 test('visitors can send their own triggers', async ({ page }) => {
   await page.goto('/#play');
-  await page.getByRole('button', { name: /send 5 of your own triggers/ }).click();
+  await page.getByRole('button', { name: /Send messages/ }).click();
   await expect(page.locator('[data-logs]')).toContainText('you sent 5 triggers');
 });
 
 test('the simulation is described in words, and says its numbers are illustrative', async ({ page }) => {
   await page.goto('/#play');
   await expect(page.getByRole('img', { name: /Interactive simulation of the auto-retry framework/ })).toBeVisible();
+  await page.getByText('How it works', { exact: true }).click();
   await expect(page.getByText(/An interactive simulation of my Engati auto-retry framework/)).toBeVisible();
 });
 

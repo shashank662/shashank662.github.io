@@ -159,13 +159,11 @@ export const profile: Profile = {
     ],
   },
   sections: [
-    { n: '01', label: 'About', href: '#about' },
-    { n: '02', label: 'Stack', href: '#stack' },
-    { n: '03', label: 'Experience', href: '#exp' },
-    { n: '04', label: 'Work', href: '#work' },
-    { n: '05', label: 'Incidents', href: '#incidents' },
-    { n: '06', label: 'Playground', href: '#play' },
-    { n: '07', label: 'Contact', href: '#contact' },
+    { n: '01', label: 'Work', href: '#work' },
+    { n: '02', label: 'Career', href: '#exp' },
+    { n: '03', label: 'Incidents', href: '#incidents' },
+    { n: '04', label: 'Playground', href: '#play' },
+    { n: '05', label: 'Contact', href: '#contact' },
   ],
   strips: {
     skills: ['Java', 'Spring Boot', 'Apache Kafka', 'RabbitMQ', 'Redis', 'MongoDB', 'Spark', 'AWS S3', 'Microservices'],

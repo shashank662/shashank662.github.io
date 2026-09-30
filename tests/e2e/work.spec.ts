@@ -69,108 +69,17 @@ test('case study 01 links to the playground, as a simulation', async ({ page }) 
   await expect(page.getByRole('link', { name: /interactive simulation/ })).toHaveAttribute('href', '/#play');
 });
 
-test('Selected work lists the four case studies and the sandbox brief', async ({ page }) => {
+test('selected work links to every case and the sandbox opens in place', async ({ page }) => {
   await page.goto('/#work');
-  await expect(page.getByText('5 systems · 4 case studies')).toBeVisible();
-  const hrefs = await page
-    .locator('#work a[href^="/work/"]')
-    .evaluateAll((els) => els.map((el) => el.getAttribute('href')));
-  expect(hrefs).toEqual(CASES.map((c) => `/work/${c.slug}`));
-  await expect(page.getByRole('button', { name: /Prod sandbox/ })).toBeVisible();
-});
-
-test('a work row opens its case study, and "Back to work" returns to the list', async ({ page }) => {
-  await page.goto('/#work');
+  expect(await page.locator('#work a[href^="/work/"]').evaluateAll(els => els.map(el => el.getAttribute('href')))).toEqual(CASES.map(c => `/work/${c.slug}`));
+  const sandbox = page.locator('#work .sandbox');
+  await sandbox.locator('summary').click();
+  await expect(sandbox.locator('p')).toBeVisible();
+  await expect(sandbox).toContainText('zero impact on production');
   await page.locator('#work a[href="/work/auto-retry-framework"]').click();
-  await expect(page).toHaveURL(/\/work\/auto-retry-framework$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Auto-retry framework');
-
   await page.getByRole('link', { name: 'Back to work' }).click();
   await expect(page).toHaveURL(/\/#work$/);
-  await expect(page.locator('#work')).toBeInViewport();
-});
-
-test('the sandbox row expands in place', async ({ page }) => {
-  await page.goto('/#work');
-  const brief = page.getByRole('button', { name: /Prod sandbox/ });
-  const more = page.locator('#brief-more');
-  await expect(brief).toHaveAttribute('aria-expanded', 'false');
-  await expect(more).toBeHidden();
-
-  await brief.click();
-  await expect(brief).toHaveAttribute('aria-expanded', 'true');
-  await expect(more).toBeVisible();
-  await expect(more).toContainText('zero impact on production');
-});
-
-test('a small card follows the mouse over a work row', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'touch screens get no hover card');
-  await page.goto('/#work');
-  const card = page.locator('[data-work-card]');
-  await page.locator('#work a[href="/work/ai-code-reviewer"]').hover();
-  await expect(card).toHaveClass(/\bon\b/);
-  await expect(card).toContainText('4× faster');
-
-  await page.mouse.move(2, 2);
-  await expect(card).not.toHaveClass(/\bon\b/);
-});
-
-test('each work row shows its result right under the title, as a large number with readable words', async ({ page }) => {
-  await page.goto('/#work');
-  const rows = page.locator('#work .row');
-  await expect(rows).toHaveCount(5);
-  for (const row of await rows.all()) {
-    // Measured together, so a page still scrolling to #work can't skew one against the other.
-    const [title, box] = await row.evaluate((el) =>
-      ['.t', '.res b'].map((sel) => el.querySelector(sel)!.getBoundingClientRect().toJSON()),
-    );
-    const number = row.locator('.res b');
-    expect(box.y).toBeGreaterThanOrEqual(title.y + title.height - 2);
-    expect(Math.abs(box.x - title.x)).toBeLessThan(4);
-    expect(parseFloat(await number.evaluate((el) => getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(22);
-    // The words beside it are in the body font, at a readable size.
-    const words = row.locator('.res span');
-    expect(parseFloat(await words.evaluate((el) => getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
-    expect(await words.evaluate((el) => getComputedStyle(el).fontFamily)).not.toMatch(/Code|mono/i);
-  }
-});
-
-test('on a phone a work row stacks title, result, then the way into the case study', async ({ page, isMobile }) => {
-  test.skip(!isMobile, 'Phones only.');
-  await page.goto('/#work');
-  const row = page.locator('#work a[href="/work/auto-retry-framework"]');
-  const [title, result, go] = await row.evaluate((el) =>
-    ['.t', '.res', '.go'].map((sel) => el.querySelector(sel)!.getBoundingClientRect().top),
-  );
-  expect(title).toBeLessThan(result);
-  expect(result).toBeLessThan(go);
-  await expect(row.locator('.go')).toHaveText(/Case study/);
-});
-
-test('a narrow window gets no hover card, even with a mouse', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'Phones have no mouse.');
-  await page.setViewportSize({ width: 800, height: 900 });
-  await page.goto('/#work');
-  await page.locator('#work a[href="/work/ai-code-reviewer"]').hover();
-  await expect(page.locator('[data-work-card]')).not.toHaveClass(/\bon\b/);
-});
-
-test('touch screens get no hover card', async ({ page, isMobile }) => {
-  test.skip(!isMobile, 'only for touch screens');
-  await page.goto('/#work');
-  await page.getByRole('button', { name: /Prod sandbox/ }).tap();
-  await expect(page.locator('[data-work-card]')).not.toHaveClass(/\bon\b/);
-});
-
-test.describe('without JavaScript', () => {
-  test.use({ javaScriptEnabled: false });
-
-  test('the sandbox brief is open and case studies still load', async ({ page }) => {
-    await page.goto('/#work');
-    await expect(page.locator('#brief-more')).toBeVisible();
-    await page.goto('/work/auto-retry-framework');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Auto-retry framework');
-  });
 });
 
 test('the retry case study states numbers that add up, and who did what', async ({ page }) => {

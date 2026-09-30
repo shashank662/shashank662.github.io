@@ -11,25 +11,12 @@ const { hero } = profile;
   <div class="meta">
     <div>
       <p class="label">{hero.label}</p>
-      <p class="intro">{hero.intro}</p>
+      <p class="intro">{profile.role} · {profile.location}<br/>{profile.status}</p>
       <a class="quick" href="/summary">{hero.quick}<span class="arrow" aria-hidden="true"> →</span></a>
     </div>
     <ol class="index mono" aria-label="Sections">
       {profile.sections.map((s) => <li><a href={s.href}><span>{s.n}</span>{s.label}</a></li>)}
     </ol>
-  </div>
-
-  {/* The best evidence first: three flagship results, each a link to its proof, and the two ways to go deeper. */}
-  <div class="proof">
-    <ul class="wins" aria-label="Flagship results">
-      {hero.proof.map((p) => (
-        <li><a href={p.href}><b class="display">{p.metric}</b><span>{p.text}</span><i aria-hidden="true">→</i></a></li>
-      ))}
-    </ul>
-    <div class="ctas">
-      <a class="cta primary" href="#work">View work</a>
-      <a class="cta" href={profile.links.resume} target="_blank" rel="noopener">Résumé</a>
-    </div>
   </div>
 
   <h1 class="name display" aria-label={profile.name}>
@@ -38,6 +25,7 @@ const { hero } = profile;
     ))}
   </h1>
 
+  <div class="ctas"><a class="cta primary" href="#work">View work</a><a class="cta" href={profile.links.resume} target="_blank" rel="noopener">Résumé</a></div>
   <div class="row2">
     <a class="badge" href="#about" aria-label="Scroll to About">
       <svg viewBox="0 0 100 100" aria-hidden="true">
@@ -48,10 +36,6 @@ const { hero } = profile;
     </a>
     <div class="lede-wrap">
       <p class="lede" set:html={emphasize(hero.lede)} />
-      <p class="typed mono" aria-hidden="true">
-        <span class="pr">~/shashank $</span> <span data-typed data-lines={JSON.stringify(hero.typedLines)}></span><i class="caret"></i>
-      </p>
-      <p class="visually-hidden">{hero.typedLines.join('. ')}</p>
     </div>
   </div>
 </section>
@@ -62,7 +46,7 @@ const { hero } = profile;
 
 <style>
   .hero {
-    position: relative; min-height: 100vh; min-height: 100svh;
+    position: relative; min-height: 620px;
     padding: 112px var(--gutter) 54px; display: flex; flex-direction: column;
   }
   .meta { display: flex; justify-content: space-between; gap: 32px; }
@@ -79,24 +63,11 @@ const { hero } = profile;
   .quick .arrow { display: inline-block; margin-left: 4px; transition: transform 0.25s var(--ease-out); }
   .quick:hover .arrow { transform: translateX(4px); }
   .index { font-size: 12px; line-height: 2.1; }
-  .index a { display: flex; gap: 16px; transition: color 0.25s; }
+  .index a { display: flex; min-height: 30px; gap: 16px; transition: color 0.25s; }
   .index span { color: var(--muted); }
   .index a:hover { color: var(--accent); }
 
-  /* Proof under the intro: three flagship results as links, then the two ways in. It fills the space that used to sit
-     empty above the name, so visitors meet the evidence before they scroll. */
-  .proof { display: flex; flex-wrap: wrap; align-items: stretch; gap: 16px 28px; margin-top: 32px; }
-  .wins { display: grid; grid-template-columns: repeat(3, minmax(0, 260px)); gap: 12px; }
-  .wins a {
-    position: relative; display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 14px 16px 16px;
-    border: 1px solid var(--line); border-radius: 12px; transition: border-color 0.25s;
-  }
-  .wins a:hover { border-color: var(--accent); }
-  .wins b { font-size: clamp(24px, 2.2vw, 32px); line-height: 1; color: var(--accent); }
-  .wins span { font-size: 14px; line-height: 1.45; color: var(--ink-2); }
-  .wins i { position: absolute; top: 14px; right: 14px; font-style: normal; color: var(--muted); transition: transform 0.25s var(--ease-out), color 0.25s; }
-  .wins a:hover i { transform: translateX(3px); color: var(--accent); }
-  .ctas { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
   .cta {
     display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 22px;
     border: 1px solid var(--ink); border-radius: 999px; font-size: 15px; font-weight: 600; white-space: nowrap;
@@ -108,13 +79,13 @@ const { hero } = profile;
   .cta:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
   .name {
-    margin-top: auto; padding-top: 40px;
+    margin-top: 38px; padding-top: 20px;
     /* A masthead, not a wall: "Shashank H R" in Source Serif 4 Bold is about 5.65em wide, so 10.5vw keeps it under 60% of the
        screen, and the 48px floor still fits a small phone. */
     font-size: clamp(48px, 10.5vw, 165px); line-height: 0.8;
-    display: flex; gap: 0.22em; white-space: nowrap; user-select: none;
+    display: flex; flex-wrap: wrap; gap: 0.22em; white-space: normal; user-select: none;
   }
-  .word { display: flex; }
+  .word { display: flex; flex-wrap: wrap; max-width: 100%; }
   .ch { display: inline-block; overflow: hidden; padding-top: 0.05em; transform-origin: 50% 100%; will-change: transform; }
   .ch > span {
     display: inline-block;
@@ -147,20 +118,6 @@ const { hero } = profile;
 
   .lede-wrap { justify-self: end; text-align: right; max-width: 920px; }
   .lede { font-size: clamp(26px, 3.4vw, 56px); font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; }
-  /* Room for the longest line up front, so typing never grows the row and pushes the name up. */
-  .typed { margin-top: 18px; font-size: clamp(12px, 1.05vw, 14px); line-height: 1.6; color: var(--muted); min-height: 1.6em; }
-  /* Typing grows rightward from a prompt that stays put, like a terminal: in a right-aligned line every key would slide
-     the prompt left, and each slide counts as layout shift. The block is as wide as the longest line, prompt and caret. */
-  .typed { width: fit-content; min-width: 59ch; margin-left: auto; text-align: left; }
-  .pr { color: var(--accent); }
-  .caret {
-    display: inline-block; width: 0.55em; height: 1.1em; margin-left: 2px; vertical-align: -0.2em;
-    background: var(--accent); animation: blink 1s steps(1) infinite;
-  }
-  /* Once every line has been typed the caret goes, and the line stays still. */
-  .typed:global(.done) .caret { visibility: hidden; }
-  @keyframes blink { 50% { opacity: 0; } }
-
   /* A phone, or a tablet held upright: one column that reads like a case study's opening. The name and what I do come
      first, then the intro, the two ways in, and the evidence. The order changes only on screen: the name is the page's
      heading either way. */
@@ -169,32 +126,17 @@ const { hero } = profile;
     .name { order: 1; margin-top: 0; padding-top: 0; }
     .row2 { order: 2; grid-template-columns: 1fr; margin-top: 20px; }
     .meta { order: 3; margin-top: 28px; }
-    .proof { order: 4; }
-    .ctas { order: -1; }
+    .ctas { order: 4; }
     .badge { display: none; }
     .lede-wrap { text-align: left; justify-self: start; }
-    .typed { margin-left: 0; }
+
   }
 
-  @media (max-width: 1100px) {
-    .wins { grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
-    .ctas { flex-direction: row; }
-  }
-
-  @media (max-width: 760px) {
-    .index { display: none; }
-    .proof { margin-top: 20px; }
-    .wins { grid-template-columns: 1fr; gap: 8px; }
-    .wins a { flex-direction: row; align-items: baseline; gap: 12px; padding: 12px 36px 12px 14px; }
-    .wins b { flex: none; font-size: 22px; }
-    .ctas .cta { flex: 1; }
-    /* On a phone the line starts at the left already, and the longest one wraps once. */
-    .typed { min-height: 3.2em; min-width: 0; margin-left: 0; }
-  }
+  @media (max-width: 760px) { .index { display: none; } .ctas .cta { flex: 1; } }
 
   @media (prefers-reduced-motion: reduce) {
     :global(.js) .ch > span, :global(.js) .row2 { transform: none; opacity: 1; transition: none; }
     .badge svg { transition: none; }
-    .caret { animation: none; }
+
   }
 </style>

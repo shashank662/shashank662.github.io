@@ -1,0 +1,102 @@
+---
+import type { ExhibitKind } from '../../lib/exhibits';
+interface Props { kind: ExhibitKind; title: string; href: string; metric: string; metricCaption: string; description: string; stack: string; decision: { title: string; body: string }; }
+const { kind, title, href, metric, metricCaption, description, stack, decision } = Astro.props;
+const actions = { retry: 'Retry delivery', billing: 'Replay events', review: 'Read the review', cart: 'Prepare reminder' };
+---
+<article class={`exhibit ${kind}`} data-exhibit={kind} data-state="idle">
+  <div class="artifact">
+    <p class="artifact-label mono"><span>Illustrative example</span><span aria-hidden="true">{kind === 'retry' ? '01 / RECEIPT' : kind === 'billing' ? '02 / LEDGER' : kind === 'review' ? '03 / DIFF' : '04 / BASKET'}</span></p>
+    {kind === 'retry' && <div class="receipt paper">
+      <div class="receipt-head mono"><span>MESSAGE / 0042</span><span class="stamp">RETRYABLE</span></div>
+      <div class="journey"><span>×<small>Failed</small></span><i>→</i><span>◷<small>Queued</small></span><i>→</i><span class="destination">✓<small>Recovered</small></span></div>
+      <p class="paper-footer mono">same payload · another attempt</p>
+    </div>}
+    {kind === 'billing' && <div class="ledger">
+      <div class="slips mono" aria-label="Five sample events for three message IDs"><span>A · sent</span><span>B · sent</span><span>A · update</span><span>C · sent</span><span>B · update</span></div>
+      <div class="invoice paper"><p class="mono">DAILY WINDOW</p><div class="invoice-total"><b class="display" data-billing-total>3</b><span>unique<br/>messages</span></div><p class="paper-footer mono">recompute → replace totals</p></div>
+    </div>}
+    {kind === 'review' && <div class="review-sheet paper">
+      <p class="mono file">delivery.java <span>sample diff</span></p>
+      <code><span class="removed">− markDelivered();</span><span class="added">+ if (response.isOk()) &#123;</span><span class="added">+ &nbsp; markDelivered();</span><span class="added">+ &#125;</span></code>
+      <div class="time-comparison"><span><small>Before</small><b>~2 hours</b></span><span aria-hidden="true">→</span><span><small>With reviewer</small><b>30–60 min</b></span></div>
+      <p class="paper-footer">Daily review time per developer · team estimate</p>
+    </div>}
+    {kind === 'cart' && <div class="cart-journey">
+      <div class="basket paper"><svg viewBox="0 0 120 75" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 27h80l-9 36H29zM40 27l20-22 20 22M44 36v18M60 36v18M76 36v18"/></svg><span class="mono">SAVED BASKET</span><span class="basket-items" aria-hidden="true">▰ ▰ ▰</span></div>
+      <span class="bridge" aria-hidden="true">→</span><div class="message paper"><span class="mono">RECOVERY MESSAGE</span><p>You left something behind.</p><span class="message-link">Return to your basket ↗</span></div>
+    </div>}
+    <div class="interaction"><button type="button" data-exhibit-action hidden>{actions[kind]} <span aria-hidden="true">↗</span></button><p data-exhibit-status aria-live="polite">{kind === 'billing' ? 'Replay the same window. The total stays put.' : kind === 'review' ? 'A small diff. A useful second pair of eyes.' : kind === 'retry' ? 'A failed delivery gets another chance.' : 'From a saved basket to a timely reminder.'}</p></div>
+  </div>
+  <div class="copy">
+    <h3 class="display">{title}</h3>
+    <p class="outcome" data-outcome><b class="display">{metric}</b><span>{metricCaption}</span></p>
+    <p class="description">{description}</p>
+    <ul class="skills" aria-label="Technologies">{stack.split(' · ').map(skill => <li>{skill}</li>)}</ul>
+    <div class="foot"><a href={href}>Case study <span aria-hidden="true">↗</span></a><details><summary>Why this worked</summary><p><strong>{decision.title}.</strong> {decision.body}</p></details></div>
+  </div>
+</article>
+<style>
+  .exhibit { min-width: 0; overflow-wrap: anywhere; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .artifact { background: var(--line2); padding: 24px; border-bottom: 1px solid var(--line); }
+  .artifact-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 25px; }
+  .paper { background: var(--bg); border: 1px solid var(--line); box-shadow: 0 9px 22px -18px var(--ink); }
+  .receipt { padding: 22px; transform: rotate(-2deg); max-width: 380px; margin: 0 auto; border-bottom: 3px dashed var(--line); }
+  .receipt-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 10px; }
+  .stamp { color: var(--accent); }
+  .journey { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 26px 0; }
+  .journey > span { text-align: center; font-size: 30px; }
+  .journey small { display: block; font: 12px var(--font-sans); margin-top: 8px; }
+  .journey i { font-style: normal; color: var(--muted); }
+  .destination { color: var(--muted); transition: color .3s; }
+  [data-state='complete'] .destination { color: var(--ok); }
+  .paper-footer { font-size: 11px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 12px; }
+  .ledger { display: grid; grid-template-columns: 1fr 1.1fr; gap: 20px; min-height: 190px; align-items: center; }
+  .slips { display: flex; flex-direction: column; gap: 5px; font-size: 11px; }
+  .slips span { background: var(--bg); padding: 6px 10px; border: 1px solid var(--line); transform: rotate(-3deg); transition: transform .3s; }
+  .slips span:nth-child(even) { transform: rotate(2deg); }
+  [data-state='active'] .slips span { transform: translateX(8px); }
+  .invoice { padding: 18px; transform: rotate(2deg); }
+  .invoice > .mono { font-size: 10px; }
+  .invoice-total { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 12px 0; }
+  .invoice-total b { font-size: 65px; color: var(--accent); line-height: 1; }
+  .invoice-total span { font-size: 13px; }
+  .review-sheet { padding: 16px 20px; }
+  .file { font-size: 11px; display: flex; justify-content: space-between; gap: 8px; color: var(--muted); }
+  code { display: block; font: 12px/1.7 var(--font-mono); margin: 10px 0; overflow-wrap: anywhere; }
+  code span { display: block; }
+  .removed { color: var(--muted); text-decoration: line-through; }
+  .added { color: var(--ok); }
+  [data-state='complete'] .review-sheet { border-color: var(--accent); }
+  .time-comparison { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; }
+  .time-comparison small { display: block; font-size: 11px; color: var(--muted); }
+  .time-comparison b { font-weight: 600; font-size: 19px; }
+  .cart-journey { min-height: 218px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .basket { width: 42%; padding: 12px; transform: rotate(-4deg); display: flex; flex-direction: column; text-align: center; }
+  .basket svg { width: 100%; color: var(--accent); }
+  .basket .mono, .message .mono { font-size: 9px; letter-spacing: .06em; }
+  .basket-items { letter-spacing: 8px; margin-top: 8px; color: var(--muted); }
+  .message { flex: 1; min-width: 110px; padding: 17px; border-radius: 12px 12px 12px 0; transform: translateY(12px); transition: transform .3s, border-color .3s; }
+  .message p { font-size: 16px; line-height: 1.3; margin: 12px 0; }
+  .message-link { font-size: 11px; color: var(--accent); }
+  [data-state='complete'] .message { transform: translateY(0); border-color: var(--accent); }
+  .interaction { margin-top: 24px; }
+  button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--ink); border-radius: 999px; font-size: 13px; background: var(--bg); }
+  button:hover { background: var(--ink); color: var(--bg); }
+  .interaction p { font-size: 12px; color: var(--ink-2); line-height: 1.5; margin-top: 10px; min-height: 3em; }
+  .copy { padding: 26px; }
+  h3 { font-size: clamp(27px, 2.8vw, 40px); line-height: 1.1; }
+  .outcome { margin: 18px 0; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+  .outcome b { font-size: clamp(27px, 2.7vw, 38px); color: var(--accent); line-height: 1.1; }
+  .outcome span { font-size: 14px; color: var(--ink-2); }
+  .description { font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+  .skills { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 22px; }
+  .skills li { font-size: 11px; border: 1px solid var(--line); padding: 4px 8px; border-radius: 4px; }
+  .foot { border-top: 1px solid var(--line); padding-top: 10px; }
+  a { display: inline-flex; gap: 20px; align-items: center; min-height: 44px; font-size: 15px; font-weight: 600; }
+  a span { color: var(--accent); }
+  summary { cursor: pointer; min-height: 44px; padding: 12px 0; font-size: 14px; }
+  details p { font-size: 14px; line-height: 1.6; padding-bottom: 10px; color: var(--ink-2); }
+  @media (max-width: 480px) { .artifact, .copy { padding: 18px; } .ledger { gap: 10px; } .invoice { padding: 12px; } .message { padding: 12px; } .receipt { padding: 16px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; } }
+</style>

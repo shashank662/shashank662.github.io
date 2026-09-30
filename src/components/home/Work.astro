@@ -1,145 +1,35 @@
 ---
 import SectionHead from './SectionHead.astro';
-import { caseNumber, getCases } from '../../data/work';
+import WorkExhibit from '../work/WorkExhibit.astro';
+import { getCases } from '../../data/work';
 import { profile } from '../../data/profile';
-import { emphasize } from '../../lib/text';
-
+import type { ExhibitKind } from '../../lib/exhibits';
 const cases = await getCases();
-const { title, brief } = profile.work;
-// Shared with the case study's title, so the title glides between the two pages.
-const glide = (slug: string) => `view-transition-name: work-${slug}; view-transition-class: work-title`;
+const exhibits: Record<string, { kind: ExhibitKind; decision: number }> = {
+  'auto-retry-framework': { kind: 'retry', decision: 2 },
+  'rcs-billing-pipeline': { kind: 'billing', decision: 2 },
+  'ai-code-reviewer': { kind: 'review', decision: 0 },
+  'abandoned-cart-recovery': { kind: 'cart', decision: 0 },
+};
+const { brief } = profile.work;
 ---
 <section class="section wrap" id="work">
-  <SectionHead n="04" label="Selected work · Engati" meta={`${cases.length + 1} systems · ${cases.length} case studies`} />
-  <h2 class="h2" set:html={emphasize(title)} />
-  <div class="rows">
-    {cases.map(({ id, data }) => (
-      <a
-        class="row"
-        href={`/work/${id}`}
-        data-card-tag={data.row.cardTag}
-        data-card-go="Case study ↗"
-        data-card-metric={data.row.cardMetric}
-        data-card-label={data.row.cardLabel}
-      >
-        <span class="n mono">{caseNumber(data.order)}</span>
-        <span class="main">
-          <span class="t display" style={glide(id)}>{data.title}</span>
-          <span class="res"><b class="display">{data.row.metric}</b><span>{data.row.metricCaption}</span></span>
-        </span>
-        <span class="about"><span class="d">{data.row.description}</span><span class="s">{data.row.stack}</span></span>
-        <span class="go"><span class="go-text">Case study</span><i aria-hidden="true">→</i></span>
-      </a>
-    ))}
-    <button
-      type="button"
-      class="row brief"
-      data-disclosure
-      aria-controls="brief-more"
-      data-card-tag={brief.cardTag}
-      data-card-go="Click to expand"
-      data-card-metric={brief.cardMetric}
-      data-card-label={brief.cardLabel}
-    >
-      <span class="n mono">{caseNumber(cases.length + 1)}</span>
-      <span class="main">
-        <span class="t display">{brief.title}</span>
-        <span class="res"><b class="display">{brief.metric}</b><span>{brief.metricCaption}</span></span>
-      </span>
-      <span class="about"><span class="d">{brief.description}</span><span class="s">{brief.stack}</span></span>
-      <span class="go"><span class="go-text">Details</span><i aria-hidden="true">+</i></span>
-    </button>
-    <div class="more" id="brief-more"><div><p>{brief.more}</p></div></div>
-  </div>
-
-  <div class="float" data-work-card aria-hidden="true">
-    <div class="card">
-      <p class="card-top mono"><span data-card="tag"></span><span data-card="go"></span></p>
-      <p class="card-metric display" data-card="metric"></p>
-      <p class="card-label" data-card="label"></p>
-    </div>
-  </div>
+  <SectionHead n="01" label="Selected work · Engati" meta="5 systems · 4 case studies" />
+  <div class="intro"><h2 class="h2">Selected work</h2><p>Open the case study for the evidence.<br/>Try the artifact for the idea.</p></div>
+  <p id="stack" class="skill-note mono">Skills in practice · technologies attached to the work below</p>
+  <div class="exhibits">{cases.map(({ id, data }) => <WorkExhibit kind={exhibits[id].kind} title={data.title} href={`/work/${id}`} metric={data.row.metric} metricCaption={data.row.metricCaption} description={data.meta.find(m => m.label === 'Role')?.value + '. ' + data.row.description + '.'} stack={data.row.stack} decision={id === 'rcs-billing-pipeline' && data.tradeoff ? { title: data.tradeoff.title, body: `${data.steps.at(-1)} ${data.tradeoff.body}` } : data.decisions[exhibits[id].decision]} />)}</div>
+  <details class="sandbox"><summary><span>{brief.title}</span><span>{brief.metric} · {brief.metricCaption}</span></summary><p>{brief.more}</p></details>
 </section>
-
-<script>
-  import '../../scripts/disclosure';
-  import '../../scripts/work-card';
-</script>
-
+<script>import '../../scripts/exhibits';</script>
 <style>
-  .rows { margin-top: 40px; border-top: 1px solid var(--line); }
-  /* Each row: the title with its result right under it, then what it is and what it's built with, then the way in. */
-  .row {
-    position: relative; display: grid; grid-template-columns: 56px 1.25fr 1.5fr 40px; gap: 20px; align-items: center;
-    width: 100%; padding: 30px 14px; border-bottom: 1px solid var(--line); text-align: left;
-    transition: background 0.35s;
-  }
-  .n { align-self: start; padding-top: 0.9em; font-size: 13px; color: var(--muted); }
-  .main, .about { display: flex; flex-direction: column; }
-  .t { font-size: clamp(26px, 3.2vw, 50px); line-height: 1; transition: transform 0.5s var(--ease-out), color 0.3s; }
-  .res { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 14px; }
-  .res b { font-size: clamp(24px, 2.1vw, 32px); line-height: 1; color: var(--accent); white-space: nowrap; }
-  .res span { font-size: 15px; line-height: 1.4; color: var(--ink-2); }
-  .d { font-size: 15px; line-height: 1.5; color: var(--ink-2); }
-  .s { margin-top: 10px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
-  .go { justify-self: end; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
-  .go i { font-style: normal; font-size: 20px; transition: transform 0.35s var(--ease-out), color 0.3s; }
-  .go-text { display: none; }
-  .brief[aria-expanded='true'] .go i { transform: rotate(45deg); }
-
-  /* Hover is for a mouse only (a tap would leave it stuck); keyboard focus gets the same look. */
-  @media (hover: hover) {
-    .row:hover { background: var(--line2); }
-    .row:hover .t { transform: translateX(10px); color: var(--accent); }
-    .row:hover .go i { color: var(--accent); }
-    a.row:hover .go i { transform: translateX(4px); }
-  }
-  .row:focus-visible { background: var(--line2); }
-  .row:focus-visible .t, .brief[aria-expanded='true'] .t { color: var(--accent); }
-
-  /* The sandbox brief opens in place. It is only collapsed once JavaScript runs, so it is readable without it. */
-  .more { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.5s var(--ease-out), visibility 0s 0.5s; }
-  .more > div { min-height: 0; overflow: hidden; }
-  .more p {
-    max-width: 980px; padding: 4px 14px 26px 90px; border-bottom: 1px solid var(--line);
-    font-size: 17px; line-height: 1.6; color: var(--muted);
-  }
-  :global(.js) .more { grid-template-rows: 0fr; visibility: hidden; }
-  :global(.js) .more:global(.open) { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
-
-  /* The hover card: fixed to the viewport and moved by work-card.ts. */
-  .float { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; }
-  .card {
-    width: 230px; margin: 26px 0 0 26px; padding: 13px 16px 15px; border-radius: 10px;
-    background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-top: 3px solid var(--accent);
-    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.5);
-    opacity: 0; transform: translateY(8px);
-    transition: opacity 0.25s, transform 0.4s var(--ease-out), margin 0.3s;
-  }
-  .float:global(.flip) .card { margin-left: -256px; }
-  .float:global(.on) .card { opacity: 1; transform: none; }
-  .card-top {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
-    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
-  }
-  /* A long tag may wrap, but "Case study ↗" stays in one piece. */
-  .card-top span:last-child { white-space: nowrap; }
-  .card-metric { margin-top: 10px; font-size: 36px; line-height: 1; color: var(--accent); }
-  .card-label { margin-top: 5px; font-size: 12.5px; line-height: 1.4; color: var(--muted); }
-
-  /* A phone: title, then result, then the way in, stacked. The hover card is for wide screens with a mouse only. */
-  @media (max-width: 860px) {
-    .row { grid-template-columns: 32px 1fr; gap: 0 12px; padding: 26px 4px; }
-    .n { padding-top: 0.5em; }
-    .about { display: none; }
-    .res { margin-top: 12px; }
-    .go { grid-column: 2; justify-self: start; margin-top: 14px; color: var(--ink); font-weight: 600; }
-    .go i { font-size: 16px; }
-    .go-text { display: inline; }
-    .more p { padding-left: 48px; }
-    .float { display: none; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .t, .more, .card { transition: none; }
-  }
+  .intro { display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+  .intro p { font-size: 15px; line-height: 1.5; color: var(--muted); }
+  .skill-note { margin: 28px 0 16px; font-size: 11px; color: var(--muted); scroll-margin-top: 100px; }
+  .exhibits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .sandbox { border-block: 1px solid var(--line); margin-top: 28px; }
+  summary { cursor: pointer; padding: 20px 0; min-height: 44px; }
+  summary span:first-child { font-weight: 600; margin-right: 20px; }
+  summary span:last-child { font-size: 14px; color: var(--muted); }
+  .sandbox p { max-width: 850px; font-size: 15px; line-height: 1.6; padding-bottom: 22px; }
+  @media (max-width: 760px) { .exhibits { grid-template-columns: 1fr; } .intro { display: block; } .intro p { margin-top: 16px; } }
 </style>

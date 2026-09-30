@@ -4,7 +4,7 @@ import { profile } from '../../data/profile';
 const { links, contact } = profile;
 ---
 <section class="contact wrap" id="contact">
-  <h2 class="label">(07) Contact · {contact.prompt}</h2>
+  <h2 class="label">(05) Contact · {contact.prompt}</h2>
   <a class="big display" href={links.email}>{contact.cta} <span aria-hidden="true">→</span></a>
   <ul class="links">
     <li><a class="u" href={links.email}>Email</a></li>
@@ -16,7 +16,7 @@ const { links, contact } = profile;
 
 <style>
   .contact { margin-top: 5vw; padding-top: 7vw; padding-bottom: 6vw; border-top: 1.5px solid var(--ink); }
-  .big { display: inline-flex; align-items: center; gap: 0.2em; margin-top: 18px; font-size: clamp(64px, 12vw, 210px); line-height: 0.95; }
+  .big { display: inline-flex; flex-wrap: wrap; max-width: 100%; overflow-wrap: anywhere; align-items: center; gap: 0.2em; margin-top: 18px; font-size: clamp(64px, 12vw, 210px); line-height: 0.95; }
   /* The arrow moves on hover, so it must not be hoverable itself: it would slide out from under the pointer,
      end the hover and slide back, over and over. Only the link's fixed box decides, so the arrow is either at rest or turned. */
   .big span { display: inline-block; color: var(--accent); pointer-events: none; transition: transform 0.6s var(--ease-out); }

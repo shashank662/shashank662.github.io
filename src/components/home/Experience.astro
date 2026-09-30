@@ -1,147 +1,39 @@
 ---
-// Experience: a slim timeline of the degree and the two roles, then each role newest first, always open, with what
-// was built in it linking to the case studies.
 import SectionHead from './SectionHead.astro';
 import { profile, type CareerProject, type CareerSpan } from '../../data/profile';
-import { formatDuration, formatRange, monthsBetween, spanPosition, toAttr, yearTicks } from '../../lib/dates';
-import { emphasize } from '../../lib/text';
-
-const { career } = profile;
-const dated = career.spans.filter((s): s is CareerSpan => !s.within);
-const projects = career.spans.filter((s): s is CareerProject => Boolean(s.within));
-const newestFirst = [...dated].sort((a, b) => b.start[0] * 12 + b.start[1] - (a.start[0] * 12 + a.start[1]));
-const ticks = yearTicks(career.axisStart);
+import { formatDuration, formatRange, monthsBetween, toAttr } from '../../lib/dates';
+const dated = profile.career.spans.filter((s): s is CareerSpan => !s.within);
+const projects = profile.career.spans.filter((s): s is CareerProject => Boolean(s.within));
 ---
 <section class="section wrap" id="exp">
-  <SectionHead n="03" label="Experience" />
-  <h2 class="h2" set:html={emphasize(career.title)} />
-  <p class="sub">{career.sub}</p>
-
-  <div class="timeline" data-career data-in-view data-axis={toAttr(career.axisStart)} aria-hidden="true">
-    <div class="track">
-      {dated.map((span, i) => {
-        const pos = spanPosition(span.start, span.end, career.axisStart);
-        return (
-          <span
-            class={`bar ${span.tone}`}
-            data-bar
-            data-start={toAttr(span.start)}
-            data-end={span.end ? toAttr(span.end) : ''}
-            style={`--l:${pos.left};--w:${pos.width};--i:${i}`}
-          ></span>
-        );
-      })}
-    </div>
-    <div class="ticks mono" data-ticks>
-      {ticks.map((t) => <span data-year style={`left:${(t.left * 100).toFixed(3)}%`}>{t.year}</span>)}
-      <span class="now" data-now style="left:100%">now</span>
-    </div>
-    <ul class="key mono">
-      {dated.map((span) => <li><i class={span.tone}></i>{span.short}</li>)}
-    </ul>
-  </div>
-
+  <div id="about"><SectionHead n="02" label="Career" /><h2 class="h2">From foundations<br/>to production.</h2></div>
   <ol class="roles">
-    {newestFirst.map((span) => {
-      const built = projects.filter((p) => p.within === span.id);
-      return (
-        <li class="role">
-          <div class="when">
-            <h3>{span.name}</h3>
-            <p class="mono">
-              {formatRange(span.start, span.end)} ·{' '}
-              <span data-duration data-start={toAttr(span.start)} data-end={span.end ? toAttr(span.end) : ''}>
-                {formatDuration(monthsBetween(span.start, span.end))}
-              </span>
-            </p>
-          </div>
-          <div class="what">
-            <p class="detail">{span.line}</p>
-            {built.length > 0 && (
-              <>
-                <p class="label built">What I built</p>
-                <ul class="projects">
-                  {built.map((p) => (
-                    <li>
-                      <a href={p.href}>
-                        <span class="pname">{p.name}<span class="arrow" aria-hidden="true">→</span></span>
-                        <span class="stat"><span class="figure">{p.figure}</span><span class="caption">{p.caption}</span></span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-            {span.awards?.map((award) => <p class="award"><span aria-hidden="true">✺ </span>{award}</p>)}
-          </div>
-        </li>
-      );
-    })}
+    {dated.map((span, i) => <li class="role">
+      <div class="when"><span class="milestone mono">0{i + 1}</span><h3>{span.name}</h3><p class="mono">{formatRange(span.start, span.end)} · <span data-duration data-start={toAttr(span.start)} data-end={span.end ? toAttr(span.end) : ''}>{formatDuration(monthsBetween(span.start, span.end))}</span></p></div>
+      <div class="what">
+        <p class="detail">{span.id === 'internship' ? 'Production release: a full-stack cart recovery flow.' : span.line}</p>
+        <ul class="projects">{projects.filter(p => p.within === span.id).map(p => <li><a href={p.href}><span aria-hidden="true">↗</span>{p.name}</a></li>)}</ul>
+        {span.id !== 'education' && <details><summary>Ownership{span.awards ? ' & recognition' : ''}</summary><p>{span.detail}</p>{span.awards?.map(award => <p class="award">✺ {award}</p>)}</details>}
+      </div>
+    </li>)}
   </ol>
 </section>
-
-<script>
-  import '../../scripts/durations';
-  import '../../scripts/in-view';
-  import '../../scripts/career';
-</script>
-
+<script>import '../../scripts/durations';</script>
 <style>
-  /* The timeline: one track, the degree and the roles as bars across it, years under it and a key. */
-  .timeline { margin-top: 40px; }
-  .track { position: relative; height: 14px; background: var(--line2); }
-  .bar {
-    position: absolute; top: 0; bottom: 0; left: calc(var(--l) * 100%); width: max(calc(var(--w) * 100%), 6px);
-    transform-origin: left; transition: transform 1.3s var(--ease-out) calc(var(--i) * 140ms);
-  }
-  .ink { background: var(--ink); }
-  .accent-soft { background: color-mix(in srgb, var(--accent) 45%, var(--bg)); }
-  .accent { background: var(--accent); }
-  :global(.js) .timeline .bar { transform: scaleX(0); }
-  :global(.js) .timeline:global(.in) .bar { transform: scaleX(1); }
-  .ticks { position: relative; height: 16px; margin-top: 8px; font-size: 11px; color: var(--muted); }
-  /* :global, because career.ts rebuilds the year labels and new elements don't carry Astro's scope attribute. */
-  .ticks :global(span) { position: absolute; top: 0; transform: translateX(-50%); }
-  .ticks :global(.now) { transform: translateX(-100%); color: var(--accent); }
-  .key { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 14px; font-size: 12px; color: var(--muted); }
-  .key li { display: flex; align-items: center; gap: 8px; }
-  .key i { width: 12px; height: 12px; }
-
-  /* Each role: its name and dates on the left, what it was and what it built on the right. */
-  .roles { margin-top: 48px; border-top: 1.5px solid var(--ink); }
-  .role {
-    display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 16px 48px;
-    padding: 32px 0; border-bottom: 1px solid var(--line);
-  }
-  h3 { font-size: clamp(20px, 1.8vw, 26px); font-weight: 600; line-height: 1.2; }
-  .when p { margin-top: 8px; font-size: 13px; color: var(--muted); }
-  .detail { font-size: 17px; line-height: 1.6; }
-  .built { margin-top: 22px; }
-  .projects { margin-top: 10px; border-top: 1px solid var(--line); }
-  .projects li { border-bottom: 1px solid var(--line); }
-  .projects a {
-    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 24px;
-    padding: 14px 0; min-height: 44px;
-  }
-  .pname { font-size: 17px; font-weight: 600; transition: color 0.25s; }
-  .arrow { display: inline-block; margin-left: 6px; color: var(--accent); transition: transform 0.25s var(--ease-out); }
-  /* The number that sums up each project, big, with what it measures under it. */
-  .stat { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
-  .figure { font-size: clamp(22px, 2.2vw, 30px); font-weight: 600; line-height: 1.1; color: var(--accent); white-space: nowrap; }
-  .caption { margin-top: 2px; font-size: 14px; line-height: 1.4; color: var(--ink-2); }
-  .projects a:hover .pname { color: var(--accent); }
-  .projects a:hover .arrow { transform: translateX(4px); }
-  .award { margin-top: 18px; font-size: 15px; color: var(--ink-2); }
-  .award span { color: var(--accent); }
-
-  @media (max-width: 760px) {
-    .role { grid-template-columns: 1fr; padding: 26px 0; }
-    .detail, .pname { font-size: 16px; }
-    .stat { align-items: flex-start; text-align: left; }
-    /* Too narrow for every year: keep 2021, 2023, 2025 … and "now". */
-    .ticks :global(span:nth-child(even):not(.now)) { display: none; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .bar, .arrow { transition: none; }
-  }
+  #about { scroll-margin-top: 100px; }
+  .roles { margin-top: 40px; border-top: 1px solid var(--ink); }
+  .role { display: grid; grid-template-columns: 1fr 1.4fr; gap: 30px; padding: 30px 0; border-bottom: 1px solid var(--line); }
+  .when { padding-left: 45px; position: relative; }
+  .milestone { position: absolute; left: 0; top: 2px; color: var(--accent); font-size: 12px; }
+  h3 { font-size: 23px; line-height: 1.2; font-weight: 600; }
+  .when p { font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .detail { font-size: 16px; line-height: 1.5; }
+  .projects { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .projects a { display: flex; align-items: center; min-height: 44px; gap: 9px; padding: 8px 12px; border: 1px solid var(--line); font-size: 13px; border-radius: 4px; }
+  .projects a:hover { border-color: var(--accent); }
+  .projects span { color: var(--accent); }
+  summary { min-height: 44px; padding: 13px 0; cursor: pointer; font-size: 13px; }
+  details p { font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+  .award { margin-top: 8px; }
+  @media (max-width: 760px) { .role { grid-template-columns: 1fr; gap: 18px; } .what { padding-left: 45px; } }
 </style>

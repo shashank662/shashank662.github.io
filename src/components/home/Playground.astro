@@ -1,18 +1,19 @@
 ---
 import SectionHead from './SectionHead.astro';
 import { profile } from '../../data/profile';
-import { emphasize } from '../../lib/text';
 
 const { playground } = profile;
 ---
 <section class="section wrap" id="play" data-playground>
-  <SectionHead n="06" label="Playground" meta="interactive simulation · illustrative numbers" />
-  <h2 class="h2" set:html={emphasize(playground.title)} />
-  <p class="sub">{playground.sub}</p>
+  <SectionHead n="04" label="Playground" meta="interactive simulation · illustrative numbers" />
+  <h2 class="h2">A delivery failed.<br/>Can the system recover?</h2>
+  <p class="sub">Send a few messages. Cause a failure. See what retries change.</p>
+  <p class="illustrative">Illustrative, not production data.</p>
+  <details class="explanation"><summary>How it works</summary><p>{playground.sub}</p></details>
   <div class="grid" data-model>
     <div class="stage" data-stage data-cursor>
       <canvas data-canvas role="img" aria-label={playground.canvasLabel}></canvas>
-      <button type="button" class="send mono" data-send>↳ send 5 of your own triggers</button>
+      <button type="button" class="send mono" data-send>Send messages</button>
       <button type="button" class="play" data-play hidden>▶ Play the simulation</button>
       <p class="nojs">
         The simulation needs JavaScript. <a class="u" href="/work/auto-retry-framework">Read how the framework works →</a>
@@ -26,7 +27,8 @@ const { playground } = profile;
         <span>Retry framework</span>
         <span class="tg" aria-hidden="true"><b data-switch-label>ON</b><i class="sw"></i></span>
       </button>
-      <button type="button" class="kill display" data-error-webhooks>⚡ Simulate error webhooks</button>
+      <button type="button" class="kill display" data-error-webhooks>Cause a failure</button>
+      <p class="hint" data-play-hint aria-live="polite">Try sending messages, then cause a failure.</p>
       <div class="logs mono" data-logs aria-hidden="true"></div>
     </div>
   </div>
@@ -37,13 +39,17 @@ const { playground } = profile;
 </script>
 
 <style>
+  .illustrative { margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .explanation summary { min-height: 44px; padding: 12px 0; cursor: pointer; font-size: 14px; }
+  .explanation p { max-width: 850px; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .hint { font-size: 13px; line-height: 1.5; padding: 0 18px 14px; color: var(--ink-2); }
   .grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; margin-top: 44px; border: 1.5px solid var(--ink); }
   .stage {
     position: relative; min-height: 440px; border-right: 1.5px solid var(--ink);
     background-image: radial-gradient(var(--line) 1px, transparent 1.3px); background-size: 22px 22px;
   }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .send { position: absolute; left: 14px; bottom: 12px; font-size: 11px; color: var(--muted); transition: color 0.25s; }
+  .send { min-height: 44px; padding: 8px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; position: absolute; left: 14px; bottom: 12px; font-size: 11px; color: var(--muted); transition: color 0.25s; }
   .send:hover { color: var(--accent); }
   /* No display rule here, so the hidden attribute keeps working. */
   .play {
